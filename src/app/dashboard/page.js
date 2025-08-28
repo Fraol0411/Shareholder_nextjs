@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { FaUserCircle, FaSignOutAlt, FaMoneyBillWave, FaChartLine, FaBank, FaFileInvoiceDollar } from 'react-icons/fa';
 
+
 export default function ShareholderDashboard() {
   const router = useRouter();
   const [decision, setDecision] = useState('');
@@ -39,6 +40,9 @@ export default function ShareholderDashboard() {
   const handleLogout = () => {
     router.push('/login');
   };
+  const handleform = () => {
+    router.push('/fillform');
+  };
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -46,14 +50,15 @@ export default function ShareholderDashboard() {
       <header className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 py-4 sm:px-6 lg:px-8 flex justify-between items-center">
           <div className="flex items-center space-x-3">
-            <img 
-              src={'/images/logo.png'}
-              alt="Awash Insurance Logo" 
-              className="h-10"
-            />
+            <img  src={'/images/logo.png'} alt="Awash Insurance Logo" className="h-10" />
             <h1 className="text-xl font-bold text-gray-800">አዋሽ ኢንሹራንስ</h1>
           </div>
-          <div className="flex items-center space-x-6">
+          <div  className="flex items-center space-x-6">
+            
+            <div onClick={handleform} className="flex items-center cursor-pointer space-x-2 bg-blue-50 px-3 py-1 rounded-full">
+              <FaUserCircle className="text-blue-600 text-xl" />
+              <span className="font-medium text-gray-700">የፎርም መሙያ</span>
+            </div>
             <div className="flex items-center space-x-2 bg-blue-50 px-3 py-1 rounded-full">
               <FaUserCircle className="text-blue-600 text-xl" />
               <span className="font-medium text-gray-700">{shareholderData.name}</span>
@@ -72,7 +77,7 @@ export default function ShareholderDashboard() {
         {/* Welcome Banner */}
         <div className="bg-gradient-to-r from-blue-700 to-blue-600 rounded-xl p-6 mb-8 text-white shadow-lg">
           <h2 className="text-2xl font-bold mb-2">እንኳን ወደ የአዋሽ የሼር ሆልደር ፓናልዎ በደህና መጡ!</h2>
-          <p className="opacity-90">የእርስዎን የድርሻ ክፍያ መረጃ ይመልከቱ እና �ሳኔ ይስጡ</p>
+          <p className="opacity-90">የእርስዎን የድርሻ ክፍያ መረጃ ይመልከቱ እና ዉሳኔ ይስጡ</p>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -80,7 +85,7 @@ export default function ShareholderDashboard() {
           <div className="bg-white rounded-xl shadow-md overflow-hidden border border-gray-100">
             <div className="bg-gradient-to-r from-blue-800 to-blue-700 px-6 py-4">
               <h3 className="text-lg font-semibold text-white flex items-center">
-                <FaUserCircle className="mr-2" /> �ንግል መረጃ
+                <FaUserCircle className="mr-2" /> የንግል መረጃ
               </h3>
             </div>
             <div className="p-6">
@@ -97,10 +102,10 @@ export default function ShareholderDashboard() {
                   <p className="text-xs font-medium text-gray-500 uppercase tracking-wider">ስልክ ቁጥር</p>
                   <p className="font-medium text-gray-800 mt-1">{shareholderData.phone}</p>
                 </div>
-                <div>
+                {/* <div>
                   <p className="text-xs font-medium text-gray-500 uppercase tracking-wider">የተመዘገበበት ዘመን</p>
                   <p className="font-medium text-gray-800 mt-1">{shareholderData.joinDate} ጀምሮ</p>
-                </div>
+                </div> */}
               </div>
             </div>
           </div>

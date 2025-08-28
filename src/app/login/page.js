@@ -2,22 +2,46 @@
 
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
-import { FaUserAlt, FaSignInAlt } from 'react-icons/fa';
+import { FaUserAlt, FaSignInAlt, FaArrowLeft } from 'react-icons/fa';
 
 export default function LoginPage() {
-  const [fileNumber, setFileNumber] = useState('');
+  const [username, setUsername] = useState(''); // ✅ Changed from fileNumber
+  const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState('');
   const router = useRouter();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setError('');
     setIsLoading(true);
-    
-    // Simulate authentication
-    setTimeout(() => {
-      router.push('/dashboard');
+
+    try {
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ username, password }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Login failed');
+      }
+
+      // ✅ Save session
+      localStorage.setItem('token', data.token);
+      localStorage.setItem('user', JSON.stringify(data.user));
+
+      // ✅ Redirect
+      router.push('/fillform');
+    } catch (err) {
+      setError(err.message);
+    } finally {
       setIsLoading(false);
-    }, 1000);
+    }
   };
 
   return (
@@ -37,34 +61,49 @@ export default function LoginPage() {
         {/* Login Form */}
         <div className="p-8">
           <h2 className="text-xl font-semibold text-gray-800 mb-6 text-center">
-            Shareholder Login
+            Login
           </h2>
-          
+
+          {error && (
+            <div className="mb-4 p-3 text-sm bg-red-50 text-red-700 rounded-lg border border-red-200">
+              {error}
+            </div>
+          )}
+
           <form onSubmit={handleSubmit} className="space-y-6">
+            {/* Username Field */}
             <div>
-              <label 
-                htmlFor="fileNumber" 
-                className="block text-sm font-medium text-gray-700 mb-1"
-              >
-                File Number
-                <span className="text-red-500">*</span>
+              <label htmlFor="username" className="block text-sm font-medium text-gray-700 mb-1">
+                Username <span className="text-red-500">*</span>
               </label>
-              <div className="relative">
-                <input
-                  id="fileNumber"
-                  type="text"
-                  value={fileNumber}
-                  onChange={(e) => setFileNumber(e.target.value)}
-                  className="w-full px-4 py-3 border text-gray-700 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                  placeholder="AW-2023-XXXX"
-                  required
-                />
-                <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-                  <span className="text-gray-400 text-sm">AW-</span>
-                </div>
-              </div>
+              <input
+                id="username"
+                type="text"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)} // ✅ Now using username
+                className="w-full px-4 py-3 border text-gray-800 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                placeholder="Enter your username"
+                required
+              />
             </div>
 
+            {/* Password Field */}
+            <div>
+              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
+                Password <span className="text-red-500">*</span>
+              </label>
+              <input
+                id="password"
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="w-full px-4 py-3 border text-gray-800 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                placeholder="Enter your password"
+                required
+              />
+            </div>
+
+            {/* Submit Button */}
             <div>
               <button
                 type="submit"
@@ -89,17 +128,23 @@ export default function LoginPage() {
                 )}
               </button>
             </div>
+
+             {/* Back to Login */}
+                        <div className="text-center">
+                          <button
+                            type="button"
+                            onClick={() => router.push('/register')}
+                            className="inline-flex items-center text-sm text-indigo-600 hover:text-indigo-800 font-medium"
+                          >
+                            <FaArrowLeft className="mr-1 text-xs" />
+                            Register
+                          </button>
+                        </div>
           </form>
 
-          {/* Help Section */}
+          {/* Footer */}
           <div className="mt-6 text-center">
-            <a 
-              href="#" 
-              className="text-sm text-blue-600 hover:text-blue-800 hover:underline"
-            >
-              Forgot your file number?
-            </a>
-            <p className="text-xs text-gray-500 mt-4">
+            <p className="text-xs text-gray-500">
               © {new Date().getFullYear()} Awash Insurance. All rights reserved.
             </p>
           </div>
