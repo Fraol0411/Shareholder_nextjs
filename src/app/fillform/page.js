@@ -2,7 +2,8 @@
 
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
-import { FaUserCircle, FaSignOutAlt, FaMoneyBillWave, FaFileInvoiceDollar } from 'react-icons/fa';
+import { FaMoneyBillWave, FaFileInvoiceDollar } from 'react-icons/fa';
+import AppShell from '../../components/AppShell';
 
 export default function ShareholderDashboard() {
   const router = useRouter();
@@ -64,7 +65,7 @@ const handleSubmit = async (e) => {
     }
 
     alert('✅ Your decision has been submitted successfully!');
-    router.push('/fillform'); // or thank you page
+    router.push('/formbasket');
   } catch (err) {
     alert('Error: ' + err.message);
   } finally {
@@ -72,49 +73,12 @@ const handleSubmit = async (e) => {
   }
 };
 
-  const handleLogout = () => {
-    router.push('/login');
-  };
-
-  const handleForm = () => {
-    router.push('/formbasket');
-  };
-
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 py-4 sm:px-6 lg:px-8 flex justify-between items-center">
-          <div className="flex items-center space-x-3">
-            <img src="/images/logo.png" alt="Awash Insurance Logo" className="h-10" />
-            <h1 className="text-xl font-bold text-gray-800">Awash Insurance</h1>
-          </div>
-          <div className="flex items-center space-x-6">
-            <div
-              onClick={handleForm}
-              className="flex items-center space-x-2 bg-blue-50 px-3 py-1 cursor-pointer rounded-full"
-            >
-              <FaUserCircle className="text-blue-600 text-xl" />
-              <span className="text-sm text-gray-700">form basket</span>
-            </div> 
-            {/* <div className="flex items-center space-x-2 bg-blue-50 px-3 py-1 rounded-full">
-              <FaUserCircle className="text-blue-600 text-xl" />
-              <span className="text-sm font-medium text-gray-700">{shareholderData.name}</span>
-            </div>*/}
-            <button
-              onClick={handleLogout}
-              className="flex items-center text-sm text-red-600 hover:text-red-800 transition-colors"
-            >
-              <FaSignOutAlt className="mr-1" /> Logout
-            </button>
-          </div>
-        </div>
-      </header>
-
-      <main className="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
+    <AppShell>
+      <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
         {/* Welcome Banner */}
         <div className="bg-gradient-to-r from-blue-700 to-blue-600 rounded-xl p-6 mb-8 text-white shadow-lg">
-          <h2 className="text-2xl font-bold mb-2">Awash Shareholder Panel</h2>
+          <h2 className="text-2xl font-bold mb-2">Awash Shareholder&apos;s Panel</h2>
           <p className="opacity-90">Dividend Payment Information and Decision</p>
         </div>
 
@@ -226,8 +190,8 @@ const handleSubmit = async (e) => {
                     className="h-4 w-4 mt-1 text-blue-600 focus:ring-blue-500 border-gray-300"
                   />
                   <label htmlFor="reinvest" className="ml-3">
-                    <span className="font-semibold text-gray-800">Reinvest this siscal year dividend in capital</span>
-                    <p className="text-gray-600 text-sm mt-1">All this year dividend will be converted to capital</p>
+                    <span className="font-semibold text-gray-800"> Reinvest this fiscal year dividend in capital </span>
+                    <p className="text-gray-600 text-sm mt-1"> All this year dividend will be converted to capital </p>
                   </label>
                 </div>
 
@@ -244,7 +208,7 @@ const handleSubmit = async (e) => {
                   />
                   <label htmlFor="withdraw" className="ml-3">
                     <span className="font-semibold text-gray-800">Withdraw my dividend</span>
-                    <p className="text-gray-600 text-sm mt-1">Receive your dividend as cash payment</p>
+                    <p className="text-gray-600 text-sm mt-1">Receive your dividend as cash payment</p> 
                   </label>
                 </div>
 
@@ -374,15 +338,7 @@ const handleSubmit = async (e) => {
             </form>
           </div>
         </div>
-      </main>
-
-      <footer className="bg-white border-t border-gray-200 mt-12 py-6">
-        <div className="max-w-7xl mx-auto px-4 text-center">
-          <p className="text-sm text-gray-600">
-            © {new Date().getFullYear()} Awash Insurance. All rights reserved.
-          </p>
-        </div>
-      </footer>
-    </div>
+      </div>
+    </AppShell>
   );
 }

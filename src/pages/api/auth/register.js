@@ -1,5 +1,4 @@
 // pages/api/auth/register.js
-// import { connect } from '@/libs/db';
 import { connect } from '../../../libs/db';
 import bcrypt from 'bcryptjs';
 
@@ -10,7 +9,6 @@ export default async function handler(req, res) {
 
   const { username, password, role } = req.body;
 
-  // Validation
   if (!username || !password || !role) {
     return res.status(400).json({ message: 'All fields are required' });
   }
@@ -26,28 +24,23 @@ export default async function handler(req, res) {
   try {
     const pool = await connect();
 
-    // Check if username already exists
-    const existingUser = await pool.request()
-      .input('username', username)
-      .query('SELECT * FROM users WHERE username = @username');
+    const existingUser = await pool.query(
+      'SELECT * FROM users WHERE username = $1',
+      [username]
+    );
 
-    if (existingUser.recordset.length > 0) {
+    if (existingUser.rows.length > 0) {
       return res.status(409).json({ message: 'Username already exists' });
     }
 
-    // Hash password
     const salt = await bcrypt.genSalt(10);
     const passwordHash = await bcrypt.hash(password, salt);
 
-    // Insert new user
-    await pool.request()
-      .input('username', username)
-      .input('password_hash', passwordHash)
-      .input('role', role)
-      .query(`
-        INSERT INTO users (username, password_hash, role)
-        VALUES (@username, @password_hash, @role)
-      `);
+    await pool.query(
+      `INSERT INTO users (username, password_hash, role)
+       VALUES ($1, $2, $3)`,
+      [username, passwordHash, role]
+    );
 
     return res.status(201).json({
       message: 'User registered successfully',

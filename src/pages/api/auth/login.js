@@ -8,7 +8,7 @@ export default async function handler(req, res) {
     return res.status(405).json({ message: 'Method not allowed' });
   }
 
-  const { username, password } = req.body; // ✅ Now using username
+  const { username, password } = req.body;
 
   if (!username || !password) {
     return res.status(400).json({ message: 'Username and password are required' });
@@ -17,33 +17,29 @@ export default async function handler(req, res) {
   try {
     const pool = await connect();
 
-    // 🔍 Find user by username
-    const userResult = await pool.request()
-      .input('username', username)
-      .query('SELECT * FROM users WHERE username = @username'); // ✅ Match by username
+    const userResult = await pool.query(
+      'SELECT * FROM users WHERE username = $1',
+      [username]
+    );
 
-    const user = userResult.recordset[0];
+    const user = userResult.rows[0];
     if (!user) {
       return res.status(401).json({ message: 'Invalid credentials' });
     }
 
-    // 🔐 Compare password
     const isPasswordValid = await bcrypt.compare(password, user.password_hash);
     if (!isPasswordValid) {
       return res.status(401).json({ message: 'Invalid credentials' });
     }
 
-    // ✅ Generate JWT token
     const token = jwt.sign(
       { id: user.id, username: user.username, role: user.role },
       process.env.JWT_SECRET || 'your-secret-key-here',
-      { expiresIn: '30m' } // High security: 30-minute expiry
+      { expiresIn: '30m' }
     );
 
-    // Remove sensitive data
     const { password_hash, ...userData } = user;
 
-    // ✅ Success
     return res.status(200).json({
       message: 'Login successful',
       token,

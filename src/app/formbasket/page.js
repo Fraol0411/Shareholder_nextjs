@@ -1,8 +1,9 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { FaFileInvoiceDollar, FaFilter, FaSearch, FaSignOutAlt } from 'react-icons/fa';
+import { FaFileInvoiceDollar, FaFilter, FaSearch } from 'react-icons/fa';
 import { useRouter } from 'next/navigation';
+import AppShell from '../../components/AppShell';
 
 export default function FormBasket() {
   const [forms, setForms] = useState([]);
@@ -103,30 +104,8 @@ export default function FormBasket() {
   ]);
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 py-4 sm:px-6 lg:px-8 flex justify-between items-center">
-          <div className="flex items-center space-x-3">
-            <img src="/images/logo.png" alt="Awash Insurance Logo" className="h-10" />
-            <h1 className="text-xl font-bold text-gray-800">Awash Insurance</h1>
-          </div>
-          <button
-            onClick={() => router.push('/fillform')}
-            className="flex items-center text-sm text-blue-600 hover:text-blue-800"
-          >
-            ← Back to fill form
-          </button>
-          <button
-            onClick={() => router.push('/login')}
-            className="flex items-center text-sm text-red-600 hover:text-red-800 transition-colors"
-          >
-            <FaSignOutAlt className="mr-1" /> Logout
-          </button>
-        </div>
-      </header>
-
-      <main className="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
+    <AppShell>
+      <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
         {/* Page Title */}
         <div className="bg-gradient-to-r from-green-700 to-green-600 rounded-xl p-6 mb-8 text-white shadow-lg">
           <h2 className="text-2xl font-bold flex items-center">
@@ -333,15 +312,7 @@ export default function FormBasket() {
             </button>
           </div>
         )}
-      </main>
-
-      <footer className="bg-white border-t border-gray-200 mt-12 py-6">
-        <div className="max-w-7xl mx-auto px-4 text-center">
-          <p className="text-sm text-gray-600">
-            © {new Date().getFullYear()} Awash Insurance. All rights reserved.
-          </p>
-        </div>
-      </footer>
-    </div>
+      </div>
+    </AppShell>
   );
 }

@@ -70,7 +70,7 @@ export default function RegisterPage() {
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-50 to-gray-50 p-4">
       <div className="w-full max-w-md bg-white rounded-xl shadow-xl overflow-hidden">
         {/* Header Section */}
-        <div className="bg-gradient-to-r from-indigo-600 to-indigo-800 p-6 text-center text-white">
+        <div className="bg-gradient-to-r from-blue-600 to-blue-800 p-6 text-center text-white">
           <div className="flex justify-center mb-4">
             <div className="bg-white/20 p-3 rounded-full">
               <FaUserPlus className="text-2xl" />
@@ -172,7 +172,7 @@ export default function RegisterPage() {
               <button
                 type="submit"
                 disabled={isLoading}
-                className={`w-full flex justify-center items-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-white bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-700 hover:to-indigo-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-200 ${
+                className={`w-full flex justify-center items-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-white bg-gradient-to-r from-blue-600 to-blue-800 hover:from-blue-700 hover:to-blue-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-200 ${
                   isLoading ? 'opacity-70 cursor-not-allowed' : ''
                 }`}
               >

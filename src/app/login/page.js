@@ -36,7 +36,7 @@ export default function LoginPage() {
       localStorage.setItem('user', JSON.stringify(data.user));
 
       // ✅ Redirect
-      router.push('/fillform');
+      router.push('/home');
     } catch (err) {
       setError(err.message);
     } finally {
