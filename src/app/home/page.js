@@ -22,6 +22,20 @@ function PortalCard({ href, icon: Icon, title, description, accent = 'blue', bad
     green: 'from-emerald-600 to-teal-700 group-hover:shadow-emerald-200/60',
     violet: 'from-violet-600 to-purple-700 group-hover:shadow-violet-200/60',
     amber: 'from-amber-500 to-orange-600 group-hover:shadow-amber-200/60',
+  
+    red: 'from-red-600 to-rose-700 group-hover:shadow-red-200/60',
+    pink: 'from-pink-600 to-rose-700 group-hover:shadow-pink-200/60',
+    indigo: 'from-indigo-600 to-blue-700 group-hover:shadow-indigo-200/60',
+    cyan: 'from-cyan-500 to-blue-600 group-hover:shadow-cyan-200/60',
+    teal: 'from-teal-500 to-cyan-700 group-hover:shadow-teal-200/60',
+    sky: 'from-sky-500 to-blue-700 group-hover:shadow-sky-200/60',
+    lime: 'from-lime-500 to-green-600 group-hover:shadow-lime-200/60',
+    orange: 'from-orange-500 to-red-600 group-hover:shadow-orange-200/60',
+    fuchsia: 'from-fuchsia-600 to-pink-700 group-hover:shadow-fuchsia-200/60',
+    rose: 'from-rose-500 to-pink-700 group-hover:shadow-rose-200/60',
+    slate: 'from-slate-600 to-slate-800 group-hover:shadow-slate-300/60',
+    gray: 'from-gray-600 to-gray-800 group-hover:shadow-gray-300/60',
+    zinc: 'from-zinc-600 to-zinc-800 group-hover:shadow-zinc-300/60',
   };
 
   return (
@@ -209,6 +223,23 @@ export default function HomePortalPage() {
                 accent="violet"
                 badge="Search"
               />
+              <PortalCard
+                href="/dividendupload"
+                icon={FaClipboardCheck}
+                title="Upload Shareholder Dividend"
+                description="upload shareholder current year dividend details."
+                accent="indigo"
+                badge="Search"
+              />
+              <PortalCard
+                href="/manage-shareholders"
+                icon={FaClipboardCheck}
+                title="Modify Shareholder Data"
+                description="Edit or Delete shareholder details."
+                accent="cyan"
+                badge="Search"
+              />
+              
             </div>
           </section>
         )}
