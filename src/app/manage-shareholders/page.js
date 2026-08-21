@@ -150,7 +150,8 @@ export default function ManageShareholders() {
       const res = await fetch('/api/shareholders', {
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id: deleteTarget.id, reg_no: deleteTarget.reg_no }),
+        // Only pass the dividend record ID. The user account will be preserved.
+        body: JSON.stringify({ id: deleteTarget.id }), 
       });
       if (!res.ok) throw new Error('Delete failed');
       setShareholders((prev) => prev.filter((s) => s.id !== deleteTarget.id));
@@ -170,7 +171,7 @@ export default function ManageShareholders() {
       const res = await fetch('/api/shareholders', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(editingItem),
+        body: JSON.stringify(editingItem), // Contains both user_id and sh_dividend id
       });
       if (!res.ok) throw new Error('Update failed');
       setShareholders((prev) => prev.map((s) => (s.id === editingItem.id ? editingItem : s)));
@@ -424,12 +425,11 @@ export default function ManageShareholders() {
               <div className="mx-auto w-14 h-14 rounded-full bg-red-100 flex items-center justify-center mb-4">
                 <FaExclamationTriangle className="text-red-600 text-2xl" />
               </div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">Delete Shareholder?</h3>
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">Delete Dividend Record?</h3>
               <p className="text-sm text-gray-500">
-                You are about to delete <span className="font-semibold text-gray-800">{deleteTarget.sh_name}</span>{' '}
-                (<span className="font-mono text-xs">{deleteTarget.reg_no}</span>).
+                You are about to delete the {deleteTarget.fiscal_year} dividend record for <span className="font-semibold text-gray-800">{deleteTarget.sh_name}</span>.
               </p>
-              <p className="text-xs text-gray-400 mt-2">This will also remove the associated user account. This action cannot be undone.</p>
+              <p className="text-xs text-gray-400 mt-2">This will remove the record for this specific fiscal year. The user's account will remain intact for other years.</p>
             </div>
             <div className="grid grid-cols-2 border-t border-gray-100">
               <button

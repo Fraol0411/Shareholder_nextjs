@@ -79,8 +79,8 @@ export default function HomePortalPage() {
 
   if (!user) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-slate-50">
-        <div className="h-10 w-10 animate-spin rounded-full border-4 border-blue-200 border-t-blue-600" />
+      <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-sky-50 via-blue-50 to-white">
+        <div className="h-10 w-10 animate-spin rounded-full border-4 border-sky-200 border-t-sky-600" />
       </div>
     );
   }
@@ -91,54 +91,20 @@ export default function HomePortalPage() {
   return (
     <AppShell>
       {/* Hero */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-slate-900 via-blue-950 to-blue-900 text-white">
-        <div className="absolute inset-0 opacity-30">
-          <div className="absolute -left-20 top-10 h-72 w-72 rounded-full bg-blue-400 blur-3xl" />
-          <div className="absolute bottom-0 right-0 h-80 w-80 rounded-full bg-cyan-400 blur-3xl" />
+      <section className="relative overflow-hidden bg-gradient-to-br from-sky-100 via-blue-100 to-sky-50">
+        <div className="absolute inset-0 opacity-40">
+          <div className="absolute -left-20 top-10 h-72 w-72 rounded-full bg-sky-300 blur-3xl" />
+          <div className="absolute bottom-0 right-0 h-80 w-80 rounded-full bg-blue-200 blur-3xl" />
         </div>
-        <div className="relative mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8 lg:py-20">
+        <div className="relative mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8 lg:py-5">
           <div className="max-w-3xl">
-            <span className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-1.5 text-sm backdrop-blur">
-              <FaShieldAlt className="text-cyan-300" />
-              Secure Shareholder Services
-            </span>
-            <h1 className="mt-6 text-3xl font-bold tracking-tight sm:text-4xl lg:text-5xl">
-              Welcome back, {user.username}
+            <h1 className="mt-6 text-3xl font-bold tracking-tight text-slate-800 sm:text-4xl lg:text-5xl">
+              Welcome back, <span className="text-transparent bg-clip-text bg-gradient-to-r from-sky-600 to-blue-700">{user.username}</span>
             </h1>
-            <p className="mt-4 text-lg leading-relaxed text-blue-100/90">
-              Your gateway to dividend information, decision forms, and shareholder records —
-              designed as a clear, friendly portal rather than a rigid back-office dashboard.
+            <p className="mt-4 text-lg leading-relaxed text-slate-600">
+              Your gateway to dividend information, decision forms, and shareholder records.
             </p>
-            <div className="mt-8 flex flex-wrap items-center gap-3">
-              <span className="rounded-full bg-white/15 px-4 py-2 text-sm font-medium backdrop-blur">
-                Role: {getRoleLabel(user.role)}
-              </span>
-              <span className="rounded-full bg-emerald-500/20 px-4 py-2 text-sm font-medium text-emerald-100">
-                Session active
-              </span>
-            </div>
           </div>
-        </div>
-      </section>
-
-      {/* Highlights strip */}
-      <section className="border-b border-slate-200 bg-white">
-        <div className="mx-auto grid max-w-7xl gap-6 px-4 py-8 sm:grid-cols-3 sm:px-6 lg:px-8">
-          {[
-            { icon: FaHandshake, title: 'Shareholder first', text: 'Simple access to dividend details and decisions.' },
-            { icon: FaClipboardCheck, title: 'Guided workflows', text: 'Step-by-step forms for staff and shareholders.' },
-            { icon: FaShieldAlt, title: 'Secure & role-based', text: 'Only see the tools your account is allowed to use.' },
-          ].map(({ icon: Icon, title, text }) => (
-            <div key={title} className="flex gap-4">
-              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-700">
-                <Icon />
-              </div>
-              <div>
-                <p className="font-semibold text-slate-900">{title}</p>
-                <p className="mt-1 text-sm text-slate-600">{text}</p>
-              </div>
-            </div>
-          ))}
         </div>
       </section>
 
@@ -159,7 +125,7 @@ export default function HomePortalPage() {
           </div>
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             <PortalCard
-              href="/dashboard"
+              href="/devidenddetail"
               icon={FaChartLine}
               title="Check Your Dividend"
               description="View your dividend balance, capital summary, and payment breakdown in one place."
@@ -189,9 +155,6 @@ export default function HomePortalPage() {
         {staff && (
           <section className="mb-14">
             <div className="mb-8">
-              <p className="text-sm font-semibold uppercase tracking-wider text-blue-600">
-                Staff Workspace
-              </p>
               <h2 className="mt-1 text-2xl font-bold text-slate-900">Process shareholder decisions</h2>
               <p className="mt-2 max-w-2xl text-slate-600">
                 Tools for front-desk and operations staff to enter forms on behalf of shareholders
@@ -267,7 +230,7 @@ export default function HomePortalPage() {
         )}
 
         {/* CTA banner */}
-        <section className="mt-16 overflow-hidden rounded-2xl bg-gradient-to-r from-blue-700 to-cyan-700 p-8 text-white shadow-xl sm:p-10">
+        <section className="mt-16 overflow-hidden rounded-2xl bg-gradient-to-r from-sky-500 to-blue-600 p-8 text-white shadow-xl shadow-sky-200/40 sm:p-10">
           <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
             <div>
               <h3 className="text-xl font-bold sm:text-2xl">Need to submit a decision today?</h3>
@@ -282,7 +245,7 @@ export default function HomePortalPage() {
                 <>
                   <Link
                     href="/fillform"
-                    className="inline-flex items-center gap-2 rounded-xl bg-white px-5 py-3 text-sm font-semibold text-blue-800 shadow transition hover:bg-blue-50"
+                    className="inline-flex items-center gap-2 rounded-xl bg-white px-5 py-3 text-sm font-semibold text-sky-700 shadow transition hover:bg-sky-50"
                   >
                     Fill Form
                     <FaArrowRight className="text-xs" />
@@ -297,7 +260,7 @@ export default function HomePortalPage() {
               ) : (
                 <Link
                   href="/dashboard"
-                  className="inline-flex items-center gap-2 rounded-xl bg-white px-5 py-3 text-sm font-semibold text-blue-800 shadow transition hover:bg-blue-50"
+                  className="inline-flex items-center gap-2 rounded-xl bg-white px-5 py-3 text-sm font-semibold text-sky-700 shadow transition hover:bg-sky-50"
                 >
                   Go to My Dividend
                   <FaArrowRight className="text-xs" />
