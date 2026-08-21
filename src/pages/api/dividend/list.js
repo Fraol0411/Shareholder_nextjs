@@ -29,10 +29,17 @@ export default async function handler(req, res) {
         dd.bank_name,
         dd.branch_name,
         dd.account_number,
+        dd.status,
+        dd.submission_date,
         dd.created_at,
-        u.username AS entered_by_name
+        dd.user_id,
+        dd.sh_dividend_id,
+        dd.entered_by,
+        staff.username AS entered_by_name,
+        sh_user.name AS shareholder_display_name
       FROM dividend_decisions dd
-      LEFT JOIN users u ON dd.entered_by = u.id
+      LEFT JOIN users staff ON dd.entered_by = staff.id
+      LEFT JOIN users sh_user ON dd.user_id = sh_user.id
       ORDER BY dd.created_at DESC
     `);
 
