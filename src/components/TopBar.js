@@ -14,6 +14,7 @@ import {
   FaChartLine,
   FaUserPlus,
   FaShieldAlt,
+  FaChevronRight,
 } from 'react-icons/fa';
 
 import {
@@ -25,10 +26,10 @@ import {
 } from '../libs/auth';
 
 const navLinkClass = (active) =>
-  `flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition-all duration-200 ${
+  `relative flex items-center gap-2 px-4 py-2 text-sm font-semibold transition-all duration-300 rounded-xl ${
     active
-      ? 'bg-sky-50 text-sky-700 shadow-sm'
-      : 'text-slate-600 hover:bg-sky-50/60 hover:text-sky-700'
+      ? 'text-blue-700 bg-blue-50/80 shadow-sm'
+      : 'text-slate-600 hover:text-blue-700 hover:bg-slate-50'
   }`;
 
 export default function TopBar() {
@@ -39,7 +40,6 @@ export default function TopBar() {
   const [user, setUser] = useState(null);
   const [mounted, setMounted] = useState(false);
 
-  // Load authentication state only on the client
   useEffect(() => {
     setMounted(true);
     const storedUser = getStoredUser();
@@ -64,130 +64,151 @@ export default function TopBar() {
     logout(router);
   };
 
-  // SSR skeleton — prevents hydration mismatch
   if (!mounted) {
-    return (
-      <header className="sticky top-0 z-50 border-b border-sky-100 bg-white/95 backdrop-blur-md shadow-sm">
-        <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-3 sm:px-6 lg:px-8">
-          <Link href="/login" className="flex items-center gap-3">
-            <img src="/images/logo.png" alt="Awash Insurance" className="h-10 w-auto" />
-            <div className="hidden sm:block">
-              <p className="text-base font-bold leading-tight text-slate-800">Awash Insurance</p>
-              <p className="text-xs text-slate-500">Shareholder Portal</p>
-            </div>
-          </Link>
-          <div className="h-9 w-24 rounded-lg bg-sky-50 animate-pulse" />
-        </div>
-      </header>
-    );
+    return <div className="h-[73px] w-full border-b border-slate-100 bg-white" />;
   }
 
   return (
-    <header className="sticky top-0 z-50 border-b border-sky-100 bg-white/95 backdrop-blur-md shadow-sm">
-      <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-3 sm:px-6 lg:px-8">
-
-        {/* Logo */}
-        <Link href={user ? '/home' : '/login'} className="flex items-center gap-3 group">
-          <img src="/images/logo.png" alt="Awash Insurance" className="h-10 w-auto transition-transform group-hover:scale-105" />
-          <div className="hidden sm:block">
-            <p className="text-base font-bold leading-tight text-slate-800">Awash Insurance</p>
-            <p className="text-xs text-slate-500">Shareholder Portal</p>
-          </div>
-        </Link>
-
-        {/* Desktop navigation */}
-        {user && (
-          <nav className="hidden items-center gap-1 lg:flex">
-            {navItems.map(({ href, label, icon: Icon }) => (
-              <Link
-                key={href}
-                href={href}
-                className={navLinkClass(pathname === href || pathname.startsWith(`${href}/`))}
-              >
-                <Icon className="text-sm" />
-                {label}
-              </Link>
-            ))}
-          </nav>
-        )}
-
-        {/* User controls */}
-        <div className="flex items-center gap-3">
-          {user && (
-            <div className="hidden items-center gap-3 md:flex">
-              {/* User badge */}
-              <div className="flex items-center gap-2 rounded-full border border-sky-100 bg-gradient-to-r from-sky-50 to-blue-50 px-4 py-1.5 shadow-sm">
-                <div className="flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-br from-sky-500 to-blue-600 text-white">
-                  <FaShieldAlt className="text-xs" />
-                </div>
-                <div className="text-right">
-                  <p className="text-sm font-semibold text-slate-800">{user.username}</p>
-                  <p className="text-xs font-medium text-sky-600">{getRoleLabel(role)}</p>
-                </div>
-              </div>
-
-              {/* Logout */}
-              <button
-                onClick={handleLogout}
-                className="inline-flex items-center gap-2 rounded-lg border border-red-100 bg-red-50 px-4 py-2 text-sm font-medium text-red-600 shadow-sm transition-all hover:bg-red-100 hover:text-red-700 hover:shadow"
-              >
-                <FaSignOutAlt />
-                Logout
-              </button>
+    <header className="sticky top-0 z-[100] w-full border-b border-slate-200/60 bg-white/80 backdrop-blur-xl">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="flex h-16 items-center justify-between gap-8">
+          
+          {/* Logo Section */}
+          <Link href={user ? '/home' : '/login'} className="flex shrink-0 items-center gap-3 group">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-blue-600 to-sky-500 shadow-lg shadow-blue-200 transition-transform group-hover:scale-105">
+              <FaShieldAlt className="text-xl text-white" />
             </div>
+            <div className="hidden sm:block">
+              <p className="text-sm font-black leading-tight tracking-tight text-slate-900 uppercase">
+                አዋሽ ኢንሹራንስ
+              </p>
+              <p className="text-[10px] font-bold text-blue-600 uppercase tracking-widest opacity-80">
+                Shareholder Portal
+              </p>
+            </div>
+          </Link>
+
+          {/* Desktop Nav - Middle */}
+          {user && (
+            <nav className="hidden items-center gap-1 lg:flex">
+              {navItems.map(({ href, label, icon: Icon }) => {
+                const active = pathname === href || pathname.startsWith(`${href}/`);
+                return (
+                  <Link key={href} href={href} className={navLinkClass(active)}>
+                    <Icon className={`text-base ${active ? 'text-blue-600' : 'text-slate-400'}`} />
+                    {label}
+                  </Link>
+                );
+              })}
+            </nav>
           )}
 
-          {/* Mobile hamburger */}
-          {user && (
-            <button
-              type="button"
-              onClick={() => setMobileOpen((open) => !open)}
-              className="inline-flex items-center justify-center rounded-lg border border-sky-100 bg-sky-50/50 p-2 text-slate-700 transition hover:bg-sky-50 lg:hidden"
-              aria-label="Toggle menu"
-            >
-              {mobileOpen ? <FaTimes /> : <FaBars />}
-            </button>
-          )}
+          {/* User Section - Right */}
+          <div className="flex items-center gap-3">
+            {user && (
+              <>
+                <div className="hidden items-center gap-4 md:flex">
+                  <div className="h-8 w-[1px] bg-slate-200" />
+                  <div className="flex items-center gap-3">
+                    <div className="text-right">
+                      <p className="text-sm font-bold text-slate-800 leading-none">{user.username}</p>
+                      <p className="mt-1 text-[10px] font-bold text-blue-600 uppercase tracking-tighter">
+                        {getRoleLabel(role)}
+                      </p>
+                    </div>
+                    <div className="flex h-9 w-9 items-center justify-center rounded-full bg-slate-100 border border-slate-200">
+                       <FaShieldAlt className="text-slate-400 text-sm" />
+                    </div>
+                  </div>
+                  
+                  <button
+                    onClick={handleLogout}
+                    className="flex h-9 w-9 items-center justify-center rounded-xl border border-red-100 bg-red-50 text-red-600 transition-all hover:bg-red-600 hover:text-white shadow-sm"
+                    title="Logout"
+                  >
+                    <FaSignOutAlt />
+                  </button>
+                </div>
+
+                {/* Mobile Menu Toggle */}
+                <button
+                  type="button"
+                  onClick={() => setMobileOpen(!mobileOpen)}
+                  className="inline-flex items-center justify-center rounded-xl bg-slate-100 p-2.5 text-slate-700 transition hover:bg-blue-50 hover:text-blue-600 lg:hidden"
+                >
+                  {mobileOpen ? <FaTimes size={20} /> : <FaBars size={20} />}
+                </button>
+              </>
+            )}
+          </div>
         </div>
       </div>
 
-      {/* Mobile menu */}
-      {user && mobileOpen && (
-        <div className="border-t border-sky-100 bg-gradient-to-b from-white to-sky-50/40 px-4 py-4 lg:hidden">
-          <nav className="space-y-1">
-            {navItems.map(({ href, label, icon: Icon }) => (
-              <Link
-                key={href}
-                href={href}
-                onClick={() => setMobileOpen(false)}
-                className={navLinkClass(pathname === href || pathname.startsWith(`${href}/`))}
-              >
-                <Icon />
-                {label}
-              </Link>
-            ))}
-          </nav>
+      {/* 
+          MOBILE MENU OVERLAY 
+          Positioned 'absolute' so it floats over content without pushing it.
+      */}
+      {user && (
+        <div 
+          className={`absolute left-0 right-0 top-[65px] z-50 w-full overflow-hidden bg-white/95 shadow-2xl backdrop-blur-2xl transition-all duration-300 ease-in-out lg:hidden ${
+            mobileOpen ? 'max-h-[100vh] border-b border-slate-200 opacity-100' : 'max-h-0 opacity-0 pointer-events-none'
+          }`}
+        >
+          {/* Backdrop Blur Helper */}
+          <div className="p-4 space-y-2">
+            <p className="px-4 text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 mb-2">Navigation</p>
+            <nav className="space-y-1">
+              {navItems.map(({ href, label, icon: Icon }) => (
+                <Link
+                  key={href}
+                  href={href}
+                  onClick={() => setMobileOpen(false)}
+                  className={`flex items-center justify-between rounded-xl px-4 py-3 transition-all ${
+                    pathname === href ? 'bg-blue-600 text-white' : 'hover:bg-slate-50 text-slate-700'
+                  }`}
+                >
+                  <div className="flex items-center gap-3">
+                    <Icon className={pathname === href ? 'text-white' : 'text-slate-400'} />
+                    <span className="font-semibold text-sm">{label}</span>
+                  </div>
+                  <FaChevronRight className={`text-[10px] ${pathname === href ? 'text-white' : 'text-slate-300'}`} />
+                </Link>
+              ))}
+            </nav>
 
-          {/* User info */}
-          <div className="mt-4 flex items-center gap-3 rounded-xl border border-sky-100 bg-white p-3 shadow-sm">
-            <div className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-sky-500 to-blue-600 text-white shadow-sm">
-              <FaShieldAlt className="text-xs" />
+            {/* Mobile User Profile Section */}
+            <div className="mt-4 border-t border-slate-100 pt-4">
+               <div className="flex items-center gap-4 rounded-2xl bg-slate-50 p-4">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-600 text-white">
+                    <FaShieldAlt />
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-sm font-bold text-slate-800">{user.username}</p>
+                    <p className="text-xs font-medium text-blue-600 uppercase tracking-tighter">{getRoleLabel(role)}</p>
+                  </div>
+                  <button
+                    onClick={handleLogout}
+                    className="flex h-10 w-10 items-center justify-center rounded-xl bg-red-100 text-red-600 hover:bg-red-600 hover:text-white transition-colors"
+                  >
+                    <FaSignOutAlt />
+                  </button>
+               </div>
             </div>
-            <div>
-              <p className="text-sm font-semibold text-slate-800">{user.username}</p>
-              <p className="text-xs font-medium text-sky-600">{getRoleLabel(role)}</p>
-            </div>
+            
+            {/* Slogan */}
+            <p className="mt-4 text-center text-[10px] font-medium text-slate-400 uppercase tracking-widest">
+                Awash Insurance S.C. &copy; {new Date().getFullYear()}
+            </p>
           </div>
-
-          {/* Mobile logout */}
-          <button
-            onClick={handleLogout}
-            className="mt-3 flex w-full items-center justify-center gap-2 rounded-lg border border-red-100 bg-red-50 px-3 py-2.5 text-sm font-medium text-red-600 shadow-sm transition hover:bg-red-100"
-          >
-            <FaSignOutAlt />
-            Logout
-          </button>
         </div>
+      )}
+
+      {/* Dark Overlay background when mobile menu is open */}
+      {mobileOpen && (
+        <div 
+          className="fixed inset-0 top-[65px] z-40 bg-slate-900/20 backdrop-blur-sm lg:hidden"
+          onClick={() => setMobileOpen(false)}
+        />
       )}
     </header>
   );
