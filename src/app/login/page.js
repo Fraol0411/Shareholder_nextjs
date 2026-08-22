@@ -91,7 +91,11 @@ export default function LoginPage() {
         <div className="relative z-10 w-full max-w-xl px-12 animate-content">
           <div className="flex items-center gap-3 text-white mb-12">
             <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-white/10 backdrop-blur-xl border border-white/20 shadow-2xl">
-              <FaShieldAlt className="text-3xl text-white" />
+              <img
+                src="/images/logo.png"
+                alt="Awash Insurance"
+                className="h-9 w-auto transition-transform group-hover:scale-105"
+              />
             </div>
             <div>
               <h1 className="text-3xl font-bold tracking-tight">አዋሽ ኢንሹራንስ</h1>
@@ -142,7 +146,11 @@ export default function LoginPage() {
           {/* Mobile Header */}
           <div className="mb-12 flex flex-col items-center text-center lg:hidden">
              <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-blue-600 shadow-xl shadow-blue-200">
-                <FaShieldAlt className="text-3xl text-white" />
+              <img
+                src="/images/logo.png"
+                alt="Awash Insurance"
+                className="h-9 w-auto transition-transform group-hover:scale-105"
+              />
              </div>
              <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100 uppercase tracking-tight">አዋሽ ኢንሹራንስ</h1>
              <p className="text-slate-500 dark:text-slate-400">Shareholder Portal</p>
