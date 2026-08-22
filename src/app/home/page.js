@@ -6,62 +6,196 @@ import { useRouter } from 'next/navigation';
 import {
   FaArrowRight,
   FaChartLine,
-  FaClipboardCheck,
+  FaClipboardList,
   FaFileInvoiceDollar,
-  FaHandshake,
-  FaShieldAlt,
   FaUserPlus,
   FaUsers,
+  FaChevronRight,
+  FaShieldAlt,
+  FaClock,
+  FaCheckCircle,
 } from 'react-icons/fa';
-import AppShell from '../../components/AppShell';
-import { getStoredUser, getToken, isStaffRole, isAdminRole, getRoleLabel } from '../../libs/auth';
 
-function PortalCard({ href, icon: Icon, title, description, accent = 'blue', badge }) {
+import AppShell from '../../components/AppShell';
+import {
+  getStoredUser,
+  getToken,
+  isStaffRole,
+  isAdminRole,
+} from '../../libs/auth';
+
+
+/* =========================================================
+   PORTAL CARD
+========================================================= */
+
+function PortalCard({
+  href,
+  icon: Icon,
+  title,
+  description,
+  accent = 'blue',
+  badge,
+}) {
   const accents = {
-    blue: 'from-blue-600 to-blue-800 group-hover:shadow-blue-200/60',
-    green: 'from-emerald-600 to-teal-700 group-hover:shadow-emerald-200/60',
-    violet: 'from-violet-600 to-purple-700 group-hover:shadow-violet-200/60',
-    amber: 'from-amber-500 to-orange-600 group-hover:shadow-amber-200/60',
-  
-    red: 'from-red-600 to-rose-700 group-hover:shadow-red-200/60',
-    pink: 'from-pink-600 to-rose-700 group-hover:shadow-pink-200/60',
-    indigo: 'from-indigo-600 to-blue-700 group-hover:shadow-indigo-200/60',
-    cyan: 'from-cyan-500 to-blue-600 group-hover:shadow-cyan-200/60',
-    teal: 'from-teal-500 to-cyan-700 group-hover:shadow-teal-200/60',
-    sky: 'from-sky-500 to-blue-700 group-hover:shadow-sky-200/60',
-    lime: 'from-lime-500 to-green-600 group-hover:shadow-lime-200/60',
-    orange: 'from-orange-500 to-red-600 group-hover:shadow-orange-200/60',
-    fuchsia: 'from-fuchsia-600 to-pink-700 group-hover:shadow-fuchsia-200/60',
-    rose: 'from-rose-500 to-pink-700 group-hover:shadow-rose-200/60',
-    slate: 'from-slate-600 to-slate-800 group-hover:shadow-slate-300/60',
-    gray: 'from-gray-600 to-gray-800 group-hover:shadow-gray-300/60',
-    zinc: 'from-zinc-600 to-zinc-800 group-hover:shadow-zinc-300/60',
+    blue: {
+      icon: 'bg-blue-600 text-white',
+      iconSoft: 'bg-blue-50 text-blue-600',
+      badge: 'bg-blue-50 text-blue-700',
+      hover: 'group-hover:border-blue-200',
+    },
+
+    green: {
+      icon: 'bg-emerald-600 text-white',
+      iconSoft: 'bg-emerald-50 text-emerald-600',
+      badge: 'bg-emerald-50 text-emerald-700',
+      hover: 'group-hover:border-emerald-200',
+    },
+
+    violet: {
+      icon: 'bg-violet-600 text-white',
+      iconSoft: 'bg-violet-50 text-violet-600',
+      badge: 'bg-violet-50 text-violet-700',
+      hover: 'group-hover:border-violet-200',
+    },
+
+    amber: {
+      icon: 'bg-amber-500 text-white',
+      iconSoft: 'bg-amber-50 text-amber-700',
+      badge: 'bg-amber-50 text-amber-700',
+      hover: 'group-hover:border-amber-200',
+    },
+
+    indigo: {
+      icon: 'bg-indigo-600 text-white',
+      iconSoft: 'bg-indigo-50 text-indigo-600',
+      badge: 'bg-indigo-50 text-indigo-700',
+      hover: 'group-hover:border-indigo-200',
+    },
+
+    cyan: {
+      icon: 'bg-cyan-600 text-white',
+      iconSoft: 'bg-cyan-50 text-cyan-600',
+      badge: 'bg-cyan-50 text-cyan-700',
+      hover: 'group-hover:border-cyan-200',
+    },
   };
+
+  const style = accents[accent] || accents.blue;
 
   return (
     <Link
       href={href}
-      className="group relative overflow-hidden rounded-2xl border border-slate-200/80 bg-white dark:border-slate-700 dark:bg-slate-800 p-6 shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-xl"
+      className={`
+        group relative flex min-h-[210px] flex-col
+        rounded-2xl border border-slate-200 bg-white
+        p-5 sm:p-6
+        transition-all duration-200
+        hover:-translate-y-1 hover:border-slate-300
+        hover:shadow-lg
+        active:scale-[0.99]
+        ${style.hover}
+      `}
     >
-      <div
-        className={`mb-5 inline-flex rounded-xl bg-gradient-to-br ${accents[accent]} p-3 text-white shadow-lg transition group-hover:scale-105`}
-      >
-        <Icon className="text-xl" />
+      {/* Top row */}
+      <div className="flex items-start justify-between gap-4">
+        <div
+          className={`
+            flex h-11 w-11 shrink-0 items-center justify-center
+            rounded-xl shadow-sm
+            sm:h-12 sm:w-12
+            ${style.icon}
+          `}
+        >
+          <Icon className="text-lg sm:text-xl" />
+        </div>
+
+        {badge && (
+          <span
+            className={`
+              rounded-full px-2.5 py-1
+              text-[10px] font-bold uppercase tracking-wide
+              ${style.badge}
+            `}
+          >
+            {badge}
+          </span>
+        )}
       </div>
-      {badge && (
-        <span className="absolute right-5 top-5 rounded-full bg-slate-100 dark:bg-slate-700 px-2.5 py-1 text-xs font-medium text-slate-600 dark:text-slate-300">
-          {badge}
+
+      {/* Content */}
+      <div className="mt-5 flex-1">
+        <h3 className="text-[17px] font-bold tracking-tight text-slate-900 sm:text-lg">
+          {title}
+        </h3>
+
+        <p className="mt-2 text-[13px] leading-5 text-slate-500 sm:text-sm sm:leading-6">
+          {description}
+        </p>
+      </div>
+
+      {/* Bottom action */}
+      <div className="mt-5 flex items-center justify-between border-t border-slate-100 pt-4">
+        <span
+          className={`
+            text-xs font-semibold
+            ${style.iconSoft.split(' ')[1]}
+          `}
+        >
+          Open service
         </span>
-      )}
-      <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100">{title}</h3>
-      <p className="mt-2 text-sm leading-relaxed text-slate-600 dark:text-slate-300">{description}</p>
-      <span className="mt-5 inline-flex items-center gap-2 text-sm font-medium text-blue-700 transition group-hover:gap-3">
-        Open
-        <FaArrowRight className="text-xs" />
-      </span>
+
+        <span
+          className={`
+            flex h-8 w-8 items-center justify-center
+            rounded-full
+            transition-all duration-200
+            group-hover:translate-x-1
+            ${style.iconSoft}
+          `}
+        >
+          <FaArrowRight className="text-xs" />
+        </span>
+      </div>
     </Link>
   );
 }
+
+
+/* =========================================================
+   SECTION HEADER
+========================================================= */
+
+function SectionHeader({ eyebrow, title, description }) {
+  return (
+    <div className="mb-6 sm:mb-8">
+      {eyebrow && (
+        <div className="mb-2 flex items-center gap-2">
+          <span className="h-1.5 w-1.5 rounded-full bg-blue-600" />
+
+          <span className="text-[10px] font-bold uppercase tracking-[0.18em] text-blue-600 sm:text-xs">
+            {eyebrow}
+          </span>
+        </div>
+      )}
+
+      <h2 className="text-xl font-bold tracking-tight text-slate-900 sm:text-2xl">
+        {title}
+      </h2>
+
+      {description && (
+        <p className="mt-1.5 max-w-2xl text-sm leading-5 text-slate-500 sm:text-[15px] sm:leading-6">
+          {description}
+        </p>
+      )}
+    </div>
+  );
+}
+
+
+/* =========================================================
+   MAIN PAGE
+========================================================= */
 
 export default function HomePortalPage() {
   const router = useRouter();
@@ -70,206 +204,313 @@ export default function HomePortalPage() {
   useEffect(() => {
     const token = getToken();
     const storedUser = getStoredUser();
+
     if (!token || !storedUser) {
       router.replace('/login');
       return;
     }
+
     setUser(storedUser);
   }, [router]);
 
+
+  /* =======================================================
+     LOADING
+  ======================================================= */
+
   if (!user) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-sky-50 via-blue-50 to-white">
-        <div className="h-10 w-10 animate-spin rounded-full border-4 border-sky-200 border-t-sky-600" />
+      <div className="flex min-h-screen items-center justify-center bg-slate-50 px-4">
+        <div className="flex flex-col items-center">
+          <div className="h-9 w-9 animate-spin rounded-full border-[3px] border-slate-200 border-t-blue-600" />
+
+          <p className="mt-4 text-xs font-semibold text-slate-400">
+            Loading your portal...
+          </p>
+        </div>
       </div>
     );
   }
 
+
   const staff = isStaffRole(user.role);
   const admin = isAdminRole(user.role);
 
+
   return (
     <AppShell>
-      {/* Hero */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-sky-100 via-blue-100 to-sky-50 dark:from-slate-800 dark:via-slate-900 dark:to-slate-950">
-        <div className="absolute inset-0 opacity-40">
-          <div className="absolute -left-20 top-10 h-72 w-72 rounded-full bg-sky-300 blur-3xl" />
-          <div className="absolute bottom-0 right-0 h-80 w-80 rounded-full bg-blue-200 blur-3xl" />
-        </div>
-        <div className="relative mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8 lg:py-5">
-          <div className="max-w-3xl">
-            <h1 className="mt-6 text-3xl font-bold tracking-tight text-slate-800 dark:text-slate-100 sm:text-4xl lg:text-5xl">
-              Welcome back, <span className="text-transparent bg-clip-text bg-gradient-to-r from-sky-600 to-blue-700">{user.username}</span>
-            </h1>
-            <p className="mt-4 text-lg leading-relaxed text-slate-600 dark:text-slate-300">
-              Your gateway to dividend information, decision forms, and shareholder records.
-            </p>
+
+      {/* ===================================================
+          HERO
+      =================================================== */}
+
+      <section className="border-b border-slate-200 bg-white">
+        <div className="mx-auto max-w-7xl px-4 py-7 sm:px-6 sm:py-9 lg:px-8 lg:py-11">
+
+          <div className="flex flex-col gap-7 lg:flex-row lg:items-center lg:justify-between">
+
+            {/* Welcome */}
+            <div className="max-w-2xl">
+
+              <div className="mb-3 inline-flex items-center gap-2 rounded-full bg-emerald-50 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-emerald-700 sm:text-xs">
+                <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                Secure portal
+              </div>
+
+              <h1 className="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl lg:text-4xl">
+                Welcome back,{' '}
+                <span className="text-blue-600">
+                  {user.username}
+                </span>
+              </h1>
+
+              <p className="mt-2 max-w-xl text-sm leading-5 text-slate-500 sm:mt-3 sm:text-base sm:leading-6">
+                {staff
+                  ? 'Access the tools you need to manage shareholder services and daily operations.'
+                  : 'Manage your shareholder information, dividend decisions, and payment history.'}
+              </p>
+
+            </div>
+
+
+
+
           </div>
         </div>
       </section>
 
-      <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8 lg:py-16">
-        {/* Shareholder / User section — visible to everyone */}
-        <section className="mb-14">
-          <div className="mb-8 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
-            <div>
-              <p className="text-sm font-semibold uppercase tracking-wider text-emerald-600">
-                Shareholder Portal
-              </p>
-              <h2 className="mt-1 text-2xl font-bold text-slate-900 dark:text-slate-100">Your dividend services</h2>
-              <p className="mt--2 max-w-2xl text-slate-600 dark:text-slate-300">
-                Check balances, review payment details, and submit your dividend decision — the
-                same experience a shareholder would use on the public-facing site.
-              </p>
-            </div>
-          </div>
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            <PortalCard
-              href="/devidenddetail"
-              icon={FaChartLine}
-              title="Check Your Dividend"
-              description="View your dividend balance, capital summary, and payment breakdown in one place."
-              accent="green"
-              badge="Shareholder"
-            />
-            <PortalCard
-              href="/dashboard"
-              icon={FaFileInvoiceDollar}
-              title="Fill Decision Form"
-              description="Choose to reinvest or withdraw your dividend and complete your submission online."
-              accent="blue"
-              badge="Decision"
-            />
-            <PortalCard
-              href="/dashboard"
-              icon={FaClipboardCheck}
-              title="Track Your Submission"
-              description="Review the decision you submitted and confirm your selected payment method."
-              accent="violet"
-              badge="Status"
-            />
-          </div>
-        </section>
 
-        {/* Staff section */}
-        {staff && (
-          <section className="mb-14">
-            <div className="mb-8">
-              <h2 className="mt-1 text-2xl font-bold text-slate-900 dark:text-slate-100">Process shareholder decisions</h2>
-              <p className="mt-2 max-w-2xl text-slate-600 dark:text-slate-300">
-                Tools for front-desk and operations staff to enter forms on behalf of shareholders
-                and review all submitted decisions.
-              </p>
-            </div>
-            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+      {/* ===================================================
+          MAIN CONTENT
+      =================================================== */}
+
+      <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-10 lg:px-8 lg:py-12">
+
+
+        {/* =================================================
+            SHAREHOLDER
+        ================================================= */}
+
+        {!staff && (
+          <section className="mb-12 sm:mb-16">
+
+            <SectionHeader
+              eyebrow="Shareholder services"
+              title="What would you like to do?"
+              description="Quick access to your investment and dividend services."
+            />
+
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+
+              <PortalCard
+                href="/devidenddetail"
+                icon={FaChartLine}
+                title="Dividend Insights"
+                description="View your capital balances, dividend information, and annual payment history."
+                accent="green"
+                badge="Finance"
+              />
+
               <PortalCard
                 href="/fillform"
                 icon={FaFileInvoiceDollar}
-                title="Fill Decision Form"
-                description="Enter a shareholder's dividend decision with file number, fiscal year, and payment details."
+                title="Investment Decision"
+                description="Choose whether to reinvest your current dividend into capital or withdraw it."
                 accent="blue"
-                badge="Staff"
+                badge="Action"
               />
+
+              <PortalCard
+                href="/my-decisions"
+                icon={FaClipboardList}
+                title="Submission History"
+                description="Review your previous decisions and check their current approval status."
+                accent="violet"
+                badge="Records"
+              />
+
+            </div>
+          </section>
+        )}
+
+
+        {/* =================================================
+            STAFF
+        ================================================= */}
+
+        {staff && (
+          <section className="mb-12 sm:mb-16">
+
+            <SectionHeader
+              eyebrow="Staff operations"
+              title="Operations Center"
+              description="Tools for processing shareholder requests and maintaining records."
+            />
+
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+
+              <PortalCard
+                href="/staff-fillform"
+                icon={FaFileInvoiceDollar}
+                title="Assisted Filing"
+                description="Submit dividend decision forms on behalf of visiting shareholders."
+                accent="blue"
+                badge="Front desk"
+              />
+
               <PortalCard
                 href="/formbasket"
                 icon={FaUsers}
-                title="Check Shareholder Decisions"
-                description="Browse, filter, and open every submitted dividend decision by fiscal year."
+                title="Decision Basket"
+                description="Review, filter, and process submitted shareholder decisions."
                 accent="green"
-                badge="Records"
+                badge="Operations"
               />
-              <PortalCard
-                href="/formbasket"
-                icon={FaClipboardCheck}
-                title="Form Basket"
-                description="Search submissions by name, file number, decision type, or payment method."
-                accent="violet"
-                badge="Search"
-              />
+
               <PortalCard
                 href="/dividendupload"
-                icon={FaClipboardCheck}
-                title="Upload Shareholder Dividend"
-                description="upload shareholder current year dividend details."
+                icon={FaFileInvoiceDollar}
+                title="Bulk Data Upload"
+                description="Import shareholder dividend records using the approved data format."
                 accent="indigo"
-                badge="Search"
+                badge="Database"
               />
+
               <PortalCard
                 href="/manage-shareholders"
-                icon={FaClipboardCheck}
-                title="Modify Shareholder Data"
-                description="Edit or Delete shareholder details."
+                icon={FaUsers}
+                title="Shareholder Registry"
+                description="View, update, and reconcile shareholder registration records."
                 accent="cyan"
-                badge="Search"
+                badge="Registry"
               />
-              
+
             </div>
           </section>
         )}
 
-        {/* Admin section */}
+
+        {/* =================================================
+            ADMIN
+        ================================================= */}
+
         {admin && (
-          <section>
-            <div className="mb-8">
-              <p className="text-sm font-semibold uppercase tracking-wider text-amber-600">
-                Administration
-              </p>
-              <h2 className="mt-1 text-2xl font-bold text-slate-900 dark:text-slate-100">Team management</h2>
+          <section className="mb-12 sm:mb-16">
+
+            <div className="rounded-2xl border border-amber-200 bg-amber-50/60 p-5 sm:p-6 lg:p-7">
+
+              <div className="mb-5 flex items-start gap-3 sm:mb-6">
+
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-amber-500 text-white">
+                  <FaShieldAlt className="text-sm" />
+                </div>
+
+                <div>
+                  <h2 className="text-lg font-bold tracking-tight text-amber-950 sm:text-xl">
+                    System Administration
+                  </h2>
+
+                  <p className="mt-1 text-xs leading-5 text-amber-800 sm:text-sm">
+                    Manage team access and platform permissions.
+                  </p>
+                </div>
+
+              </div>
+
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+
+                <PortalCard
+                  href="/register"
+                  icon={FaUserPlus}
+                  title="User Management"
+                  description="Create staff accounts and manage system access roles."
+                  accent="amber"
+                  badge="System"
+                />
+
+              </div>
+
             </div>
-            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              <PortalCard
-                href="/register"
-                icon={FaUserPlus}
-                title="Register Staff User"
-                description="Create new staff accounts with appropriate roles for portal access."
-                accent="amber"
-                badge="Admin"
-              />
-            </div>
+
           </section>
         )}
 
-        {/* CTA banner */}
-        <section className="mt-16 overflow-hidden rounded-2xl bg-gradient-to-r from-sky-500 to-blue-600 p-8 text-white shadow-xl shadow-sky-200/40 sm:p-10">
-          <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
-            <div>
-              <h3 className="text-xl font-bold sm:text-2xl">Need to submit a decision today?</h3>
-              <p className="mt-2 max-w-xl text-blue-100">
-                {staff
-                  ? 'Jump straight into the staff form to register a shareholder decision, or open the basket to review recent entries.'
-                  : 'Open your dividend dashboard to review balances and complete your decision form.'}
-              </p>
+
+        {/* =================================================
+            NOTICE / CTA
+        ================================================= */}
+
+        <section className="overflow-hidden rounded-2xl bg-slate-900">
+
+          <div className="flex flex-col gap-5 p-5 sm:p-7 lg:flex-row lg:items-center lg:justify-between lg:p-9">
+
+            <div className="flex gap-4">
+
+              <div className="hidden h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white/10 text-blue-400 sm:flex">
+                <FaClock />
+              </div>
+
+              <div>
+                <h3 className="text-base font-bold text-white sm:text-lg">
+                  {staff
+                    ? 'Daily reconciliation reminder'
+                    : 'Dividend decision deadline'}
+                </h3>
+
+                <p className="mt-1.5 max-w-2xl text-xs leading-5 text-slate-400 sm:text-sm sm:leading-6">
+                  {staff
+                    ? 'Please ensure physical forms are reconciled with digital entries at the end of each working day.'
+                    : 'Dividend reinvestment decisions are subject to the applicable fiscal-year deadline.'}
+                </p>
+              </div>
+
             </div>
-            <div className="flex flex-wrap gap-3">
-              {staff ? (
-                <>
-                  <Link
-                    href="/fillform"
-                    className="inline-flex items-center gap-2 rounded-xl bg-white px-5 py-3 text-sm font-semibold text-sky-700 shadow transition hover:bg-sky-50"
-                  >
-                    Fill Form
-                    <FaArrowRight className="text-xs" />
-                  </Link>
-                  <Link
-                    href="/formbasket"
-                    className="inline-flex items-center gap-2 rounded-xl border border-white/40 px-5 py-3 text-sm font-semibold text-white transition hover:bg-white/10"
-                  >
-                    View Decisions
-                  </Link>
-                </>
-              ) : (
-                <Link
-                  href="/dashboard"
-                  className="inline-flex items-center gap-2 rounded-xl bg-white px-5 py-3 text-sm font-semibold text-sky-700 shadow transition hover:bg-sky-50"
-                >
-                  Go to My Dividend
-                  <FaArrowRight className="text-xs" />
-                </Link>
-              )}
-            </div>
+
+
+            <Link
+              href={staff ? '/formbasket' : '/fillform'}
+              className="
+                flex w-full shrink-0 items-center justify-center
+                gap-2 rounded-xl bg-blue-600
+                px-5 py-3
+                text-sm font-bold text-white
+                transition-colors
+                hover:bg-blue-500
+                active:scale-[0.98]
+                sm:w-auto
+              "
+            >
+              {staff ? 'Open decisions' : 'Make a decision'}
+
+              <FaChevronRight className="text-xs" />
+            </Link>
+
           </div>
+
         </section>
-      </div>
+
+
+        {/* Small footer status */}
+
+        <div className="mt-7 flex flex-col items-center justify-center gap-1 text-center sm:flex-row sm:gap-2">
+
+          <span className="flex items-center gap-1.5 text-[10px] font-medium text-slate-400 sm:text-xs">
+            <FaCheckCircle className="text-emerald-500" />
+            Secure connection
+          </span>
+
+          <span className="hidden text-slate-300 sm:inline">
+            •
+          </span>
+
+          <span className="text-[10px] text-slate-400 sm:text-xs">
+            Awash Insurance Shareholder Portal
+          </span>
+
+        </div>
+
+      </main>
+
     </AppShell>
   );
 }

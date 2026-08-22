@@ -52,9 +52,11 @@ export default function TopBar() {
 
   const navItems = [
     { href: '/home', label: 'Home', icon: FaHome, show: true },
-    { href: '/dashboard', label: 'My Dividend', icon: FaChartLine, show: true },
-    { href: '/fillform', label: 'Fill Form', icon: FaFileInvoiceDollar, show: staff },
-    { href: '/formbasket', label: 'Decisions', icon: FaClipboardList, show: staff },
+    { href: '/devidenddetail', label: 'My Dividend', icon: FaChartLine, show: !staff },
+    { href: '/fillform', label: 'Fill Form', icon: FaFileInvoiceDollar, show: !staff },
+    { href: '/my-decisions', label: 'My Submissions', icon: FaClipboardList, show: !staff },
+    { href: '/staff-fillform', label: 'Fill Form (Staff)', icon: FaFileInvoiceDollar, show: staff },
+    { href: '/formbasket', label: 'All Decisions', icon: FaClipboardList, show: staff },
     { href: '/register', label: 'Register Staff', icon: FaUserPlus, show: admin },
   ].filter((item) => item.show);
 
