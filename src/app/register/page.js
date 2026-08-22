@@ -67,8 +67,8 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-50 to-gray-50 p-4">
-      <div className="w-full max-w-md bg-white rounded-xl shadow-xl overflow-hidden">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-50 to-gray-50 dark:from-slate-950 dark:to-slate-900 p-4">
+      <div className="w-full max-w-md bg-white dark:bg-slate-800 rounded-xl shadow-xl overflow-hidden">
         {/* Header Section */}
         <div className="bg-gradient-to-r from-blue-600 to-blue-800 p-6 text-center text-white">
           <div className="flex justify-center mb-4">
@@ -82,7 +82,7 @@ export default function RegisterPage() {
 
         {/* Registration Form */}
         <div className="p-8">
-          <h2 className="text-xl font-semibold text-gray-800 mb-6 text-center">Create Account</h2>
+          <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-100 mb-6 text-center">Create Account</h2>
 
           {error && (
             <div className="mb-4 p-3 text-sm bg-red-50 text-red-700 rounded-lg border border-red-200">
@@ -99,7 +99,7 @@ export default function RegisterPage() {
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Username */}
             <div>
-              <label htmlFor="username" className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="username" className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">
                 Username <span className="text-red-500">*</span>
               </label>
               <input
@@ -108,7 +108,7 @@ export default function RegisterPage() {
                 type="text"
                 value={formData.username}
                 onChange={handleChange}
-                className="w-full px-4 py-3 border text-gray-800 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                className="w-full px-4 py-3 border text-gray-800 dark:text-gray-100 bg-white dark:bg-slate-900 border-gray-300 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                 placeholder="Enter username"
                 required
               />
@@ -116,7 +116,7 @@ export default function RegisterPage() {
 
             {/* Password */}
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">
                 Password <span className="text-red-500">*</span>
               </label>
               <input
@@ -125,7 +125,7 @@ export default function RegisterPage() {
                 type="password"
                 value={formData.password}
                 onChange={handleChange}
-                className="w-full px-4 py-3 border text-gray-800 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                className="w-full px-4 py-3 border text-gray-800 dark:text-gray-100 bg-white dark:bg-slate-900 border-gray-300 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                 placeholder="At least 6 characters"
                 minLength={6}
                 required
@@ -134,7 +134,7 @@ export default function RegisterPage() {
 
             {/* Confirm Password */}
             <div>
-              <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">
                 Confirm Password <span className="text-red-500">*</span>
               </label>
               <input
@@ -143,7 +143,7 @@ export default function RegisterPage() {
                 type="password"
                 value={formData.confirmPassword}
                 onChange={handleChange}
-                className="w-full px-4 py-3 border text-gray-800 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                className="w-full px-4 py-3 border text-gray-800 dark:text-gray-100 bg-white dark:bg-slate-900 border-gray-300 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                 placeholder="Repeat your password"
                 required
               />
@@ -151,15 +151,15 @@ export default function RegisterPage() {
 
             {/* Role */}
             <div>
-              <label htmlFor="role" className="block text-sm font-medium text-gray-700 mb-1">
-                Role <span className="text-red-500 text-gray-800">*</span>
+              <label htmlFor="role" className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">
+                Role <span className="text-red-500">*</span>
               </label>
               <select
                 id="role"
                 name="role"
                 value={formData.role}
                 onChange={handleChange}
-                className="w-full px-4 py-3 border text-gray-800 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                className="w-full px-4 py-3 border text-gray-800 dark:text-gray-100 bg-white dark:bg-slate-900 border-gray-300 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
               >
                 <option value="staff">Staff</option>
                 {/* <option value="supervisor">Supervisor</option>
@@ -208,8 +208,8 @@ export default function RegisterPage() {
         </div>
 
         {/* Footer */}
-        <div className="bg-gray-50 px-8 py-4 text-center">
-          <p className="text-xs text-gray-500">
+        <div className="bg-gray-50 dark:bg-slate-900 px-8 py-4 text-center">
+          <p className="text-xs text-gray-500 dark:text-gray-400">
             © {new Date().getFullYear()} Awash Insurance. All rights reserved.
           </p>
         </div>

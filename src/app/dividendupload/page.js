@@ -4,12 +4,14 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { FaUpload, FaFileExcel } from 'react-icons/fa';
 import AppShell from '../../components/AppShell';
+import { useTranslation } from '../../components/LanguageProvider';
 
 export default function UploadDividend() {
   const [file, setFile] = useState(null);
   const [isUploading, setIsUploading] = useState(false);
   const [message, setMessage] = useState('');
   const router = useRouter();
+  const { t } = useTranslation();
 
   const handleFileChange = (e) => {
     setFile(e.target.files[0]);
@@ -19,7 +21,7 @@ export default function UploadDividend() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!file) {
-      setMessage('Please select an Excel file.');
+      setMessage(t('upload.selectExcel'));
       return;
     }
 
@@ -62,24 +64,21 @@ export default function UploadDividend() {
   return (
     <AppShell>
       <div className="mx-auto max-w-3xl px-4 py-8 sm:px-6 lg:px-8">
-        <div className="bg-white rounded-xl shadow-md border border-gray-100 overflow-hidden">
+        <div className="theme-surface rounded-xl shadow-md border overflow-hidden">
           <div className="bg-gradient-to-r from-green-700 to-green-600 px-6 py-4">
             <h3 className="text-lg font-semibold text-white flex items-center">
-              <FaFileExcel className="mr-2" /> Upload Shareholder Dividend Data
+              <FaFileExcel className="mr-2" /> {t('upload.title')}
             </h3>
           </div>
 
           <div className="p-6">
-            <p className="text-gray-600 mb-6">
-              Upload an Excel file (<code>.xlsx</code> or <code>.xls</code>) containing shareholder dividend information. 
-              This will populate the <code>sh_dividend</code> table and create corresponding <code>users</code> accounts with the default system password.
-            </p>
+            <p className="text-gray-600 dark:text-gray-300 mb-6">{t('upload.description')} (<code>.xlsx</code> / <code>.xls</code>)</p>
 
             <form onSubmit={handleSubmit} className="space-y-6">
-              <div className="flex flex-col items-center justify-center border-2 border-dashed border-gray-300 rounded-lg p-8 bg-gray-50 hover:bg-gray-100 transition-colors">
+              <div className="flex flex-col items-center justify-center border-2 border-dashed border-gray-300 dark:border-slate-600 rounded-lg p-8 bg-gray-50 dark:bg-slate-800 hover:bg-gray-100 dark:hover:bg-slate-700 transition-colors">
                 <FaUpload className="text-4xl text-gray-400 mb-3" />
                 <label htmlFor="file-upload" className="cursor-pointer text-blue-600 font-medium hover:text-blue-800">
-                  {file ? 'Change File' : 'Click to select Excel file'}
+                  {file ? t('upload.changeFile') : t('upload.selectFile')}
                 </label>
                 <input
                   id="file-upload"
@@ -89,8 +88,8 @@ export default function UploadDividend() {
                   className="hidden"
                 />
                 {file && (
-                  <p className="mt-2 text-sm text-gray-600">
-                    Selected: <span className="font-semibold">{file.name}</span>
+                  <p className="mt-2 text-sm text-gray-600 dark:text-gray-300">
+                    {t('upload.selected')}: <span className="font-semibold">{file.name}</span>
                   </p>
                 )}
               </div>
@@ -114,10 +113,10 @@ export default function UploadDividend() {
                       <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                       <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                     </svg>
-                    Processing...
+                    {t('upload.processing')}
                   </>
                 ) : (
-                  'Upload and Process File'
+                  t('upload.submit')
                 )}
               </button>
             </form>

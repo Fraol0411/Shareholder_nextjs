@@ -4,8 +4,10 @@ import { useEffect, useState } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { FaFileInvoiceDollar, FaUserCircle, FaMoneyBillWave, FaBank, FaPiggyBank } from 'react-icons/fa';
 import AppShell from '../../../components/AppShell';
+import { useTranslation } from '../../../components/LanguageProvider';
 
 export default function FormDetail() {
+  const { t } = useTranslation();
   const router = useRouter();
   const { id } = useParams(); // ✅ Correct way to get dynamic param in App Router
 
@@ -52,7 +54,7 @@ export default function FormDetail() {
     return (
       <AppShell>
         <div className="flex min-h-[50vh] items-center justify-center">
-          <p className="text-gray-600">Loading form details...</p>
+          <p className="text-gray-600 dark:text-gray-300">{t('detail.loading')}</p>
         </div>
       </AppShell>
     );
@@ -80,7 +82,7 @@ export default function FormDetail() {
     return (
       <AppShell>
         <div className="flex min-h-[50vh] items-center justify-center">
-          <p className="text-gray-600">Form not found.</p>
+          <p className="text-gray-600 dark:text-gray-300">{t('detail.notFound')}</p>
         </div>
       </AppShell>
     );
@@ -93,18 +95,18 @@ export default function FormDetail() {
         <div className="bg-gradient-to-r from-blue-700 to-blue-600 rounded-xl p-6 mb-8 text-white shadow-lg">
           <h2 className="text-2xl font-bold flex items-center">
             <FaFileInvoiceDollar className="mr-2" />
-            Form Details
+            {t('detail.formTitle')}
           </h2>
-          <p className="opacity-90">Full information about dividend decision #{id}</p>
+          <p className="opacity-90">{t('detail.formSubtitle')} #{id}</p>
         </div>
 
         {/* Form Details */}
-        <div className="bg-white rounded-xl shadow-md p-8 border border-gray-100 space-y-6">
+        <div className="theme-surface rounded-xl shadow-md p-8 border space-y-6">
           {/* File & Date */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">File Number</label>
-              <p className="text-gray-800 font-medium">{form.file_number}</p>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">{t('form.fileNumber')}</label>
+              <p className="text-gray-800 dark:text-gray-100 font-medium">{form.file_number}</p>
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Submission Date</label>
@@ -116,8 +118,8 @@ export default function FormDetail() {
 
           {/* Shareholder Info */}
           <div className="border-t pt-6">
-            <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center">
-              <FaUserCircle className="mr-2" /> Shareholder Information
+            <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-4 flex items-center">
+              <FaUserCircle className="mr-2" /> {t('detail.shareholderInfo')}
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
@@ -141,8 +143,8 @@ export default function FormDetail() {
 
           {/* Decision Details */}
           <div className="border-t pt-6">
-            <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center">
-              <FaMoneyBillWave className="mr-2" /> Decision Summary
+            <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-4 flex items-center">
+              <FaMoneyBillWave className="mr-2" /> {t('detail.summary')}
             </h3>
             <div className="space-y-3">
               <div>
@@ -187,8 +189,8 @@ export default function FormDetail() {
           {/* Payment Method */}
           {form.decision_type === 'withdraw' && (
             <div className="border-t pt-6">
-              <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center">
-                <FaPiggyBank className="mr-2" /> Payment Details
+              <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-4 flex items-center">
+                <FaPiggyBank className="mr-2" /> {t('detail.paymentDetails')}
               </h3>
               <div className="space-y-3">
                 <div>
@@ -220,7 +222,7 @@ export default function FormDetail() {
 
           {/* Submitted By */}
           <div className="border-t pt-6">
-            <h3 className="text-lg font-semibold text-gray-800 mb-4">Submitted By</h3>
+            <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-4">{t('detail.submittedBy')}</h3>
             <p className="text-gray-800">
               <FaUserCircle className="inline mr-1 text-blue-600" />
               {form.entered_by_name || 'Unknown Staff'}

@@ -429,7 +429,7 @@ export default function ManageShareholders() {
               <p className="text-sm text-gray-500">
                 You are about to delete the {deleteTarget.fiscal_year} dividend record for <span className="font-semibold text-gray-800">{deleteTarget.sh_name}</span>.
               </p>
-              <p className="text-xs text-gray-400 mt-2">This will remove the record for this specific fiscal year. The user's account will remain intact for other years.</p>
+              <p className="text-xs text-gray-400 mt-2">This will remove the record for this specific fiscal year. The user&apos;s account will remain intact for other years.</p>
             </div>
             <div className="grid grid-cols-2 border-t border-gray-100">
               <button

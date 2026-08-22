@@ -7,12 +7,14 @@ import {
   FaHashtag, FaPrint, FaCheck
 } from 'react-icons/fa';
 import AppShell from '../../components/AppShell';
+import { useTranslation } from '../../components/LanguageProvider';
 
 /* ─── Format number helper ─── */
 const fmt = (v) =>
   Number(v || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
 export default function DividendDetail() {
+  const { t } = useTranslation();
   const [regNo, setRegNo] = useState('');
   const [fiscalYears, setFiscalYears] = useState([]);
   const [selectedYear, setSelectedYear] = useState('');
@@ -78,10 +80,10 @@ export default function DividendDetail() {
         <div className="flex flex-col gap-3 mb-6 sm:flex-row sm:items-center sm:justify-between sm:mb-8">
           <div>
             <h2 className="text-xl sm:text-2xl lg:text-3xl font-extrabold text-gray-900 tracking-tight">
-              My Dividend Portfolio
+              {t('detail.title')}
             </h2>
             <p className="text-gray-500 mt-0.5 text-xs sm:text-sm">
-              Track your capital, declared dividends, and historical balances.
+              {t('detail.subtitle')}
             </p>
           </div>
 
@@ -125,13 +127,13 @@ export default function DividendDetail() {
         ) : (
           <div className="space-y-4 sm:space-y-6">
             {/* ── Hero: Total Dividend ── */}
-            <HeroTotalCard value={record.total_dividend} />
+            <HeroTotalCard value={record.total_dividend} t={t} />
 
             {/* ── Metric Cards ── */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
-              <MetricCard label="Paid-up Capital" value={record.paidup_capital} icon={FaWallet} accent="blue" showCurrency />
-              <MetricCard label="Dividend Declared" value={record.dividend_declared} icon={FaChartLine} accent="emerald" />
-              <MetricCard label="Dividend B/F" value={record.dividend_bf} icon={FaHistory} accent="violet" />
+              <MetricCard label={t('detail.paidCapital')} value={record.paidup_capital} icon={FaWallet} accent="blue" showCurrency />
+              <MetricCard label={t('detail.declared')} value={record.dividend_declared} icon={FaChartLine} accent="emerald" />
+              <MetricCard label={t('detail.broughtForward')} value={record.dividend_bf} icon={FaHistory} accent="violet" />
             </div>
 
             {/* ── Shareholder Profile ── */}
@@ -156,6 +158,7 @@ export default function DividendDetail() {
 /* ── Fiscal Year Dropdown ── */
 function FiscalYearDropdown({ years, selected, onSelect }) {
   const [open, setOpen] = useState(false);
+  const { t } = useTranslation();
   const ref = useRef(null);
   const disabled = years.length === 0;
 
@@ -187,7 +190,7 @@ function FiscalYearDropdown({ years, selected, onSelect }) {
     setOpen(false);
   };
 
-  const displayLabel = selected ? `FY ${selected}` : (disabled ? 'No years' : 'Select year');
+  const displayLabel = selected ? `FY ${selected}` : (disabled ? t('detail.noYears') : t('detail.selectYear'));
 
   return (
     <div ref={ref} className="relative flex-1 sm:flex-none sm:w-52">
@@ -233,7 +236,7 @@ function FiscalYearDropdown({ years, selected, onSelect }) {
               absolute z-50 top-full left-0 right-auto
               mt-1.5 w-full min-w-[12rem]
               max-h-64 overflow-y-auto
-              bg-white border border-gray-200 rounded-lg
+              theme-surface border rounded-lg
               shadow-lg ring-1 ring-black/5
               py-1
               animate-[slideUp_0.15s_ease]
@@ -271,6 +274,7 @@ function FiscalYearDropdown({ years, selected, onSelect }) {
 
 /* ── Hero Total Card ── */
 function HeroTotalCard({ value }) {
+  const { t } = useTranslation();
   return (
     <div className="relative overflow-hidden rounded-xl sm:rounded-2xl bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800 px-4 py-5 sm:p-8 text-white shadow-xl">
       {/* decorative rings */}
@@ -279,14 +283,14 @@ function HeroTotalCard({ value }) {
 
       <div className="relative z-10">
         <p className="text-[11px] sm:text-sm font-semibold uppercase tracking-widest text-blue-200">
-          Total Dividend Balance
+          {t('detail.total')}
         </p>
         <p className="mt-2 text-3xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight tabular-nums">
           {fmt(value)}
         </p>
         <div className="mt-2 sm:mt-3 flex items-center gap-1.5 text-xs sm:text-sm text-blue-200">
           <FaMoneyBillWave className="shrink-0" />
-          <span>Declared + brought-forward dividends</span>
+          <span>{t('detail.declaredForward')}</span>
         </div>
       </div>
     </div>
@@ -304,7 +308,7 @@ function MetricCard({ label, value, icon: Icon, accent = 'blue', showCurrency = 
   const c = accentMap[accent] || accentMap.blue;
 
   return (
-    <div className="group relative bg-white rounded-xl border border-gray-100 px-4 py-3.5 sm:p-5 shadow-sm hover:shadow-md transition-all duration-200">
+    <div className="group relative theme-surface rounded-xl border px-4 py-3.5 sm:p-5 shadow-sm hover:shadow-md transition-all duration-200">
       <div className="flex items-center gap-2.5 mb-2">
         <div className={`p-2 rounded-lg ${c.bg} ${c.text} ring-1 ${c.ring}`}>
           <Icon className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
@@ -332,12 +336,12 @@ function ProfileCard({ record }) {
   ];
 
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+    <div className="theme-surface rounded-xl shadow-sm border overflow-hidden">
       <div className="px-4 py-3 sm:px-5 sm:py-3.5 border-b border-gray-100 flex items-center gap-2.5">
         <div className="p-1.5 bg-gray-100 rounded-lg text-gray-600">
           <FaUser className="w-3.5 h-3.5" />
         </div>
-        <h3 className="text-sm sm:text-base font-bold text-gray-800">Shareholder Profile</h3>
+        <h3 className="text-sm sm:text-base font-bold text-gray-800 dark:text-gray-100">Shareholder Profile</h3>
       </div>
       <div className="px-4 py-4 sm:p-5 grid grid-cols-2 sm:grid-cols-3 gap-x-4 gap-y-4 sm:gap-x-8 sm:gap-y-5">
         {fields.map(({ icon: Icon, label, value }) => (
@@ -347,7 +351,7 @@ function ProfileCard({ record }) {
             </div>
             <div className="min-w-0">
               <p className="text-[10px] sm:text-[11px] font-bold text-gray-400 uppercase tracking-wider truncate">{label}</p>
-              <p className="text-xs sm:text-sm font-semibold text-gray-800 mt-0.5 break-words truncate">{value || '—'}</p>
+              <p className="text-xs sm:text-sm font-semibold text-gray-800 dark:text-gray-100 mt-0.5 break-words truncate">{value || '-'}</p>
             </div>
           </div>
         ))}
@@ -365,7 +369,7 @@ function SkeletonLayout() {
       {/* Metric skeletons */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
         {[0, 1, 2].map((i) => (
-          <div key={i} className="rounded-xl bg-white border border-gray-100 px-4 py-3.5 space-y-3">
+          <div key={i} className="theme-surface rounded-xl border px-4 py-3.5 space-y-3">
             <div className="flex items-center gap-2.5">
               <div className="w-8 h-8 rounded-lg bg-gray-100" />
               <div className="h-3 w-16 rounded bg-gray-100" />
@@ -392,8 +396,9 @@ function SkeletonLayout() {
 
 /* ── Empty State ── */
 function EmptyState() {
+  const { t } = useTranslation();
   return (
-    <div className="flex flex-col items-center justify-center py-16 sm:py-20 bg-white rounded-xl border border-gray-100 shadow-sm">
+    <div className="theme-surface flex flex-col items-center justify-center py-16 sm:py-20 rounded-xl border shadow-sm">
       <div className="w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center mb-4">
         <FaHistory className="text-2xl text-gray-300" />
       </div>

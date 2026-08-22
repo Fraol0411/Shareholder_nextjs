@@ -4,8 +4,10 @@ import { useEffect, useState } from 'react';
 import { FaFileInvoiceDollar, FaFilter, FaSearch } from 'react-icons/fa';
 import { useRouter } from 'next/navigation';
 import AppShell from '../../components/AppShell';
+import { useTranslation } from '../../components/LanguageProvider';
 
 export default function FormBasket() {
+  const { t } = useTranslation();
   const [forms, setForms] = useState([]);
   const [filteredForms, setFilteredForms] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -110,26 +112,26 @@ export default function FormBasket() {
         <div className="bg-gradient-to-r from-green-700 to-green-600 rounded-xl p-6 mb-8 text-white shadow-lg">
           <h2 className="text-2xl font-bold flex items-center">
             <FaFileInvoiceDollar className="mr-2" />
-            Form Basket – Dividend Decisions
+            {t('basket.title')}
           </h2>
-          <p className="opacity-90">Select a fiscal year to view and filter forms</p>
+          <p className="opacity-90">{t('basket.subtitle')}</p>
         </div>
 
         {/* Filters */}
-        <div className="bg-white rounded-xl shadow-md p-6 mb-6 border border-gray-100">
-          <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center">
-            <FaFilter className="mr-2" /> Filter Forms
+        <div className="theme-surface rounded-xl shadow-md p-6 mb-6 border">
+          <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-4 flex items-center">
+            <FaFilter className="mr-2" /> {t('basket.filters')}
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {/* Fiscal Year (Required) */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Fiscal Year *</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">{t('form.fiscalYear')} *</label>
               <select
                 value={fiscalYear}
                 onChange={(e) => setFiscalYear(e.target.value)}
-                className="w-full px-3 py-2 text-gray-800 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
+                className="theme-control w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
               >
-                <option value="">Select Year</option>
+                <option value="">{t('basket.selectYear')}</option>
                 <option value="2024/2025">2024/2025</option>
                 <option value="2025/2026">2025/2026</option>
                 <option value="2026/2027">2026/2027</option>
@@ -139,12 +141,12 @@ export default function FormBasket() {
 
             {/* Decision Type */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Decision Type</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">{t('basket.decisionType')}</label>
               <select
                 value={decisionType}
                 onChange={(e) => setDecisionType(e.target.value)}
                 disabled={!fiscalYear}
-                className="w-full px-3 py-2 border text-gray-800 border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 bg-gray-50 disabled:bg-gray-100 disabled:cursor-not-allowed"
+                className="theme-control w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 disabled:opacity-60 disabled:cursor-not-allowed"
               >
                 <option value="">All Types</option>
                 <option value="reinvest">Reinvest Full</option>
@@ -155,12 +157,12 @@ export default function FormBasket() {
 
             {/* Payment Method */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Payment Method</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">{t('basket.paymentMethod')}</label>
               <select
                 value={paymentMethod}
                 onChange={(e) => setPaymentMethod(e.target.value)}
                 disabled={!fiscalYear}
-                className="w-full px-3 text-gray-800 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 bg-gray-50 disabled:bg-gray-100 disabled:cursor-not-allowed"
+                className="theme-control w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 disabled:opacity-60 disabled:cursor-not-allowed"
               >
                 <option value="">All Methods</option>
                 <option value="bank-transfer">Bank Transfer</option>
@@ -196,7 +198,7 @@ export default function FormBasket() {
 
             {/* Search */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Search</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">{t('basket.search')}</label>
               <div className="relative">
                 <FaSearch className="absolute left-3 top-3 text-gray-400" />
                 <input
@@ -205,7 +207,7 @@ export default function FormBasket() {
                   onChange={(e) => setSearchTerm(e.target.value)}
                   placeholder="File # or Name"
                   disabled={!fiscalYear}
-                  className="w-full pl-10 px-3 py-2 border text-gray-800 border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 bg-gray-50 disabled:bg-gray-100 disabled:cursor-not-allowed"
+                  className="theme-control w-full pl-10 px-3 py-2 border rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 disabled:opacity-60 disabled:cursor-not-allowed"
                 />
               </div>
             </div>
@@ -223,8 +225,8 @@ export default function FormBasket() {
         {!fiscalYear && (
           <div className="text-center py-16">
             <FaFileInvoiceDollar className="mx-auto text-gray-300 text-6xl mb-4" />
-            <h3 className="text-lg font-medium text-gray-700 mb-2">Select a Fiscal Year</h3>
-            <p className="text-gray-500 mb-4">Please choose a fiscal year above to view dividend forms.</p>
+            <h3 className="text-lg font-medium text-gray-700 dark:text-gray-200 mb-2">{t('basket.noYear')}</h3>
+            <p className="text-gray-500 dark:text-gray-400 mb-4">{t('basket.noYearHelp')}</p>
             <p className="text-sm text-gray-400">This helps reduce load time and focus on relevant data.</p>
           </div>
         )}
@@ -239,10 +241,10 @@ export default function FormBasket() {
 
             {filteredForms.length === 0 ? (
               <div className="text-center py-10">
-                <p className="text-gray-500">No forms match your filters.</p>
+                <p className="text-gray-500 dark:text-gray-400">{t('basket.noResults')}</p>
               </div>
             ) : (
-              <div className="bg-white rounded-xl shadow-md overflow-hidden border border-gray-100">
+              <div className="theme-surface rounded-xl shadow-md overflow-hidden border">
                 <div className="overflow-x-auto">
                   <table className="w-full text-sm">
                     <thead className="bg-gray-50 border-b">

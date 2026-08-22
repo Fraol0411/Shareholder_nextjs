@@ -4,10 +4,12 @@ import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { FaUserCircle, FaSignOutAlt, FaMoneyBillWave, FaChartLine, FaBank, FaFileInvoiceDollar } from 'react-icons/fa';
 import AppShell from 'src/components/AppShell';
+import { useTranslation } from '../../components/LanguageProvider';
 
 
 export default function ShareholderDashboard() {
   const router = useRouter();
+  const { t } = useTranslation();
   const [decision, setDecision] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showBankDetails, setShowBankDetails] = useState(false);
@@ -51,31 +53,31 @@ export default function ShareholderDashboard() {
           <main className="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
             {/* Welcome Banner */}
             <div className="bg-gradient-to-r from-blue-700 to-blue-600 rounded-xl p-6 mb-8 text-white shadow-lg">
-              <h2 className="text-2xl font-bold mb-2">እንኳን ወደ የአዋሽ የሼር ሆልደር ፓናልዎ በደህና መጡ!</h2>
-              <p className="opacity-90">የእርስዎን የድርሻ ክፍያ መረጃ ይመልከቱ እና ዉሳኔ ይስጡ</p>
+              <h2 className="text-2xl font-bold mb-2">{t('dashboard.welcome')}</h2>
+              <p className="opacity-90">{t('dashboard.subtitle')}</p>
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               {/* Personal Info Card */}
-              <div className="bg-white rounded-xl shadow-md overflow-hidden border border-gray-100">
+              <div className="bg-white dark:bg-slate-800 rounded-xl shadow-md overflow-hidden border border-gray-100 dark:border-slate-700">
                 <div className="bg-gradient-to-r from-blue-800 to-blue-700 px-6 py-4">
                   <h3 className="text-lg font-semibold text-white flex items-center">
-                    <FaUserCircle className="mr-2" /> የንግል መረጃ
+                    <FaUserCircle className="mr-2" /> {t('dashboard.personalInfo')}
                   </h3>
                 </div>
                 <div className="p-6">
                   <div className="space-y-4">
                     <div>
-                      <p className="text-xs font-medium text-gray-500 uppercase tracking-wider">የፋይል ቁጥር</p>
-                      <p className="font-medium text-gray-800 mt-1">{shareholderData.fileNumber}</p>
+                      <p className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">{t('dashboard.fileNumber')}</p>
+                      <p className="font-medium text-gray-800 dark:text-gray-100 mt-1">{shareholderData.fileNumber}</p>
                     </div>
                     <div>
-                      <p className="text-xs font-medium text-gray-500 uppercase tracking-wider">ኢሜይል</p>
-                      <p className="font-medium text-gray-800 mt-1">{shareholderData.email}</p>
+                      <p className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">{t('dashboard.email')}</p>
+                      <p className="font-medium text-gray-800 dark:text-gray-100 mt-1">{shareholderData.email}</p>
                     </div>
                     <div>
-                      <p className="text-xs font-medium text-gray-500 uppercase tracking-wider">ስልክ ቁጥር</p>
-                      <p className="font-medium text-gray-800 mt-1">{shareholderData.phone}</p>
+                      <p className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">{t('dashboard.phone')}</p>
+                      <p className="font-medium text-gray-800 dark:text-gray-100 mt-1">{shareholderData.phone}</p>
                     </div>
                     {/* <div>
                       <p className="text-xs font-medium text-gray-500 uppercase tracking-wider">የተመዘገበበት ዘመን</p>
@@ -86,31 +88,31 @@ export default function ShareholderDashboard() {
               </div>
 
               {/* Dividend Summary Card */}
-              <div className="bg-white rounded-xl shadow-md overflow-hidden border border-gray-100 lg:col-span-2">
+              <div className="bg-white dark:bg-slate-800 rounded-xl shadow-md overflow-hidden border border-gray-100 dark:border-slate-700 lg:col-span-2">
                 <div className="bg-gradient-to-r from-green-700 to-green-600 px-6 py-4">
                   <h3 className="text-lg font-semibold text-white flex items-center">
-                    <FaMoneyBillWave className="mr-2" /> የድርሻ ክፍያ ቅጽ
+                    <FaMoneyBillWave className="mr-2" /> {t('dashboard.dividendForm')}
                   </h3>
                 </div>
                 <div className="p-6">
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
                     <div className="bg-blue-50 p-4 rounded-lg border border-blue-100">
-                      <p className="text-xs font-medium text-blue-600 uppercase tracking-wider">የተከፈለ ካፒታል</p>
+                      <p className="text-xs font-medium text-blue-600 uppercase tracking-wider">{t('dashboard.paidCapital')}</p>
                       <p className="text-2xl font-bold text-blue-800 mt-1">ETB {shareholderData.paidUpCapital.toLocaleString()}</p>
                     </div>
                     <div className="bg-green-50 p-4 rounded-lg border border-green-100">
-                      <p className="text-xs font-medium text-green-600 uppercase tracking-wider">ጠቅላላ የድርሻ ክፍያ</p>
+                      <p className="text-xs font-medium text-green-600 uppercase tracking-wider">{t('dashboard.grossDividend')}</p>
                       <p className="text-2xl font-bold text-green-800 mt-1">ETB {shareholderData.grossDividend.toLocaleString()}</p>
                     </div>
                     <div className="bg-purple-50 p-4 rounded-lg border border-purple-100">
-                      <p className="text-xs font-medium text-purple-600 uppercase tracking-wider">የተሻገረ የድርሻ ክፍያ</p>
+                      <p className="text-xs font-medium text-purple-600 uppercase tracking-wider">{t('dashboard.broughtForward')}</p>
                       <p className="text-2xl font-bold text-purple-800 mt-1">ETB {shareholderData.dividendBroughtForward.toLocaleString()}</p>
                     </div>
                   </div>
 
                   {/* Total Balance Highlight */}
                   <div className="bg-gradient-to-r from-blue-50 to-blue-100 border border-blue-200 rounded-xl p-5 mb-6 shadow-inner">
-                    <p className="text-sm font-medium text-blue-600 uppercase tracking-wider">ጠቅላላ የድርሻ ክፍያ መጠን </p>
+                    <p className="text-sm font-medium text-blue-600 uppercase tracking-wider">{t('dashboard.totalDividend')}</p>
                     <p className="text-3xl font-bold text-blue-900 mt-2">
                       ETB {shareholderData.totalDividendBalance.toLocaleString()}
                     </p>
@@ -118,12 +120,12 @@ export default function ShareholderDashboard() {
 
                   {/* Decision Form */}
                   <form onSubmit={handleSubmit} className="mt-6 border-t border-gray-200 pt-6">
-                    <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center">
-                      <FaFileInvoiceDollar className="mr-2 text-blue-600" /> ውሳኔ ይስጡ
+                    <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-4 flex items-center">
+                      <FaFileInvoiceDollar className="mr-2 text-blue-600" /> {t('dashboard.makeDecision')}
                     </h3>
                     
                     <div className="space-y-4">
-                      <div className="flex items-start p-4 rounded-lg hover:bg-gray-50 transition-colors border border-gray-200">
+                      <div className="flex items-start p-4 rounded-lg hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors border border-gray-200 dark:border-slate-600">
                         <div className="flex items-center h-5 mt-1">
                           <input
                             id="reinvest"
@@ -136,12 +138,12 @@ export default function ShareholderDashboard() {
                           />
                         </div>
                         <label htmlFor="reinvest" className="ml-3 block">
-                          <span className="font-semibold text-gray-800">የትርፍ ድርሻዬን በሙሉ ወደ ካፒታል ማዞር</span>
-                          <p className="text-gray-600 mt-1 text-sm">አስካሁን ያልወሰድኩት የትርፍ ድርሻዬ በሙሉ ወደ ካፒታል ይዙርልኝ</p>
+                          <span className="font-semibold text-gray-800 dark:text-gray-100">{t('dashboard.reinvestAll')}</span>
+                          <p className="text-gray-600 dark:text-gray-300 mt-1 text-sm">{t('dashboard.reinvestAllHelp')}</p>
                         </label>
                       </div>
 
-                    <div className="flex items-start p-4 rounded-lg hover:bg-gray-50 transition-colors border border-gray-200">
+                    <div className="flex items-start p-4 rounded-lg hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors border border-gray-200 dark:border-slate-600">
                         <div className="flex items-center h-5 mt-1">
                           <input
                             id="reinvestyear"
@@ -154,12 +156,12 @@ export default function ShareholderDashboard() {
                           />
                         </div>
                         <label htmlFor="reinvest" className="ml-3 block">
-                          <span className="font-semibold text-gray-800">አ ኤ አ የ2023/24 ዓመት የትርፍ ድርሻዬን ወደ ካፒታል ማዞር</span>
-                          <p className="text-gray-600 mt-1 text-sm"> የ2023/24 ዓመት የትርፍ ድርሻዬን ወደ ካፒታል ማዞር </p>
+                          <span className="font-semibold text-gray-800 dark:text-gray-100">{t('dashboard.reinvestYear')}</span>
+                          <p className="text-gray-600 dark:text-gray-300 mt-1 text-sm">{t('dashboard.reinvestYear')}</p>
                         </label>
                       </div>
 
-                      <div className="flex items-start p-4 rounded-lg hover:bg-gray-50 transition-colors border border-gray-200">
+                      <div className="flex items-start p-4 rounded-lg hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors border border-gray-200 dark:border-slate-600">
                         <div className="flex items-center h-5 mt-1">
                           <input
                             id="withdraw"
@@ -172,8 +174,8 @@ export default function ShareholderDashboard() {
                           />
                         </div>
                         <label htmlFor="withdraw" className="ml-3 block">
-                          <span className="font-semibold text-gray-800">የትርፍ ድርሻዬን መውሰድ</span>
-                          <p className="text-gray-600 mt-1 text-sm">የድርሻ ክፍያዎን እንደ ገንዘብ ማግኘት ይምረጡ</p>
+                          <span className="font-semibold text-gray-800 dark:text-gray-100">{t('dashboard.withdraw')}</span>
+                          <p className="text-gray-600 dark:text-gray-300 mt-1 text-sm">{t('dashboard.withdrawHelp')}</p>
                         </label>
                       </div>
 
@@ -203,16 +205,16 @@ export default function ShareholderDashboard() {
                             <div className="p-3 rounded-lg bg-gray-50 border border-gray-200">
                               <div className="mb-2">
                                 <label className="block text-gray-800 font-medium mb-1">
-                                  በገንዘብ የሚክፍልኝ መጠን
+                                  {t('dashboard.cashAmount')}
                                 </label>
                                 <input
                                   type="text"
-                                  placeholder="የሚወሰድ መጠን (ETB)"
+                                  placeholder={t('dashboard.amountPlaceholder')}
                                   className="w-full px-3 text-gray-800 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
                                   max={shareholderData.totalDividendBalance}
                                 />
                                 <p className="text-xs text-gray-500 mt-1">
-                                  ከፍተኛ መጠን: ETB {shareholderData.totalDividendBalance.toLocaleString()}
+                                  {t('dashboard.maximum')}: ETB {shareholderData.totalDividendBalance.toLocaleString()}
                                 </p>
                               </div>
 
@@ -231,23 +233,23 @@ export default function ShareholderDashboard() {
                                   </div>
                                   
                                   <label htmlFor="bank-transfer" className="ml-3 block">
-                                    <span className="font-medium text-gray-800">ወደ ባንክ ሂሳብ ላክ</span>
+                                    <span className="font-medium text-gray-800 dark:text-gray-100">{t('dashboard.bankTransfer')}</span>
                                     {paymentMethod === 'bank-transfer' && (
                                       <div className="mt-2 space-y-2">
                                         <input
                                           type="text"
-                                          placeholder="የባንክ ስም"
+                                          placeholder={t('dashboard.bankName')}
                                           defaultValue={shareholderData.bankName}
                                           className="w-full px-3 py-2 text-gray-800 text-sm border border-gray-300 rounded-md"
                                         />
                                         <input
                                           type="text"
-                                          placeholder="የቅርንጫፍ ስም"
+                                          placeholder={t('dashboard.branchName')}
                                           className="w-full px-3 py-2 text-gray-800 text-sm border border-gray-300 rounded-md"
                                         />
                                         <input
                                           type="text"
-                                          placeholder="የሂሳብ ቁጥር"
+                                          placeholder={t('dashboard.accountNumber')}
                                           defaultValue={shareholderData.accountNumber}
                                           className="w-full px-3 py-2 text-sm border text-gray-800 border-gray-300 rounded-md"
                                         />
@@ -268,7 +270,7 @@ export default function ShareholderDashboard() {
                                     />
                                   </div>
                                   <label htmlFor="check" className="ml-3 block">
-                                    <span className="font-medium text-gray-800">ቼክ በመጠቀም ይቀበሉ</span>
+                                    <span className="font-medium text-gray-800 dark:text-gray-100">{t('dashboard.check')}</span>
                                   </label>
                                 </div>
                               </div>
@@ -290,9 +292,9 @@ export default function ShareholderDashboard() {
                                 <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                                 <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                               </svg>
-                              በማስገባት ላይ...
+                              {t('dashboard.submitting')}
                             </span>
-                          ) : 'ውሳኔዎን አስገቡ'}
+                          ) : t('dashboard.submit')}
                         </button>
                       </div>
                     </div>

@@ -39,3 +39,4 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+.qoder/plans/Theme_and_i18n_a18e7734.md

@@ -1,10 +1,27 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 :root {
   --background: #f8fafc;
   --foreground: #0f172a;
   --brand-blue: #1d4ed8;
   --brand-teal: #0d9488;
+  --surface: #ffffff;
+  --surface-elevated: #f8fafc;
+  --border: #e2e8f0;
+  --muted: #64748b;
+}
+
+.dark {
+  --background: #0f172a;
+  --foreground: #f1f5f9;
+  --brand-blue: #60a5fa;
+  --brand-teal: #2dd4bf;
+  --surface: #1e293b;
+  --surface-elevated: #334155;
+  --border: #475569;
+  --muted: #94a3b8;
 }
 
 @theme inline {
@@ -18,6 +35,29 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-geist-sans), system-ui, sans-serif;
+  transition: background-color 200ms ease, color 200ms ease;
+}
+
+:root[lang="am"] body,
+:root[lang="om"] body {
+  font-family: var(--font-noto-ethiopic), var(--font-geist-sans), system-ui, sans-serif;
+}
+
+.theme-surface {
+  background: var(--surface);
+  border-color: var(--border);
+  color: var(--foreground);
+}
+
+.theme-surface-muted {
+  background: var(--surface-elevated);
+  border-color: var(--border);
+}
+
+.theme-control {
+  background: var(--surface);
+  border-color: var(--border);
+  color: var(--foreground);
 }
 
 @keyframes slideUp {

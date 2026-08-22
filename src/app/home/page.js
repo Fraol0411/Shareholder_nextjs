@@ -41,7 +41,7 @@ function PortalCard({ href, icon: Icon, title, description, accent = 'blue', bad
   return (
     <Link
       href={href}
-      className="group relative overflow-hidden rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-xl"
+      className="group relative overflow-hidden rounded-2xl border border-slate-200/80 bg-white dark:border-slate-700 dark:bg-slate-800 p-6 shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-xl"
     >
       <div
         className={`mb-5 inline-flex rounded-xl bg-gradient-to-br ${accents[accent]} p-3 text-white shadow-lg transition group-hover:scale-105`}
@@ -49,12 +49,12 @@ function PortalCard({ href, icon: Icon, title, description, accent = 'blue', bad
         <Icon className="text-xl" />
       </div>
       {badge && (
-        <span className="absolute right-5 top-5 rounded-full bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-600">
+        <span className="absolute right-5 top-5 rounded-full bg-slate-100 dark:bg-slate-700 px-2.5 py-1 text-xs font-medium text-slate-600 dark:text-slate-300">
           {badge}
         </span>
       )}
-      <h3 className="text-lg font-semibold text-slate-900">{title}</h3>
-      <p className="mt-2 text-sm leading-relaxed text-slate-600">{description}</p>
+      <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100">{title}</h3>
+      <p className="mt-2 text-sm leading-relaxed text-slate-600 dark:text-slate-300">{description}</p>
       <span className="mt-5 inline-flex items-center gap-2 text-sm font-medium text-blue-700 transition group-hover:gap-3">
         Open
         <FaArrowRight className="text-xs" />
@@ -91,17 +91,17 @@ export default function HomePortalPage() {
   return (
     <AppShell>
       {/* Hero */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-sky-100 via-blue-100 to-sky-50">
+      <section className="relative overflow-hidden bg-gradient-to-br from-sky-100 via-blue-100 to-sky-50 dark:from-slate-800 dark:via-slate-900 dark:to-slate-950">
         <div className="absolute inset-0 opacity-40">
           <div className="absolute -left-20 top-10 h-72 w-72 rounded-full bg-sky-300 blur-3xl" />
           <div className="absolute bottom-0 right-0 h-80 w-80 rounded-full bg-blue-200 blur-3xl" />
         </div>
         <div className="relative mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8 lg:py-5">
           <div className="max-w-3xl">
-            <h1 className="mt-6 text-3xl font-bold tracking-tight text-slate-800 sm:text-4xl lg:text-5xl">
+            <h1 className="mt-6 text-3xl font-bold tracking-tight text-slate-800 dark:text-slate-100 sm:text-4xl lg:text-5xl">
               Welcome back, <span className="text-transparent bg-clip-text bg-gradient-to-r from-sky-600 to-blue-700">{user.username}</span>
             </h1>
-            <p className="mt-4 text-lg leading-relaxed text-slate-600">
+            <p className="mt-4 text-lg leading-relaxed text-slate-600 dark:text-slate-300">
               Your gateway to dividend information, decision forms, and shareholder records.
             </p>
           </div>
@@ -116,8 +116,8 @@ export default function HomePortalPage() {
               <p className="text-sm font-semibold uppercase tracking-wider text-emerald-600">
                 Shareholder Portal
               </p>
-              <h2 className="mt-1 text-2xl font-bold text-slate-900">Your dividend services</h2>
-              <p className="mt--2 max-w-2xl text-slate-600">
+              <h2 className="mt-1 text-2xl font-bold text-slate-900 dark:text-slate-100">Your dividend services</h2>
+              <p className="mt--2 max-w-2xl text-slate-600 dark:text-slate-300">
                 Check balances, review payment details, and submit your dividend decision — the
                 same experience a shareholder would use on the public-facing site.
               </p>
@@ -155,8 +155,8 @@ export default function HomePortalPage() {
         {staff && (
           <section className="mb-14">
             <div className="mb-8">
-              <h2 className="mt-1 text-2xl font-bold text-slate-900">Process shareholder decisions</h2>
-              <p className="mt-2 max-w-2xl text-slate-600">
+              <h2 className="mt-1 text-2xl font-bold text-slate-900 dark:text-slate-100">Process shareholder decisions</h2>
+              <p className="mt-2 max-w-2xl text-slate-600 dark:text-slate-300">
                 Tools for front-desk and operations staff to enter forms on behalf of shareholders
                 and review all submitted decisions.
               </p>
@@ -214,7 +214,7 @@ export default function HomePortalPage() {
               <p className="text-sm font-semibold uppercase tracking-wider text-amber-600">
                 Administration
               </p>
-              <h2 className="mt-1 text-2xl font-bold text-slate-900">Team management</h2>
+              <h2 className="mt-1 text-2xl font-bold text-slate-900 dark:text-slate-100">Team management</h2>
             </div>
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
               <PortalCard

@@ -4,9 +4,11 @@ import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { FaMoneyBillWave, FaFileInvoiceDollar } from 'react-icons/fa';
 import AppShell from '../../components/AppShell';
+import { useTranslation } from '../../components/LanguageProvider';
 
 export default function ShareholderDashboard() {
   const router = useRouter();
+  const { t } = useTranslation();
   const [decision, setDecision] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState('');
@@ -78,15 +80,15 @@ export default function ShareholderDashboard() {
       <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
         {/* Welcome Banner */}
         <div className="bg-gradient-to-r from-blue-700 to-blue-600 rounded-xl p-6 mb-8 text-white shadow-lg">
-          <h2 className="text-2xl font-bold mb-2">Awash Shareholder&apos;s Panel</h2>
-          <p className="opacity-90">Dividend Payment Information and Decision</p>
+          <h2 className="text-2xl font-bold mb-2">{t('form.panel')}</h2>
+          <p className="opacity-90">{t('form.description')}</p>
         </div>
 
         {/* Dividend Decision Form */}
-        <div className="bg-white rounded-xl shadow-md border border-gray-100">
+        <div className="theme-surface rounded-xl shadow-md border">
           <div className="bg-gradient-to-r from-green-700 to-green-600 px-6 py-4">
             <h3 className="text-lg font-semibold text-white flex items-center">
-              <FaMoneyBillWave className="mr-2" /> Dividend Payment Form
+              <FaMoneyBillWave className="mr-2" /> {t('form.title')}
             </h3>
           </div>
 
@@ -94,19 +96,19 @@ export default function ShareholderDashboard() {
             <form onSubmit={handleSubmit} className="space-y-6">
               {/* Form Fields Grid */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                <div className="p-4 bg-white border border-gray-200 rounded-lg">
-                  <label className="block text-sm font-medium text-gray-700 mb-1">File Number</label>
-                  <input name="file_number" type="text" placeholder="Enter file number" className="w-full px-3 py-2 border text-gray-800 border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500" />
+                <div className="theme-surface-muted p-4 border rounded-lg">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">{t('form.fileNumber')}</label>
+                  <input name="file_number" type="text" placeholder={t('form.fileNumber')} className="theme-control w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500" />
                 </div>
 
-                <div className="p-4 bg-white border border-gray-200 rounded-lg">
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Date</label>
-                  <input name="date" type="date" className="w-full px-3 py-2 border text-gray-800 border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500" />
+                <div className="theme-surface-muted p-4 border rounded-lg">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">{t('form.date')}</label>
+                  <input name="date" type="date" className="theme-control w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500" />
                 </div>
 
-                <div className="p-4 bg-white border border-gray-200 rounded-lg">
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Fiscal Year</label>
-                  <select name="fiscal_year" className="w-full px-3 py-2 border text-gray-800 border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500">
+                <div className="theme-surface-muted p-4 border rounded-lg">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">{t('form.fiscalYear')}</label>
+                  <select name="fiscal_year" className="theme-control w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500">
                     <option value="2024/2025">2024/2025</option>
                     <option value="2025/2026">2025/2026</option>
                     <option value="2026/2027">2026/2027</option>
@@ -114,25 +116,25 @@ export default function ShareholderDashboard() {
                   </select>
                 </div>
 
-                <div className="p-4 bg-white border border-gray-200 rounded-lg md:col-span-2">
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Shareholder Name</label>
-                  <input name="shareholder_name" type="text" placeholder="Enter full name" className="w-full px-3 py-2 border text-gray-800 border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500" />
+                <div className="theme-surface-muted p-4 border rounded-lg md:col-span-2">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">{t('form.shareholderName')}</label>
+                  <input name="shareholder_name" type="text" placeholder={t('form.shareholderName')} className="theme-control w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500" />
                 </div>
 
-                <div className="p-4 bg-white border border-gray-200 rounded-lg">
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
-                  <input name="email" type="email" placeholder="Enter email address" className="w-full px-3 py-2 border text-gray-800 border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500" />
+                <div className="theme-surface-muted p-4 border rounded-lg">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">{t('form.email')}</label>
+                  <input name="email" type="email" placeholder={t('form.email')} className="theme-control w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500" />
                 </div>
 
-                <div className="p-4 bg-white border border-gray-200 rounded-lg">
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Phone Number</label>
-                  <input name="phone" type="tel" placeholder="Enter phone number" className="w-full px-3 py-2 border text-gray-800 border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500" />
+                <div className="theme-surface-muted p-4 border rounded-lg">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">{t('form.phone')}</label>
+                  <input name="phone" type="tel" placeholder={t('form.phone')} className="theme-control w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500" />
                 </div>
               </div>
 
               {/* Decision Section */}
               <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center">
-                <FaFileInvoiceDollar className="mr-2 text-blue-600" /> Make Your Decision
+                <FaFileInvoiceDollar className="mr-2 text-blue-600" /> {t('form.decision')}
               </h3>
 
               <div className="space-y-4">

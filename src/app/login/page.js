@@ -8,6 +8,7 @@ import {
   FaChartLine, FaFileInvoiceDollar, FaClipboardCheck,
   FaEye, FaEyeSlash
 } from 'react-icons/fa';
+import ThemeToggle from '../../components/ThemeToggle';
 
 export default function LoginPage() {
   const [identifier, setIdentifier] = useState('');
@@ -52,7 +53,7 @@ export default function LoginPage() {
   };
 
   return (
-<div className="flex min-h-screen w-full bg-slate-50 font-sans selection:bg-sky-100">
+<div className="relative flex min-h-screen w-full bg-slate-50 dark:bg-slate-950 font-sans selection:bg-sky-100 dark:selection:bg-sky-900/40 transition-colors duration-200">
       <style>{`
         @keyframes fadeIn {
           from { opacity: 0; transform: translateY(10px); }
@@ -64,7 +65,16 @@ export default function LoginPage() {
           background-image: radial-gradient(at 0% 0%, rgba(14, 165, 233, 0.15) 0, transparent 50%), 
                             radial-gradient(at 100% 100%, rgba(37, 99, 235, 0.1) 0, transparent 50%);
         }
+        .dark .bg-mesh {
+          background-color: #0f172a;
+          background-image: radial-gradient(at 0% 0%, rgba(14, 165, 233, 0.12) 0, transparent 45%),
+                            radial-gradient(at 100% 100%, rgba(30, 64, 175, 0.2) 0, transparent 50%);
+        }
       `}</style>
+
+      <div className="absolute right-5 top-5 z-30">
+        <ThemeToggle />
+      </div>
 
       {/* ────────────────────────────────────────── */}
       {/* LEFT PANEL — Centered Branding             */}
@@ -134,17 +144,17 @@ export default function LoginPage() {
              <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-blue-600 shadow-xl shadow-blue-200">
                 <FaShieldAlt className="text-3xl text-white" />
              </div>
-             <h1 className="text-2xl font-bold text-slate-900 uppercase tracking-tight">አዋሽ ኢንሹራንስ</h1>
-             <p className="text-slate-500">Shareholder Portal</p>
+             <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100 uppercase tracking-tight">አዋሽ ኢንሹራንስ</h1>
+             <p className="text-slate-500 dark:text-slate-400">Shareholder Portal</p>
           </div>
 
           <div className="mb-10 text-center lg:text-left">
-            <h2 className="text-3xl font-bold text-slate-900 tracking-tight">Welcome Back</h2>
-            <p className="mt-2 text-slate-500 text-sm">Please enter your details to access your account.</p>
+            <h2 className="text-3xl font-bold text-slate-900 dark:text-slate-100 tracking-tight">Welcome Back</h2>
+            <p className="mt-2 text-slate-500 dark:text-slate-400 text-sm">Please enter your details to access your account.</p>
           </div>
 
           {error && (
-            <div className="mb-6 flex items-center gap-3 rounded-xl border border-red-100 bg-red-50 p-4 text-sm text-red-600">
+            <div className="mb-6 flex items-center gap-3 rounded-xl border border-red-100 dark:border-red-900/70 bg-red-50 dark:bg-red-950/40 p-4 text-sm text-red-600 dark:text-red-300">
               <FaExclamationCircle className="shrink-0" />
               <p className="font-medium">{error}</p>
             </div>
@@ -152,7 +162,7 @@ export default function LoginPage() {
 
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-2">
-              <label className="text-sm font-semibold text-slate-700 ml-1">Login Identity</label>
+              <label className="text-sm font-semibold text-slate-700 dark:text-slate-200 ml-1">Login Identity</label>
               <div className="group relative">
                 <div className="absolute inset-y-0 left-0 flex items-center pl-4 text-slate-400 group-focus-within:text-blue-600 transition-colors">
                   <FaUserAlt size={16} />
@@ -162,7 +172,7 @@ export default function LoginPage() {
                   value={identifier}
                   onChange={(e) => setIdentifier(e.target.value)}
                   placeholder="ID, Phone, or Full Name"
-                  className="w-full rounded-xl border border-slate-200 bg-white py-3.5 pl-11 pr-4 text-slate-900 transition-all placeholder:text-slate-400 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 outline-none shadow-sm"
+                  className="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 py-3.5 pl-11 pr-4 text-slate-900 dark:text-slate-100 transition-all placeholder:text-slate-400 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 outline-none shadow-sm"
                   required
                 />
               </div>
@@ -170,7 +180,7 @@ export default function LoginPage() {
 
             <div className="space-y-2">
               <div className="flex items-center justify-between ml-1">
-                <label className="text-sm font-semibold text-slate-700">Password</label>
+                <label className="text-sm font-semibold text-slate-700 dark:text-slate-200">Password</label>
                 <button type="button" className="text-xs font-bold text-blue-600 hover:text-blue-700 transition-colors">Forgot?</button>
               </div>
               <div className="group relative">
@@ -182,13 +192,13 @@ export default function LoginPage() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
-                  className="w-full rounded-xl border border-slate-200 bg-white py-3.5 pl-11 pr-12 text-slate-900 transition-all focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 outline-none shadow-sm"
+                  className="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 py-3.5 pl-11 pr-12 text-slate-900 dark:text-slate-100 transition-all focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 outline-none shadow-sm"
                   required
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute inset-y-0 right-0 flex items-center pr-4 text-slate-400 hover:text-slate-600"
+                  className="absolute inset-y-0 right-0 flex items-center pr-4 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
                 >
                   {showPassword ? <FaEyeSlash size={18} /> : <FaEye size={18} />}
                 </button>
@@ -211,8 +221,8 @@ export default function LoginPage() {
             </button>
           </form>
 
-          <div className="mt-10 border-t border-slate-200 pt-8 text-center">
-            <p className="text-slate-600 text-sm">
+          <div className="mt-10 border-t border-slate-200 dark:border-slate-700 pt-8 text-center">
+            <p className="text-slate-600 dark:text-slate-300 text-sm">
               Not yet registered?{' '}
               <button
                 onClick={() => router.push('/register')}
