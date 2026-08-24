@@ -22,12 +22,14 @@ const notoEthiopic = Noto_Sans_Ethiopic({
 export const metadata = {
   title: "Share Holders",
   description: "Share Holders Dashboard",
+  icon: "/images/favicon.ico",
 };
 
 export default function RootLayout({ children }) {
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
+        <link rel="icon" href={metadata.icon} />
         <script
           dangerouslySetInnerHTML={{
             __html: `(() => { try { const theme = localStorage.getItem('theme') || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'); document.documentElement.classList.toggle('dark', theme === 'dark'); document.documentElement.style.colorScheme = theme; } catch (error) {} })()`,

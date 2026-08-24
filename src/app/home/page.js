@@ -1,8 +1,8 @@
-'use client';
+"use client";
 
-import { useEffect, useState } from 'react';
-import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useEffect, useState } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 import {
   FaArrowRight,
   FaChartLine,
@@ -14,16 +14,16 @@ import {
   FaShieldAlt,
   FaClock,
   FaCheckCircle,
-} from 'react-icons/fa';
+} from "react-icons/fa";
 
-import AppShell from '../../components/AppShell';
+import AppShell from "../../components/AppShell";
+import { useTranslation } from "../../components/LanguageProvider";
 import {
   getStoredUser,
   getToken,
   isStaffRole,
   isAdminRole,
-} from '../../libs/auth';
-
+} from "../../libs/auth";
 
 /* =========================================================
    PORTAL CARD
@@ -34,50 +34,68 @@ function PortalCard({
   icon: Icon,
   title,
   description,
-  accent = 'blue',
+  accent = "blue",
   badge,
 }) {
+  const { t } = useTranslation();
   const accents = {
     blue: {
-      icon: 'bg-blue-600 text-white',
-      iconSoft: 'bg-blue-50 text-blue-600',
-      badge: 'bg-blue-50 text-blue-700',
-      hover: 'group-hover:border-blue-200',
+      icon: "bg-blue-600 text-white",
+      iconSoft:
+        "bg-blue-50 text-blue-600 dark:bg-blue-950/40 dark:text-blue-300",
+      iconText: "text-blue-600 dark:text-blue-300",
+      badge: "bg-blue-50 text-blue-700 dark:bg-blue-950/40 dark:text-blue-300",
+      hover: "group-hover:border-blue-200 dark:group-hover:border-blue-700",
     },
 
     green: {
-      icon: 'bg-emerald-600 text-white',
-      iconSoft: 'bg-emerald-50 text-emerald-600',
-      badge: 'bg-emerald-50 text-emerald-700',
-      hover: 'group-hover:border-emerald-200',
+      icon: "bg-emerald-600 text-white",
+      iconSoft:
+        "bg-emerald-50 text-emerald-600 dark:bg-emerald-950/40 dark:text-emerald-300",
+      iconText: "text-emerald-600 dark:text-emerald-300",
+      badge:
+        "bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300",
+      hover:
+        "group-hover:border-emerald-200 dark:group-hover:border-emerald-700",
     },
 
     violet: {
-      icon: 'bg-violet-600 text-white',
-      iconSoft: 'bg-violet-50 text-violet-600',
-      badge: 'bg-violet-50 text-violet-700',
-      hover: 'group-hover:border-violet-200',
+      icon: "bg-violet-600 text-white",
+      iconSoft:
+        "bg-violet-50 text-violet-600 dark:bg-violet-950/40 dark:text-violet-300",
+      iconText: "text-violet-600 dark:text-violet-300",
+      badge:
+        "bg-violet-50 text-violet-700 dark:bg-violet-950/40 dark:text-violet-300",
+      hover: "group-hover:border-violet-200 dark:group-hover:border-violet-700",
     },
 
     amber: {
-      icon: 'bg-amber-500 text-white',
-      iconSoft: 'bg-amber-50 text-amber-700',
-      badge: 'bg-amber-50 text-amber-700',
-      hover: 'group-hover:border-amber-200',
+      icon: "bg-amber-500 text-white",
+      iconSoft:
+        "bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300",
+      iconText: "text-amber-700 dark:text-amber-300",
+      badge:
+        "bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300",
+      hover: "group-hover:border-amber-200 dark:group-hover:border-amber-700",
     },
 
     indigo: {
-      icon: 'bg-indigo-600 text-white',
-      iconSoft: 'bg-indigo-50 text-indigo-600',
-      badge: 'bg-indigo-50 text-indigo-700',
-      hover: 'group-hover:border-indigo-200',
+      icon: "bg-indigo-600 text-white",
+      iconSoft:
+        "bg-indigo-50 text-indigo-600 dark:bg-indigo-950/40 dark:text-indigo-300",
+      iconText: "text-indigo-600 dark:text-indigo-300",
+      badge:
+        "bg-indigo-50 text-indigo-700 dark:bg-indigo-950/40 dark:text-indigo-300",
+      hover: "group-hover:border-indigo-200 dark:group-hover:border-indigo-700",
     },
 
     cyan: {
-      icon: 'bg-cyan-600 text-white',
-      iconSoft: 'bg-cyan-50 text-cyan-600',
-      badge: 'bg-cyan-50 text-cyan-700',
-      hover: 'group-hover:border-cyan-200',
+      icon: "bg-cyan-600 text-white",
+      iconSoft:
+        "bg-cyan-50 text-cyan-600 dark:bg-cyan-950/40 dark:text-cyan-300",
+      iconText: "text-cyan-600 dark:text-cyan-300",
+      badge: "bg-cyan-50 text-cyan-700 dark:bg-cyan-950/40 dark:text-cyan-300",
+      hover: "group-hover:border-cyan-200 dark:group-hover:border-cyan-700",
     },
   };
 
@@ -88,10 +106,10 @@ function PortalCard({
       href={href}
       className={`
         group relative flex min-h-[210px] flex-col
-        rounded-2xl border border-slate-200 bg-white
+        rounded-2xl border border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-800
         p-5 sm:p-6
         transition-all duration-200
-        hover:-translate-y-1 hover:border-slate-300
+        hover:-translate-y-1 hover:border-slate-300 dark:hover:border-slate-600
         hover:shadow-lg
         active:scale-[0.99]
         ${style.hover}
@@ -118,31 +136,31 @@ function PortalCard({
               ${style.badge}
             `}
           >
-            {badge}
+            {t(badge)}
           </span>
         )}
       </div>
 
       {/* Content */}
       <div className="mt-5 flex-1">
-        <h3 className="text-[17px] font-bold tracking-tight text-slate-900 sm:text-lg">
-          {title}
+        <h3 className="text-[17px] font-bold tracking-tight text-slate-900 dark:text-slate-100 sm:text-lg">
+          {t(title)}
         </h3>
 
-        <p className="mt-2 text-[13px] leading-5 text-slate-500 sm:text-sm sm:leading-6">
-          {description}
+        <p className="mt-2 text-[13px] leading-5 text-slate-500 dark:text-slate-400 sm:text-sm sm:leading-6">
+          {t(description)}
         </p>
       </div>
 
       {/* Bottom action */}
-      <div className="mt-5 flex items-center justify-between border-t border-slate-100 pt-4">
+      <div className="mt-5 flex items-center justify-between border-t border-slate-100 pt-4 dark:border-slate-700">
         <span
           className={`
             text-xs font-semibold
-            ${style.iconSoft.split(' ')[1]}
+            ${style.iconText}
           `}
         >
-          Open service
+          {t("home.openService")}
         </span>
 
         <span
@@ -151,7 +169,7 @@ function PortalCard({
             rounded-full
             transition-all duration-200
             group-hover:translate-x-1
-            ${style.iconSoft}
+              ${style.iconSoft}
           `}
         >
           <FaArrowRight className="text-xs" />
@@ -161,37 +179,37 @@ function PortalCard({
   );
 }
 
-
 /* =========================================================
    SECTION HEADER
 ========================================================= */
 
 function SectionHeader({ eyebrow, title, description }) {
+  const { t } = useTranslation();
+
   return (
     <div className="mb-6 sm:mb-8">
       {eyebrow && (
         <div className="mb-2 flex items-center gap-2">
           <span className="h-1.5 w-1.5 rounded-full bg-blue-600" />
 
-          <span className="text-[10px] font-bold uppercase tracking-[0.18em] text-blue-600 sm:text-xs">
-            {eyebrow}
+          <span className="text-[10px] font-bold uppercase tracking-[0.18em] text-blue-600 dark:text-blue-300 sm:text-xs">
+            {t(eyebrow)}
           </span>
         </div>
       )}
 
-      <h2 className="text-xl font-bold tracking-tight text-slate-900 sm:text-2xl">
-        {title}
+      <h2 className="text-xl font-bold tracking-tight text-slate-900 dark:text-slate-100 sm:text-2xl">
+        {t(title)}
       </h2>
 
       {description && (
-        <p className="mt-1.5 max-w-2xl text-sm leading-5 text-slate-500 sm:text-[15px] sm:leading-6">
-          {description}
+        <p className="mt-1.5 max-w-2xl text-sm leading-5 text-slate-500 dark:text-slate-400 sm:text-[15px] sm:leading-6">
+          {t(description)}
         </p>
       )}
     </div>
   );
 }
-
 
 /* =========================================================
    MAIN PAGE
@@ -199,6 +217,7 @@ function SectionHeader({ eyebrow, title, description }) {
 
 export default function HomePortalPage() {
   const router = useRouter();
+  const { t } = useTranslation();
   const [user, setUser] = useState(null);
 
   useEffect(() => {
@@ -206,13 +225,12 @@ export default function HomePortalPage() {
     const storedUser = getStoredUser();
 
     if (!token || !storedUser) {
-      router.replace('/login');
+      router.replace("/login");
       return;
     }
 
     setUser(storedUser);
   }, [router]);
-
 
   /* =======================================================
      LOADING
@@ -220,119 +238,97 @@ export default function HomePortalPage() {
 
   if (!user) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-slate-50 px-4">
+      <div className="flex min-h-screen items-center justify-center bg-slate-50 px-4 dark:bg-slate-950">
         <div className="flex flex-col items-center">
-          <div className="h-9 w-9 animate-spin rounded-full border-[3px] border-slate-200 border-t-blue-600" />
+          <div className="h-9 w-9 animate-spin rounded-full border-[3px] border-slate-200 border-t-blue-600 dark:border-slate-700 dark:border-t-blue-400" />
 
           <p className="mt-4 text-xs font-semibold text-slate-400">
-            Loading your portal...
+            {t("home.loading")}
           </p>
         </div>
       </div>
     );
   }
 
-
   const staff = isStaffRole(user.role);
   const admin = isAdminRole(user.role);
 
-
   return (
     <AppShell>
-
       {/* ===================================================
           HERO
       =================================================== */}
 
-      <section className="border-b border-slate-200 bg-white">
-        <div className="mx-auto max-w-7xl px-4 py-7 sm:px-6 sm:py-9 lg:px-8 lg:py-11">
-
+      <section className="border-b border-slate-200 py-7 dark:border-slate-700 sm:py-9 lg:py-11">
           <div className="flex flex-col gap-7 lg:flex-row lg:items-center lg:justify-between">
-
             {/* Welcome */}
             <div className="max-w-2xl">
-
-              <div className="mb-3 inline-flex items-center gap-2 rounded-full bg-emerald-50 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-emerald-700 sm:text-xs">
+              {/* <div className="mb-3 inline-flex items-center gap-2 rounded-full bg-emerald-50 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300 sm:text-xs">
                 <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
-                Secure portal
-              </div>
+                {t("home.securePortal")}
+              </div> */}
 
-              <h1 className="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl lg:text-4xl">
-                Welcome back,{' '}
-                <span className="text-blue-600">
-                  {user.username}
-                </span>
+              <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-100 sm:text-3xl lg:text-4xl">
+                {t("home.welcomeBack")}{" "}
+                <span className="text-blue-600">{user.username}</span>
               </h1>
 
-              <p className="mt-2 max-w-xl text-sm leading-5 text-slate-500 sm:mt-3 sm:text-base sm:leading-6">
+              <p className="mt-2 max-w-xl text-sm leading-5 text-slate-500 dark:text-slate-400 sm:mt-3 sm:text-base sm:leading-6">
                 {staff
-                  ? 'Access the tools you need to manage shareholder services and daily operations.'
-                  : 'Manage your shareholder information, dividend decisions, and payment history.'}
+                  ? t("home.staffSubtitle")
+                  : t("home.shareholderSubtitle")}
               </p>
-
             </div>
-
-
-
-
           </div>
-        </div>
       </section>
-
 
       {/* ===================================================
           MAIN CONTENT
       =================================================== */}
 
-      <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-10 lg:px-8 lg:py-12">
-
-
+      <div className="py-8 sm:py-10 lg:py-12">
         {/* =================================================
             SHAREHOLDER
         ================================================= */}
 
         {!staff && (
           <section className="mb-12 sm:mb-16">
-
             <SectionHeader
-              eyebrow="Shareholder services"
-              title="What would you like to do?"
-              description="Quick access to your investment and dividend services."
+              eyebrow="home.shareholderServices"
+              title="home.shareholderTitle"
+              description="home.shareholderDescription"
             />
 
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-
               <PortalCard
                 href="/devidenddetail"
                 icon={FaChartLine}
-                title="Dividend Insights"
-                description="View your capital balances, dividend information, and annual payment history."
+                title="home.dividendInsights"
+                description="home.dividendInsightsDescription"
                 accent="green"
-                badge="Finance"
+                badge="home.finance"
               />
 
               <PortalCard
                 href="/fillform"
                 icon={FaFileInvoiceDollar}
-                title="Investment Decision"
-                description="Choose whether to reinvest your current dividend into capital or withdraw it."
+                title="home.investmentDecision"
+                description="home.investmentDecisionDescription"
                 accent="blue"
-                badge="Action"
+                badge="home.action"
               />
 
               <PortalCard
                 href="/my-decisions"
                 icon={FaClipboardList}
-                title="Submission History"
-                description="Review your previous decisions and check their current approval status."
+                title="home.submissionHistory"
+                description="home.submissionHistoryDescription"
                 accent="violet"
-                badge="Records"
+                badge="home.records"
               />
-
             </div>
           </section>
         )}
-
 
         {/* =================================================
             STAFF
@@ -340,55 +336,51 @@ export default function HomePortalPage() {
 
         {staff && (
           <section className="mb-12 sm:mb-16">
-
             <SectionHeader
-              eyebrow="Staff operations"
-              title="Operations Center"
-              description="Tools for processing shareholder requests and maintaining records."
+              eyebrow="home.staffOperations"
+              title="home.operationsCenter"
+              description="home.staffOperationsDescription"
             />
 
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-
               <PortalCard
                 href="/staff-fillform"
                 icon={FaFileInvoiceDollar}
-                title="Assisted Filing"
-                description="Submit dividend decision forms on behalf of visiting shareholders."
+                title="home.assistedFiling"
+                description="home.assistedFilingDescription"
                 accent="blue"
-                badge="Front desk"
+                badge="home.frontDesk"
               />
 
               <PortalCard
                 href="/formbasket"
                 icon={FaUsers}
-                title="Decision Basket"
-                description="Review, filter, and process submitted shareholder decisions."
+                title="home.decisionBasket"
+                description="home.decisionBasketDescription"
                 accent="green"
-                badge="Operations"
+                badge="home.operations"
               />
 
               <PortalCard
                 href="/dividendupload"
                 icon={FaFileInvoiceDollar}
-                title="Bulk Data Upload"
-                description="Import shareholder dividend records using the approved data format."
+                title="home.bulkDataUpload"
+                description="home.bulkDataUploadDescription"
                 accent="indigo"
-                badge="Database"
+                badge="home.database"
               />
 
               <PortalCard
                 href="/manage-shareholders"
                 icon={FaUsers}
-                title="Shareholder Registry"
-                description="View, update, and reconcile shareholder registration records."
+                title="home.shareholderRegistry"
+                description="home.shareholderRegistryDescription"
                 accent="cyan"
-                badge="Registry"
+                badge="home.registry"
               />
-
             </div>
           </section>
         )}
-
 
         {/* =================================================
             ADMIN
@@ -396,121 +388,109 @@ export default function HomePortalPage() {
 
         {admin && (
           <section className="mb-12 sm:mb-16">
-
-            <div className="rounded-2xl border border-amber-200 bg-amber-50/60 p-5 sm:p-6 lg:p-7">
-
+            <div className="rounded-2xl border border-amber-200 bg-amber-50/60 p-5 dark:border-amber-800 dark:bg-amber-950/30 sm:p-6 lg:p-7">
               <div className="mb-5 flex items-start gap-3 sm:mb-6">
-
                 <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-amber-500 text-white">
                   <FaShieldAlt className="text-sm" />
                 </div>
 
                 <div>
-                  <h2 className="text-lg font-bold tracking-tight text-amber-950 sm:text-xl">
-                    System Administration
+                  <h2 className="text-lg font-bold tracking-tight text-amber-950 dark:text-amber-100 sm:text-xl">
+                    {t("home.systemAdministration")}
                   </h2>
 
-                  <p className="mt-1 text-xs leading-5 text-amber-800 sm:text-sm">
-                    Manage team access and platform permissions.
+                  <p className="mt-1 text-xs leading-5 text-amber-800 dark:text-amber-200 sm:text-sm">
+                    {t("home.systemAdministrationDescription")}
                   </p>
                 </div>
-
               </div>
 
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-
                 <PortalCard
                   href="/register"
                   icon={FaUserPlus}
-                  title="User Management"
-                  description="Create staff accounts and manage system access roles."
+                  title="home.userManagement"
+                  description="home.userManagementDescription"
                   accent="amber"
-                  badge="System"
+                  badge="home.system"
                 />
-
               </div>
-
             </div>
-
           </section>
         )}
-
 
         {/* =================================================
             NOTICE / CTA
         ================================================= */}
 
-        <section className="overflow-hidden rounded-2xl bg-slate-900">
+        <section
+          className="
+    relative overflow-hidden rounded-2xl
+    bg-gradient-to-br
+    from-slate-900 via-blue-950 to-blue-900
+    dark:from-slate-950 dark:via-blue-950 dark:to-slate-900
+  "
+        >
+          <div
+            className="
+              pointer-events-none absolute
+              -right-16 -top-20
+              h-48 w-48 rounded-full
+              bg-blue-500/10 blur-3xl
+              dark:bg-blue-400/5
+            "
+          />
 
-          <div className="flex flex-col gap-5 p-5 sm:p-7 lg:flex-row lg:items-center lg:justify-between lg:p-9">
-
+          <div className="relative flex flex-col gap-4 p-5 sm:gap-5 sm:p-7 lg:flex-row lg:items-center lg:justify-between lg:p-9">
+            {/* Content */}
             <div className="flex gap-4">
+              {/* <div className="hidden h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white/10 text-blue-400 sm:flex">
+                <FaClock />
+              </div> */}
 
-              <div className="hidden h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white/10 text-blue-400 sm:flex">
+              <div
+                className="
+                  hidden h-10 w-10 shrink-0 items-center justify-center
+                  rounded-xl bg-white/10 text-blue-100
+                  ring-1 ring-white/10 sm:flex
+                "
+              >
                 <FaClock />
               </div>
-
               <div>
                 <h3 className="text-base font-bold text-white sm:text-lg">
                   {staff
-                    ? 'Daily reconciliation reminder'
-                    : 'Dividend decision deadline'}
+                    ? t("home.staffReminder")
+                    : t("home.shareholderDeadline")}
                 </h3>
-
-                <p className="mt-1.5 max-w-2xl text-xs leading-5 text-slate-400 sm:text-sm sm:leading-6">
+                {/* <p className="mt-1.5 max-w-2xl text-xs leading-5 text-slate-300 dark:text-slate-400 sm:text-sm sm:leading-6"> */}
+                <p className="mt-1.5 max-w-2xl text-xs leading-5 text-blue-100/75 sm:text-sm sm:leading-6">
                   {staff
-                    ? 'Please ensure physical forms are reconciled with digital entries at the end of each working day.'
-                    : 'Dividend reinvestment decisions are subject to the applicable fiscal-year deadline.'}
+                    ? t("home.staffReminderDescription")
+                    : t("home.shareholderDeadlineDescription")}
                 </p>
               </div>
-
             </div>
-
-
             <Link
-              href={staff ? '/formbasket' : '/fillform'}
+              href={staff ? "/formbasket" : "/fillform"}
               className="
-                flex w-full shrink-0 items-center justify-center
-                gap-2 rounded-xl bg-blue-600
-                px-5 py-3
-                text-sm font-bold text-white
-                transition-colors
-                hover:bg-blue-500
+                flex w-full shrink-0 items-center justify-center gap-2
+                rounded-xl bg-white px-5 py-3.5
+                text-sm font-bold text-blue-900
+                shadow-sm transition-all duration-200
+                hover:bg-blue-50 hover:shadow-md
                 active:scale-[0.98]
+                focus:outline-none focus:ring-2 focus:ring-white/60
+                focus:ring-offset-2 focus:ring-offset-blue-900
                 sm:w-auto
               "
             >
-              {staff ? 'Open decisions' : 'Make a decision'}
-
+              {staff ? t("home.openDecisions") : t("home.makeDecision")}
               <FaChevronRight className="text-xs" />
             </Link>
-
           </div>
-
         </section>
-
-
-        {/* Small footer status */}
-
-        <div className="mt-7 flex flex-col items-center justify-center gap-1 text-center sm:flex-row sm:gap-2">
-
-          <span className="flex items-center gap-1.5 text-[10px] font-medium text-slate-400 sm:text-xs">
-            <FaCheckCircle className="text-emerald-500" />
-            Secure connection
-          </span>
-
-          <span className="hidden text-slate-300 sm:inline">
-            •
-          </span>
-
-          <span className="text-[10px] text-slate-400 sm:text-xs">
-            Awash Insurance Shareholder Portal
-          </span>
-
-        </div>
-
-      </main>
-
+      </div>
     </AppShell>
   );
 }

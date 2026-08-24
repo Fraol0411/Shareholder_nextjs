@@ -90,7 +90,7 @@ export default function FormDetail() {
 
   return (
     <AppShell>
-      <div className="mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:px-8">
+      <div className="py-8">
         {/* Page Title */}
         <div className="bg-gradient-to-r from-blue-700 to-blue-600 rounded-xl p-6 mb-8 text-white shadow-lg">
           <h2 className="text-2xl font-bold flex items-center">

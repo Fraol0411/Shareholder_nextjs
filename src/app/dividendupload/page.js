@@ -63,7 +63,7 @@ export default function UploadDividend() {
 
   return (
     <AppShell>
-      <div className="mx-auto max-w-3xl px-4 py-8 sm:px-6 lg:px-8">
+      <div className="py-8">
         <div className="theme-surface rounded-xl shadow-md border overflow-hidden">
           <div className="bg-gradient-to-r from-green-700 to-green-600 px-6 py-4">
             <h3 className="text-lg font-semibold text-white flex items-center">

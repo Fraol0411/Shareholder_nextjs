@@ -75,14 +75,14 @@ export default function DividendDetail() {
 
   return (
     <AppShell>
-      <div className="px-3 py-5 sm:px-4 sm:py-8 lg:px-8 mx-auto max-w-7xl">
+      <div className="py-5 sm:py-8">
         {/* ── Header ── */}
         <div className="flex flex-col gap-3 mb-6 sm:flex-row sm:items-center sm:justify-between sm:mb-8">
           <div>
-            <h2 className="text-xl sm:text-2xl lg:text-3xl font-extrabold text-gray-900 tracking-tight">
+            <h2 className="text-xl sm:text-2xl lg:text-3xl font-extrabold text-gray-900 dark:text-gray-100 tracking-tight">
               {t('detail.title')}
             </h2>
-            <p className="text-gray-500 mt-0.5 text-xs sm:text-sm">
+            <p className="text-gray-500 dark:text-gray-400 mt-0.5 text-xs sm:text-sm">
               {t('detail.subtitle')}
             </p>
           </div>
@@ -100,7 +100,7 @@ export default function DividendDetail() {
               <button
                 onClick={handlePrint}
                 title="Print record"
-                className="inline-flex items-center gap-1.5 px-3 py-2 text-xs sm:text-sm font-medium text-gray-600 bg-white border border-gray-200 rounded-lg shadow-sm hover:bg-gray-50 hover:text-gray-800 hover:border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500/40 transition-all"
+                className="inline-flex items-center gap-1.5 px-3 py-2 text-xs sm:text-sm font-medium text-gray-600 bg-white border border-gray-200 rounded-lg shadow-sm hover:bg-gray-50 hover:text-gray-800 hover:border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500/40 transition-all dark:bg-slate-800 dark:border-slate-700 dark:text-gray-300 dark:hover:bg-slate-700 dark:hover:text-white dark:hover:border-slate-600"
               >
                 <FaPrint className="text-xs" />
                 <span className="hidden sm:inline">Print</span>
@@ -113,13 +113,13 @@ export default function DividendDetail() {
         {isLoading ? (
           <SkeletonLayout />
         ) : error ? (
-          <div className="bg-red-50 border border-red-200 rounded-xl p-4 sm:p-5 flex items-start gap-3 text-red-700">
-            <div className="p-1.5 bg-red-100 rounded-lg shrink-0">
+          <div className="bg-red-50 border border-red-200 rounded-xl p-4 sm:p-5 flex items-start gap-3 text-red-700 dark:bg-red-950/40 dark:border-red-900/70 dark:text-red-300">
+            <div className="p-1.5 bg-red-100 rounded-lg shrink-0 dark:bg-red-900/60">
               <FaExclamationTriangle className="text-sm" />
             </div>
             <div>
-              <p className="font-semibold text-sm text-red-800">Something went wrong</p>
-              <p className="text-xs text-red-600 mt-0.5">{error}</p>
+              <p className="font-semibold text-sm text-red-800 dark:text-red-200">Something went wrong</p>
+              <p className="text-xs text-red-600 dark:text-red-300 mt-0.5">{error}</p>
             </div>
           </div>
         ) : !record ? (
@@ -132,8 +132,8 @@ export default function DividendDetail() {
             {/* ── Metric Cards ── */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
               <MetricCard label={t('detail.paidCapital')} value={record.paidup_capital} icon={FaWallet} accent="blue" showCurrency />
-              <MetricCard label={t('detail.declared')} value={record.dividend_declared} icon={FaChartLine} accent="emerald" />
-              <MetricCard label={t('detail.broughtForward')} value={record.dividend_bf} icon={FaHistory} accent="violet" />
+              <MetricCard label={t('detail.declared')} value={record.dividend_declared} icon={FaChartLine} accent="emerald" showCurrency/>
+              <MetricCard label={t('detail.broughtForward')} value={record.dividend_bf} icon={FaHistory} accent="violet" showCurrency />
             </div>
 
             {/* ── Shareholder Profile ── */}
@@ -204,18 +204,18 @@ function FiscalYearDropdown({ years, selected, onSelect }) {
         aria-expanded={open}
         className={`
           w-full flex items-center gap-2.5 pl-3 pr-2 py-2
-          bg-white border rounded-lg text-sm font-medium shadow-sm
+          bg-white border rounded-lg text-sm font-medium shadow-sm dark:bg-slate-800 dark:text-gray-200
           transition-all duration-200 cursor-pointer
           focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-blue-500
           disabled:opacity-50 disabled:cursor-not-allowed
           ${open
             ? 'border-blue-500 ring-2 ring-blue-500/20'
-            : 'border-gray-200 hover:border-gray-300'
+            : 'border-gray-200 hover:border-gray-300 dark:border-slate-700 dark:hover:border-slate-600'
           }
         `}
       >
-        <FaCalendarAlt className="text-gray-400 text-xs shrink-0" />
-        <span className="flex-1 text-left text-gray-700 truncate">{displayLabel}</span>
+        <FaCalendarAlt className="text-gray-400 dark:text-gray-500 text-xs shrink-0" />
+        <span className="flex-1 text-left text-gray-700 dark:text-gray-200 truncate">{displayLabel}</span>
         <svg
           className={`w-4 h-4 text-gray-400 shrink-0 transition-transform duration-200 ${open ? 'rotate-180' : ''}`}
           fill="none" viewBox="0 0 24 24" stroke="currentColor"
@@ -255,8 +255,8 @@ function FiscalYearDropdown({ years, selected, onSelect }) {
                     px-3 py-2.5 sm:py-2
                     text-sm cursor-pointer transition-colors duration-150
                     ${isActive
-                      ? 'bg-blue-50 text-blue-700 font-semibold'
-                      : 'text-gray-700 hover:bg-gray-50 active:bg-gray-100'
+                      ? 'bg-blue-50 text-blue-700 font-semibold dark:bg-blue-950/40 dark:text-blue-300'
+                      : 'text-gray-700 hover:bg-gray-50 active:bg-gray-100 dark:text-gray-200 dark:hover:bg-slate-700 dark:active:bg-slate-600'
                     }
                   `}
                 >
@@ -299,9 +299,9 @@ function HeroTotalCard({ value }) {
 
 /* ── Metric Card ── */
 const accentMap = {
-  blue:    { bg: 'bg-blue-50',    text: 'text-blue-600',    ring: 'ring-blue-100',    bar: 'bg-blue-500' },
-  emerald: { bg: 'bg-emerald-50', text: 'text-emerald-600', ring: 'ring-emerald-100', bar: 'bg-emerald-500' },
-  violet:  { bg: 'bg-violet-50',  text: 'text-violet-600',  ring: 'ring-violet-100',  bar: 'bg-violet-500' },
+  blue:    { bg: 'bg-blue-50 dark:bg-blue-950/40',    text: 'text-blue-600 dark:text-blue-300',    ring: 'ring-blue-100 dark:ring-blue-900',    bar: 'bg-blue-500' },
+  emerald: { bg: 'bg-emerald-50 dark:bg-emerald-950/40', text: 'text-emerald-600 dark:text-emerald-300', ring: 'ring-emerald-100 dark:ring-emerald-900', bar: 'bg-emerald-500' },
+  violet:  { bg: 'bg-violet-50 dark:bg-violet-950/40',  text: 'text-violet-600 dark:text-violet-300',  ring: 'ring-violet-100 dark:ring-violet-900',  bar: 'bg-violet-500' },
 };
 
 function MetricCard({ label, value, icon: Icon, accent = 'blue', showCurrency = false }) {
@@ -313,10 +313,10 @@ function MetricCard({ label, value, icon: Icon, accent = 'blue', showCurrency = 
         <div className={`p-2 rounded-lg ${c.bg} ${c.text} ring-1 ${c.ring}`}>
           <Icon className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
         </div>
-        <p className="text-xs font-semibold text-gray-500 leading-tight">{label}</p>
+        <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 leading-tight">{label}</p>
       </div>
 
-      <p className="text-xl sm:text-2xl font-bold text-gray-900 tracking-tight tabular-nums">
+      <p className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-gray-100 tracking-tight tabular-nums">
         {fmt(value)}
         {showCurrency && <span className="ml-1 text-[10px] font-medium text-gray-400 uppercase">ETB</span>}
       </p>
@@ -337,8 +337,8 @@ function ProfileCard({ record }) {
 
   return (
     <div className="theme-surface rounded-xl shadow-sm border overflow-hidden">
-      <div className="px-4 py-3 sm:px-5 sm:py-3.5 border-b border-gray-100 flex items-center gap-2.5">
-        <div className="p-1.5 bg-gray-100 rounded-lg text-gray-600">
+      <div className="px-4 py-3 sm:px-5 sm:py-3.5 border-b border-gray-100 dark:border-slate-700 flex items-center gap-2.5">
+        <div className="p-1.5 bg-gray-100 rounded-lg text-gray-600 dark:bg-slate-700 dark:text-gray-300">
           <FaUser className="w-3.5 h-3.5" />
         </div>
         <h3 className="text-sm sm:text-base font-bold text-gray-800 dark:text-gray-100">Shareholder Profile</h3>
@@ -346,11 +346,11 @@ function ProfileCard({ record }) {
       <div className="px-4 py-4 sm:p-5 grid grid-cols-2 sm:grid-cols-3 gap-x-4 gap-y-4 sm:gap-x-8 sm:gap-y-5">
         {fields.map(({ icon: Icon, label, value }) => (
           <div key={label} className="flex items-start gap-2 min-w-0">
-            <div className="p-1.5 bg-gray-50 rounded-md text-gray-400 shrink-0">
+            <div className="p-1.5 bg-gray-50 rounded-md text-gray-400 shrink-0 dark:bg-slate-700 dark:text-gray-300">
               <Icon className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
             </div>
             <div className="min-w-0">
-              <p className="text-[10px] sm:text-[11px] font-bold text-gray-400 uppercase tracking-wider truncate">{label}</p>
+              <p className="text-[10px] sm:text-[11px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider truncate">{label}</p>
               <p className="text-xs sm:text-sm font-semibold text-gray-800 dark:text-gray-100 mt-0.5 break-words truncate">{value || '-'}</p>
             </div>
           </div>
@@ -365,27 +365,27 @@ function SkeletonLayout() {
   return (
     <div className="space-y-3 sm:space-y-4 animate-pulse">
       {/* Hero skeleton */}
-      <div className="rounded-xl bg-gradient-to-br from-gray-200 to-gray-100 h-28 sm:h-36" />
+      <div className="rounded-xl bg-gradient-to-br from-gray-200 to-gray-100 dark:from-slate-700 dark:to-slate-800 h-28 sm:h-36" />
       {/* Metric skeletons */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
         {[0, 1, 2].map((i) => (
           <div key={i} className="theme-surface rounded-xl border px-4 py-3.5 space-y-3">
             <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-lg bg-gray-100" />
-              <div className="h-3 w-16 rounded bg-gray-100" />
+              <div className="w-8 h-8 rounded-lg bg-gray-100 dark:bg-slate-700" />
+              <div className="h-3 w-16 rounded bg-gray-100 dark:bg-slate-700" />
             </div>
-            <div className="h-6 w-28 rounded bg-gray-100" />
+            <div className="h-6 w-28 rounded bg-gray-100 dark:bg-slate-700" />
           </div>
         ))}
       </div>
       {/* Profile skeleton */}
-      <div className="rounded-xl bg-white border border-gray-100 px-4 py-4 space-y-3">
-        <div className="h-4 w-36 rounded bg-gray-100" />
+      <div className="rounded-xl bg-white border border-gray-100 px-4 py-4 space-y-3 dark:bg-slate-800 dark:border-slate-700">
+        <div className="h-4 w-36 rounded bg-gray-100 dark:bg-slate-700" />
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
           {Array.from({ length: 6 }).map((_, i) => (
             <div key={i} className="space-y-1.5">
-              <div className="h-2.5 w-16 rounded bg-gray-100" />
-              <div className="h-3.5 w-24 rounded bg-gray-100" />
+              <div className="h-2.5 w-16 rounded bg-gray-100 dark:bg-slate-700" />
+              <div className="h-3.5 w-24 rounded bg-gray-100 dark:bg-slate-700" />
             </div>
           ))}
         </div>
@@ -399,11 +399,11 @@ function EmptyState() {
   const { t } = useTranslation();
   return (
     <div className="theme-surface flex flex-col items-center justify-center py-16 sm:py-20 rounded-xl border shadow-sm">
-      <div className="w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center mb-4">
-        <FaHistory className="text-2xl text-gray-300" />
+      <div className="w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center mb-4 dark:bg-slate-700">
+        <FaHistory className="text-2xl text-gray-300 dark:text-slate-500" />
       </div>
-      <h3 className="text-base font-bold text-gray-800">No Records Found</h3>
-      <p className="text-xs text-gray-500 mt-1 max-w-xs text-center px-4">
+      <h3 className="text-base font-bold text-gray-800 dark:text-gray-100">No Records Found</h3>
+      <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 max-w-xs text-center px-4">
         There are no dividend records for your account in the selected fiscal year.
       </p>
     </div>

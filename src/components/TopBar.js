@@ -24,6 +24,7 @@ import {
   isAdminRole,
   getRoleLabel,
 } from '../libs/auth';
+import Container from './Container';
 
 const navLinkClass = (active) =>
   `relative flex items-center gap-2 px-4 py-2 text-sm font-semibold transition-all duration-300 rounded-xl ${
@@ -72,7 +73,7 @@ export default function TopBar() {
 
   return (
     <header className="sticky top-0 z-[100] w-full border-b border-slate-200/60 bg-white/80 backdrop-blur-xl">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <Container>
         <div className="flex h-16 items-center justify-between gap-8">
           
           {/* Logo Section */}
@@ -144,7 +145,7 @@ export default function TopBar() {
             )}
           </div>
         </div>
-      </div>
+      </Container>
 
       {/* 
           MOBILE MENU OVERLAY 

@@ -50,7 +50,7 @@ export default function ShareholderDashboard() {
   return (
 
       <AppShell>
-          <main className="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
+          <div className="py-8">
             {/* Welcome Banner */}
             <div className="bg-gradient-to-r from-blue-700 to-blue-600 rounded-xl p-6 mb-8 text-white shadow-lg">
               <h2 className="text-2xl font-bold mb-2">{t('dashboard.welcome')}</h2>
@@ -302,7 +302,7 @@ export default function ShareholderDashboard() {
                 </div>
               </div>
             </div>
-          </main>
+          </div>
        </AppShell>
   );
 }
