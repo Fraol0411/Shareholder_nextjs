@@ -75,7 +75,6 @@ export default function NavBar() {
     { href: '/staff-fillform', label: 'nav.fillform', icon: FaFileInvoiceDollar, show: staff },
     { href: '/formbasket', label: 'nav.decisions', icon: FaClipboardList, show: staff },
     { href: '/register', label: 'nav.register', icon: FaUserPlus, show: admin },
-    {href: '/profile', label: 'profile.title', icon: FaUserPlus, show: true}
   ].filter((item) => item.show);
 
   const handleLogout = () => {

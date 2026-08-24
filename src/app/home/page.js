@@ -388,7 +388,7 @@ export default function HomePortalPage() {
 
         {admin && (
           <section className="mb-12 sm:mb-16">
-            <div className="rounded-2xl border border-amber-200 bg-amber-50/60 p-5 dark:border-amber-800 dark:bg-amber-950/30 sm:p-6 lg:p-7">
+            <div className="rounded-2xl border border-amber-200 bg-amber-50/60 p-5 dark:border-amber-950 dark:bg-amber-950/5 sm:p-6 lg:p-7">
               <div className="mb-5 flex items-start gap-3 sm:mb-6">
                 <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-amber-500 text-white">
                   <FaShieldAlt className="text-sm" />

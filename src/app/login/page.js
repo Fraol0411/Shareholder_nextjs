@@ -1,22 +1,22 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import {
-  FaUserAlt, FaSignInAlt, FaLock, FaInfoCircle,
-  FaExclamationCircle, FaShieldAlt,
-  FaChartLine, FaFileInvoiceDollar, FaClipboardCheck,
+  FaUserAlt, FaSignInAlt, FaLock,
+  FaExclamationCircle,
+  FaChartLine, FaClipboardCheck,
   FaEye, FaEyeSlash
 } from 'react-icons/fa';
 import ThemeToggle from '../../components/ThemeToggle';
 
 export default function LoginPage() {
+  const router = useRouter();
   const [identifier, setIdentifier] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
-  const router = useRouter();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -53,7 +53,7 @@ export default function LoginPage() {
   };
 
   return (
-<div className="relative flex min-h-screen w-full bg-slate-50 dark:bg-slate-950 font-sans selection:bg-sky-100 dark:selection:bg-sky-900/40 transition-colors duration-200">
+    <div className="relative flex min-h-dvh w-full bg-slate-50 dark:bg-slate-950 font-sans selection:bg-sky-100 dark:selection:bg-sky-900/40">
       <style>{`
         @keyframes fadeIn {
           from { opacity: 0; transform: translateY(10px); }
@@ -62,7 +62,7 @@ export default function LoginPage() {
         .animate-content { animation: fadeIn 0.8s ease-out forwards; }
         .bg-mesh {
           background-color: #f8fafc;
-          background-image: radial-gradient(at 0% 0%, rgba(14, 165, 233, 0.15) 0, transparent 50%), 
+          background-image: radial-gradient(at 0% 0%, rgba(14, 165, 233, 0.15) 0, transparent 50%),
                             radial-gradient(at 100% 100%, rgba(37, 99, 235, 0.1) 0, transparent 50%);
         }
         .dark .bg-mesh {
@@ -71,10 +71,6 @@ export default function LoginPage() {
                             radial-gradient(at 100% 100%, rgba(30, 64, 175, 0.2) 0, transparent 50%);
         }
       `}</style>
-
-      <div className="absolute right-5 top-5 z-30">
-        <ThemeToggle />
-      </div>
 
       {/* ────────────────────────────────────────── */}
       {/* LEFT PANEL — Centered Branding             */}
@@ -94,7 +90,7 @@ export default function LoginPage() {
               <img
                 src="/images/logo.png"
                 alt="Awash Insurance"
-                className="h-9 w-auto transition-transform group-hover:scale-105"
+                className="h-9 w-auto"
               />
             </div>
             <div>
@@ -141,110 +137,107 @@ export default function LoginPage() {
       {/* ────────────────────────────────────────── */}
       {/* RIGHT PANEL — Centered Login Form          */}
       {/* ────────────────────────────────────────── */}
-      <div className="bg-mesh relative flex w-full min-h-screen items-center justify-center p-6 lg:w-1/2 sm:p-12">
-        <div className="relative z-10 w-full max-w-[420px] animate-content">
-          {/* Mobile Header */}
-          <div className="mb-12 flex flex-col items-center text-center lg:hidden">
-             <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-blue-600 shadow-xl shadow-blue-200">
-              <img
-                src="/images/logo.png"
-                alt="Awash Insurance"
-                className="h-9 w-auto transition-transform group-hover:scale-105"
-              />
-             </div>
-             <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100 uppercase tracking-tight">አዋሽ ኢንሹራንስ</h1>
-             <p className="text-slate-500 dark:text-slate-400">Shareholder Portal</p>
-          </div>
-
-          <div className="mb-10 text-center lg:text-left">
-            <h2 className="text-3xl font-bold text-slate-900 dark:text-slate-100 tracking-tight">Welcome Back</h2>
-            <p className="mt-2 text-slate-500 dark:text-slate-400 text-sm">Please enter your details to access your account.</p>
-          </div>
-
-          {error && (
-            <div className="mb-6 flex items-center gap-3 rounded-xl border border-red-100 dark:border-red-900/70 bg-red-50 dark:bg-red-950/40 p-4 text-sm text-red-600 dark:text-red-300">
-              <FaExclamationCircle className="shrink-0" />
-              <p className="font-medium">{error}</p>
+      <div className="bg-mesh relative flex w-full min-h-dvh flex-col lg:w-1/2">
+        {/* ── Mobile top bar ── */}
+        <div className="flex shrink-0 items-center justify-between px-4 pt-[max(0.75rem,env(safe-area-inset-top))] sm:px-6 lg:absolute lg:right-5 lg:top-5 lg:z-30 lg:justify-end lg:p-0">
+          <div className="flex items-center gap-2.5 lg:hidden">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white shadow-sm ring-1 ring-slate-200">
+              <img src="/images/logo.png" alt="Awash Insurance" className="h-7 w-auto" />
             </div>
-          )}
-
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="space-y-2">
-              <label className="text-sm font-semibold text-slate-700 dark:text-slate-200 ml-1">Login Identity</label>
-              <div className="group relative">
-                <div className="absolute inset-y-0 left-0 flex items-center pl-4 text-slate-400 group-focus-within:text-blue-600 transition-colors">
-                  <FaUserAlt size={16} />
-                </div>
-                <input
-                  type="text"
-                  value={identifier}
-                  onChange={(e) => setIdentifier(e.target.value)}
-                  placeholder="ID, Phone, or Full Name"
-                  className="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 py-3.5 pl-11 pr-4 text-slate-900 dark:text-slate-100 transition-all placeholder:text-slate-400 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 outline-none shadow-sm"
-                  required
-                />
-              </div>
+            <div>
+              <p className="text-sm font-bold leading-tight text-slate-900 dark:text-slate-100">አዋሽ ኢንሹራንስ</p>
+              <p className="text-[11px] font-medium text-slate-500 dark:text-slate-400">Shareholder Portal</p>
             </div>
-
-            <div className="space-y-2">
-              <div className="flex items-center justify-between ml-1">
-                <label className="text-sm font-semibold text-slate-700 dark:text-slate-200">Password</label>
-                <button type="button" className="text-xs font-bold text-blue-600 hover:text-blue-700 transition-colors">Forgot?</button>
-              </div>
-              <div className="group relative">
-                <div className="absolute inset-y-0 left-0 flex items-center pl-4 text-slate-400 group-focus-within:text-blue-600 transition-colors">
-                  <FaLock size={16} />
-                </div>
-                <input
-                  type={showPassword ? "text" : "password"}
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="••••••••"
-                  className="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 py-3.5 pl-11 pr-12 text-slate-900 dark:text-slate-100 transition-all focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 outline-none shadow-sm"
-                  required
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute inset-y-0 right-0 flex items-center pr-4 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
-                >
-                  {showPassword ? <FaEyeSlash size={18} /> : <FaEye size={18} />}
-                </button>
-              </div>
-            </div>
-
-            <button
-              type="submit"
-              disabled={isLoading}
-              className="relative flex w-full items-center justify-center overflow-hidden rounded-xl bg-blue-600 py-4 font-bold text-white shadow-lg shadow-blue-600/20 transition-all hover:bg-blue-700 active:scale-[0.98] disabled:opacity-70"
-            >
-              {isLoading ? (
-                <div className="h-5 w-5 animate-spin rounded-full border-2 border-white/30 border-t-white" />
-              ) : (
-                <div className="flex items-center gap-2">
-                  <span>Sign In to Dashboard</span>
-                  <FaSignInAlt className="text-sm opacity-70" />
-                </div>
-              )}
-            </button>
-          </form>
-
-          <div className="mt-10 border-t border-slate-200 dark:border-slate-700 pt-8 text-center">
-            <p className="text-slate-600 dark:text-slate-300 text-sm">
-              Not yet registered?{' '}
-              <button
-                onClick={() => router.push('/register')}
-                className="font-bold text-blue-600 underline-offset-4 hover:underline transition-all"
-              >
-                Create an Account
-              </button>
-            </p>
           </div>
+          <ThemeToggle />
         </div>
 
-        {/* Mobile footer */}
-        <div className="absolute bottom-6 text-center lg:hidden">
-          <p className="text-[10px] text-slate-400">&copy; {new Date().getFullYear()} Awash Insurance S.C.</p>
+        {/* ── Form area — fills all remaining height and centers content ── */}
+        <div className="flex flex-1 items-center justify-center px-4 pb-[max(1.5rem,env(safe-area-inset-bottom))] pt-6 sm:px-8 lg:p-12">
+          <div className="relative z-10 w-full max-w-[420px] animate-content">
+            <div className="rounded-2xl border border-slate-200/80 bg-white/90 p-5 shadow-sm dark:border-slate-700 dark:bg-slate-900/80 sm:p-8 lg:border-0 lg:bg-transparent lg:p-0 lg:shadow-none dark:lg:bg-transparent">
+              <div className="mb-7 text-left sm:mb-10 lg:text-left">
+                <h2 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-100 sm:text-3xl">Welcome Back</h2>
+                <p className="mt-1.5 text-sm text-slate-500 dark:text-slate-400 sm:mt-2">Please enter your details to access your account.</p>
+              </div>
+
+              {error && (
+                <div className="mb-6 flex items-center gap-3 rounded-xl border border-red-100 dark:border-red-900/70 bg-red-50 dark:bg-red-950/40 p-4 text-sm text-red-600 dark:text-red-300">
+                  <FaExclamationCircle className="shrink-0" />
+                  <p className="font-medium">{error}</p>
+                </div>
+              )}
+
+              <form onSubmit={handleSubmit} className="space-y-5 sm:space-y-6">
+                <div className="space-y-2">
+                  <label className="ml-1 text-sm font-semibold text-slate-700 dark:text-slate-200">Login Identity</label>
+                  <div className="group relative">
+                    <div className="absolute inset-y-0 left-0 flex items-center pl-4 text-slate-400 transition-colors group-focus-within:text-blue-600">
+                      <FaUserAlt size={16} />
+                    </div>
+                    <input
+                      type="text"
+                      value={identifier}
+                      onChange={(e) => setIdentifier(e.target.value)}
+                      placeholder="ID, Phone, or Full Name"
+                      autoComplete="username"
+                      className="w-full rounded-xl border border-slate-200 bg-white py-3.5 pl-11 pr-4 text-base text-slate-900 shadow-sm outline-none transition-all placeholder:text-slate-400 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
+                      required
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <div className="ml-1 flex items-center justify-between">
+                    <label className="text-sm font-semibold text-slate-700 dark:text-slate-200">Password</label>
+                    <button type="button" onClick={() => router.push('/forgot-password')} className="text-xs font-bold text-blue-600 transition-colors hover:text-blue-700">Forgot password?</button>
+                  </div>
+                  <div className="group relative">
+                    <div className="absolute inset-y-0 left-0 flex items-center pl-4 text-slate-400 transition-colors group-focus-within:text-blue-600">
+                      <FaLock size={16} />
+                    </div>
+                    <input
+                      type={showPassword ? 'text' : 'password'}
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      placeholder="••••••••"
+                      autoComplete="current-password"
+                      style={{ WebkitTextSecurity: showPassword ? 'none' : undefined }}
+                      className="w-full rounded-xl border border-slate-200 bg-white py-3.5 pl-11 pr-12 text-base text-slate-900 shadow-sm outline-none transition-all focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 [&::-ms-reveal]:hidden [&::-ms-clear]:hidden"
+                      required
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute inset-y-0 right-0 flex items-center pr-4 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
+                      aria-label={showPassword ? 'Hide password' : 'Show password'}
+                    >
+                      {showPassword ? <FaEyeSlash size={18} /> : <FaEye size={18} />}
+                    </button>
+                  </div>
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={isLoading}
+                  className="relative flex min-h-12 w-full items-center justify-center overflow-hidden rounded-xl bg-blue-600 py-3.5 text-base font-bold text-white shadow-lg shadow-blue-600/20 transition-all hover:bg-blue-700 active:scale-[0.98] disabled:opacity-70 sm:py-4"
+                >
+                  {isLoading ? (
+                    <div className="h-5 w-5 animate-spin rounded-full border-2 border-white/30 border-t-white" />
+                  ) : (
+                    <div className="flex items-center gap-2">
+                      <span>Sign In to Dashboard</span>
+                      <FaSignInAlt className="text-sm opacity-70" />
+                    </div>
+                  )}
+                </button>
+              </form>
+            </div>
+
+            <p className="mt-6 text-center text-[11px] text-slate-400 lg:hidden">
+              &copy; {new Date().getFullYear()} Awash Insurance S.C.
+            </p>
+          </div>
         </div>
       </div>
     </div>
