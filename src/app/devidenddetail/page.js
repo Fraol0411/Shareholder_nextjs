@@ -308,17 +308,24 @@ function MetricCard({ label, value, icon: Icon, accent = 'blue', showCurrency = 
   const c = accentMap[accent] || accentMap.blue;
 
   return (
-    <div className="group relative theme-surface rounded-xl border px-4 py-3.5 sm:p-5 shadow-sm hover:shadow-md transition-all duration-200">
+    <div className="group relative theme-surface rounded-xl border border-gray-200/70 dark:border-gray-700/50 px-4 py-3.5 sm:p-5 transition-all duration-200 hover:border-gray-300 dark:hover:border-gray-600">
       <div className="flex items-center gap-2.5 mb-2">
         <div className={`p-2 rounded-lg ${c.bg} ${c.text} ring-1 ${c.ring}`}>
           <Icon className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
         </div>
-        <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 leading-tight">{label}</p>
+
+        <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 leading-tight">
+          {label}
+        </p>
       </div>
 
       <p className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-gray-100 tracking-tight tabular-nums">
         {fmt(value)}
-        {showCurrency && <span className="ml-1 text-[10px] font-medium text-gray-400 uppercase">ETB</span>}
+        {showCurrency && (
+          <span className="ml-1 text-[10px] font-medium text-gray-400 uppercase">
+            ETB
+          </span>
+        )}
       </p>
     </div>
   );

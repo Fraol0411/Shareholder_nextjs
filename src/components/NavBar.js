@@ -293,3 +293,230 @@ export default function NavBar() {
     </>
   );
 }
+
+
+// 'use client';
+
+// import { useEffect, useState, useRef } from 'react';
+// import Link from 'next/link';
+// import { usePathname, useRouter } from 'next/navigation';
+// import ThemeToggle from './ThemeToggle';
+// import LanguageSelector from './LanguageSelector';
+// import Container from './Container';
+// import { useTranslation } from './LanguageProvider';
+
+// // Modern stroke icons (Heroicons)
+// import { 
+//   HiOutlineHome, 
+//   HiOutlineChartBar, 
+//   HiOutlineDocumentText, 
+//   HiOutlineClipboardDocumentList, 
+//   HiOutlineUserPlus,
+//   HiOutlineArrowRightOnRectangle,
+//   HiChevronDown,
+//   HiBars3BottomRight,
+//   HiXMark,
+//   HiOutlineUserCircle
+// } from "react-icons/hi2";
+
+// import {
+//   getStoredUser,
+//   logout,
+//   isStaffRole,
+//   isAdminRole,
+//   getRoleLabel,
+// } from '../libs/auth';
+
+// export default function NavBar() {
+//   const router = useRouter();
+//   const pathname = usePathname();
+
+//   const [mobileOpen, setMobileOpen] = useState(false);
+//   const [userMenuOpen, setUserMenuOpen] = useState(false);
+//   const [user, setUser] = useState(null);
+//   const [mounted, setMounted] = useState(false);
+//   const { t } = useTranslation();
+
+//   const userMenuRef = useRef(null);
+
+//   useEffect(() => {
+//     setMounted(true);
+//     setUser(getStoredUser());
+//   }, []);
+
+//   // Close user menu on outside click
+//   useEffect(() => {
+//     if (!userMenuOpen) return;
+//     const handler = (e) => {
+//       if (userMenuRef.current && !userMenuRef.current.contains(e.target)) setUserMenuOpen(false);
+//     };
+//     document.addEventListener('mousedown', handler);
+//     return () => document.removeEventListener('mousedown', handler);
+//   }, [userMenuOpen]);
+
+//   // Close mobile menu on route change
+//   useEffect(() => {
+//     setMobileOpen(false);
+//   }, [pathname]);
+
+//   const role = user?.role;
+//   const staff = isStaffRole(role);
+//   const admin = isAdminRole(role);
+
+//   const navItems = [
+//     { href: '/home', label: 'nav.home', icon: HiOutlineHome, show: true },
+//     { href: '/devidenddetail', label: 'nav.dividend', icon: HiOutlineChartBar, show: !staff },
+//     { href: '/fillform', label: 'nav.fillform', icon: HiOutlineDocumentText, show: !staff },
+//     { href: '/my-decisions', label: 'nav.decisions', icon: HiOutlineClipboardDocumentList, show: !staff },
+//     { href: '/staff-fillform', label: 'nav.fillform', icon: HiOutlineDocumentText, show: staff },
+//     { href: '/formbasket', label: 'nav.decisions', icon: HiOutlineClipboardDocumentList, show: staff },
+//     { href: '/register', label: 'nav.register', icon: HiOutlineUserPlus, show: admin },
+//   ].filter((item) => item.show);
+
+//   const handleLogout = () => {
+//     setUserMenuOpen(false);
+//     logout(router);
+//   };
+
+//   const isActive = (href) => pathname === href || pathname.startsWith(`${href}/`);
+
+//   if (!mounted) return <div className="h-16 w-full bg-white dark:bg-slate-950 border-b border-slate-100 dark:border-slate-800" />;
+
+//   return (
+//     <>
+//       <nav className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-md dark:bg-slate-950/80 border-b border-slate-200/50 dark:border-slate-800/50 transition-all duration-300">
+//         <Container>
+//           <div className="flex h-16 items-center justify-between">
+            
+//             {/* ── Logo Section ── */}
+//             <Link href={user ? '/home' : '/login'} className="flex shrink-0 items-center group">
+//               <img 
+//                 src="/images/logo.png" 
+//                 alt="Awash Insurance" 
+//                 className="h-8 w-auto transition-transform duration-300 group-hover:scale-105" 
+//               />
+//             </Link>
+
+//             {/* ── Desktop Navigation (Modern Pills) ── */}
+//             {user && (
+//               <div className="hidden lg:flex items-center gap-1.5">
+//                 {navItems.map(({ href, label, icon: Icon }) => {
+//                   const active = isActive(href);
+//                   return (
+//                     <Link
+//                       key={href}
+//                       href={href}
+//                       className={`flex items-center gap-2 px-4 py-2 rounded-full text-[13px] font-semibold transition-all duration-200 ${
+//                         active
+//                           ? 'bg-blue-600 text-white shadow-lg shadow-blue-200 dark:shadow-none'
+//                           : 'text-slate-500 hover:bg-blue-50 hover:text-blue-600 dark:text-slate-400 dark:hover:bg-slate-800'
+//                       }`}
+//                     >
+//                       <Icon className={`w-4 h-4 ${active ? 'opacity-100' : 'opacity-70'}`} />
+//                       {t(label)}
+//                     </Link>
+//                   );
+//                 })}
+//               </div>
+//             )}
+
+//             {/* ── Right Utilities ── */}
+//             <div className="flex items-center gap-3">
+//               <div className="hidden md:flex items-center gap-1 border-r border-slate-200 dark:border-slate-800 pr-3">
+//                 <LanguageSelector />
+//                 <ThemeToggle />
+//               </div>
+
+//               {/* User Profile Dropdown */}
+//               {user && (
+//                 <div ref={userMenuRef} className="relative">
+//                   <button
+//                     onClick={() => setUserMenuOpen(!userMenuOpen)}
+//                     className="flex items-center gap-2.5 p-1 pr-3 rounded-full bg-slate-50 hover:bg-blue-50 dark:bg-slate-900 border border-transparent hover:border-blue-100 transition-all"
+//                   >
+//                     {/* Circular Avatar aligned with body color */}
+//                     <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-600 text-[11px] font-bold text-white shadow-sm">
+//                       {user.username?.charAt(0).toUpperCase() || 'U'}
+//                     </div>
+//                     <div className="hidden sm:block text-left">
+//                       <p className="text-[13px] font-bold text-slate-700 dark:text-slate-100 leading-none">{user.username}</p>
+//                     </div>
+//                     <HiChevronDown className={`w-3.5 h-3.5 text-slate-400 transition-transform duration-200 ${userMenuOpen ? 'rotate-180' : ''}`} />
+//                   </button>
+
+//                   {userMenuOpen && (
+//                     <div className="absolute right-0 mt-3 w-56 overflow-hidden rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-2xl shadow-slate-200/50 dark:shadow-none animate-in fade-in slide-in-from-top-2">
+//                       <div className="px-4 py-4 bg-slate-50/50 dark:bg-slate-800/50 border-b border-slate-100 dark:border-slate-800">
+//                         <p className="text-sm font-bold text-slate-900 dark:text-white truncate">{user.username}</p>
+//                         <p className="text-[10px] uppercase tracking-wider font-bold text-blue-600 dark:text-blue-400 mt-1">{getRoleLabel(role)}</p>
+//                       </div>
+//                       <div className="p-1.5">
+//                         <Link 
+//                           href="/profile" 
+//                           onClick={() => setUserMenuOpen(false)}
+//                           className="flex items-center gap-2.5 px-3 py-2.5 text-sm text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-colors"
+//                         >
+//                           <HiOutlineUserCircle className="w-5 h-5 opacity-70" />
+//                           {t('profile.title')}
+//                         </Link>
+//                         <button 
+//                           onClick={handleLogout} 
+//                           className="w-full flex items-center gap-2.5 px-3 py-2.5 text-sm text-red-500 hover:bg-red-50 dark:hover:bg-red-950/30 rounded-xl transition-colors"
+//                         >
+//                           <HiOutlineArrowRightOnRectangle className="w-5 h-5" />
+//                           {t('nav.signout')}
+//                         </button>
+//                       </div>
+//                     </div>
+//                   )}
+//                 </div>
+//               )}
+
+//               {/* Mobile Menu Toggle */}
+//               {user && (
+//                 <button
+//                   onClick={() => setMobileOpen(!mobileOpen)}
+//                   className="lg:hidden p-2 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+//                 >
+//                   {mobileOpen ? <HiXMark size={24} /> : <HiBars3BottomRight size={24} />}
+//                 </button>
+//               )}
+//             </div>
+//           </div>
+//         </Container>
+
+//         {/* ── Mobile Menu Overlay ── */}
+//         {mobileOpen && user && (
+//           <div className="lg:hidden absolute w-full bg-white dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800 p-4 space-y-2 shadow-2xl animate-in fade-in slide-in-from-top-4">
+//              {navItems.map(({ href, label, icon: Icon }) => (
+//                 <Link
+//                   key={href}
+//                   href={href}
+//                   className={`flex items-center gap-3 p-4 rounded-2xl text-sm font-semibold transition-all ${
+//                     isActive(href) 
+//                     ? 'bg-blue-600 text-white shadow-lg shadow-blue-200' 
+//                     : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-900'
+//                   }`}
+//                 >
+//                   <Icon className="w-5 h-5" />
+//                   {t(label)}
+//                 </Link>
+//              ))}
+//              <div className="pt-4 mt-2 border-t border-slate-100 dark:border-slate-800 flex justify-between items-center px-2">
+//                 <div className="flex gap-2">
+//                   <LanguageSelector />
+//                   <ThemeToggle />
+//                 </div>
+//                 <button onClick={handleLogout} className="text-sm font-bold text-red-500 px-3 py-2">
+//                   {t('nav.signout')}
+//                 </button>
+//              </div>
+//           </div>
+//         )}
+//       </nav>
+
+//       {/* Transparent spacer to prevent content overlap */}
+//       <div className="h-16" /> 
+//     </>
+//   );
+// }
