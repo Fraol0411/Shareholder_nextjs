@@ -60,6 +60,12 @@ export default function MyDecisionsPage() {
         headers: { Authorization: `Bearer ${token}` },
       });
       const data = await res.json();
+      // check if response has rows
+      if (!data || !data.decisions || data.decisions.length === 0) {
+        setDecisions([]);
+        setIsLoading(false);
+        return;
+      }
       if (!res.ok) throw new Error(data.message || 'Failed to load decisions');
       setDecisions(data.decisions || []);
     } catch (err) {
