@@ -47,7 +47,7 @@ export function isStaffRole(role) {
 }
 
 export function isAdminRole(role) {
-  return role === 'admin' || role === 'staff';
+  return role === 'admin';
 }
 
 export function getRoleLabel(role) {

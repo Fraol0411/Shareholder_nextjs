@@ -168,7 +168,7 @@ export default function LoginPage() {
 
         <div className="relative z-10 w-full max-w-xl px-12 animate-content">
           <div className="flex items-center gap-3 text-white mb-12">
-            <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-white/10 backdrop-blur-xl border border-white/20 shadow-2xl">
+            <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-white backdrop-blur-xl border border-white/20 shadow-2xl">
               <img src="/images/logo.png" alt="Awash Insurance" className="h-9 w-auto" />
             </div>
             <div>
@@ -189,7 +189,7 @@ export default function LoginPage() {
           <div className="mt-12 space-y-4">
             {[
               { icon: FaChartLine, title: 'Portfolio Insights', desc: 'Track your growth and dividend history.' },
-              { icon: FaClipboardCheck, title: 'Easy Compliance', desc: 'Manage tax documents and legal forms.' }
+              // { icon: FaClipboardCheck, title: 'Easy Compliance', desc: 'Manage tax documents and legal forms.' }
             ].map((item, i) => (
               <div key={i} className="flex items-center gap-4 rounded-2xl bg-white/5 p-5 backdrop-blur-md border border-white/10 hover:bg-white/10 transition-all cursor-default">
                 <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-sky-400 text-blue-900">
@@ -348,7 +348,7 @@ export default function LoginPage() {
                         onClick={() => { setShowChangePassword(true); setError(''); setPasswordSetSuccess(false); }}
                         className="font-bold text-blue-600 transition-colors hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300"
                       >
-                        Set your password
+                        Enroll Now!
                       </button>
                     </p>
                   </div>
