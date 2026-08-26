@@ -42,21 +42,9 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
-                <Link href="/dashboard" className="group flex items-center gap-2 text-slate-600 transition-colors hover:text-sky-700 dark:text-slate-300 dark:hover:text-sky-300">
+                <Link href="/devidenddetail" className="group flex items-center gap-2 text-slate-600 transition-colors hover:text-sky-700 dark:text-slate-300 dark:hover:text-sky-300">
                   <span className="h-1 w-1 rounded-full bg-sky-300 transition-all group-hover:w-3 group-hover:bg-sky-500" />
                   {t('footer.checkDividend')}
-                </Link>
-              </li>
-              <li>
-                <Link href="/fillform" className="group flex items-center gap-2 text-slate-600 transition-colors hover:text-sky-700 dark:text-slate-300 dark:hover:text-sky-300">
-                  <span className="h-1 w-1 rounded-full bg-sky-300 transition-all group-hover:w-3 group-hover:bg-sky-500" />
-                  {t('footer.fillForm')}
-                </Link>
-              </li>
-              <li>
-                <Link href="/formbasket" className="group flex items-center gap-2 text-slate-600 transition-colors hover:text-sky-700 dark:text-slate-300 dark:hover:text-sky-300">
-                  <span className="h-1 w-1 rounded-full bg-sky-300 transition-all group-hover:w-3 group-hover:bg-sky-500" />
-                  {t('footer.decisions')}
                 </Link>
               </li>
             </ul>

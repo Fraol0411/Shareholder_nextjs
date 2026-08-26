@@ -294,7 +294,7 @@ export default function UserManagementPage() {
               <button
                 type="submit"
                 disabled={isSaving}
-                className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-blue-700 disabled:opacity-70"
+                className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-[#233e90] px-4 py-2.5 text-sm font-semibold text-white hover:bg-blue-700 disabled:opacity-70"
               >
                 <FaUserPlus />
                 {isSaving ? 'Saving...' : 'Create user'}
@@ -415,7 +415,7 @@ export default function UserManagementPage() {
               <button type="button" onClick={() => setEditingUser(null)} className="rounded-lg border border-slate-200 px-4 py-2 text-sm font-medium text-slate-600 dark:border-slate-600 dark:text-slate-300">
                 Cancel
               </button>
-              <button type="submit" disabled={isSaving} className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700 disabled:opacity-70">
+              <button type="submit" disabled={isSaving} className="inline-flex items-center gap-2 rounded-lg bg-[#233e90] px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700 disabled:opacity-70">
                 <FaSave />
                 {isSaving ? 'Saving...' : 'Save changes'}
               </button>
@@ -461,7 +461,7 @@ export default function UserManagementPage() {
               <button type="button" onClick={() => setPasswordUser(null)} className="rounded-lg border border-slate-200 px-4 py-2 text-sm font-medium text-slate-600 dark:border-slate-600 dark:text-slate-300">
                 Cancel
               </button>
-              <button type="submit" disabled={isSaving} className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700 disabled:opacity-70">
+              <button type="submit" disabled={isSaving} className="inline-flex items-center gap-2 rounded-lg bg-[#233e90] px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700 disabled:opacity-70">
                 <FaKey />
                 {isSaving ? 'Saving...' : 'Update password'}
               </button>

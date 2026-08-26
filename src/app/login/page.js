@@ -159,7 +159,7 @@ export default function LoginPage() {
       {/* ────────────────────────────────────────── */}
       {/* LEFT PANEL — Branding (hidden on mobile)   */}
       {/* ────────────────────────────────────────── */}
-      <div className="relative hidden w-1/2 flex-col items-center justify-center overflow-hidden bg-blue-700 lg:flex">
+      <div className="relative hidden w-1/2 flex-col items-center justify-center overflow-hidden bg-[#233e90] lg:flex">
         <div className="absolute inset-0 z-0">
           <div className="absolute top-[-10%] left-[-10%] w-[70%] h-[70%] rounded-full bg-sky-500/20 blur-[120px]" />
           <div className="absolute bottom-[-10%] right-[-10%] w-[60%] h-[60%] rounded-full bg-blue-900/40 blur-[100px]" />
@@ -326,7 +326,7 @@ export default function LoginPage() {
                     <button
                       type="submit"
                       disabled={isLoading}
-                      className="relative flex min-h-12 w-full items-center justify-center overflow-hidden rounded-xl bg-blue-600 py-3.5 text-base font-bold text-white shadow-lg shadow-blue-600/20 transition-all hover:bg-blue-700 active:scale-[0.98] disabled:opacity-70 sm:py-4"
+                      className="relative flex min-h-12 w-full items-center justify-center overflow-hidden rounded-xl bg-[#233e90] py-3.5 text-base font-bold text-white shadow-lg shadow-blue-600/20 transition-all hover:bg-blue-700 active:scale-[0.98] disabled:opacity-70 sm:py-4"
                     >
                       {isLoading ? (
                         <div className="h-5 w-5 animate-spin rounded-full border-2 border-white/30 border-t-white" />
@@ -460,7 +460,7 @@ export default function LoginPage() {
                     <button
                       type="submit"
                       disabled={isLoading}
-                      className="relative flex min-h-12 w-full items-center justify-center overflow-hidden rounded-xl bg-blue-600 py-3.5 text-base font-bold text-white shadow-lg shadow-blue-600/20 transition-all hover:bg-blue-700 active:scale-[0.98] disabled:opacity-70 sm:py-4"
+                      className="relative flex min-h-12 w-full items-center justify-center overflow-hidden rounded-xl bg-[#233e90] py-3.5 text-base font-bold text-white shadow-lg shadow-blue-600/20 transition-all hover:bg-blue-700 active:scale-[0.98] disabled:opacity-70 sm:py-4"
                     >
                       {isLoading ? (
                         <div className="h-5 w-5 animate-spin rounded-full border-2 border-white/30 border-t-white" />

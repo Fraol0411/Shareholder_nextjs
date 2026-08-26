@@ -50,7 +50,7 @@
  *      - Invalidate any previous unused OTPs for the same user on each new request.
  */
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
+
 import { connect } from '../../../libs/db';
 // import bcrypt from 'bcryptjs';        // uncomment when implementing
 // import crypto from 'crypto';          // uncomment when implementing

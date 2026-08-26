@@ -276,7 +276,7 @@ function FiscalYearDropdown({ years, selected, onSelect }) {
 function HeroTotalCard({ value }) {
   const { t } = useTranslation();
   return (
-    <div className="relative overflow-hidden rounded-xl sm:rounded-2xl bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800 px-4 py-5 sm:p-8 text-white shadow-xl">
+    <div className="relative overflow-hidden rounded-xl sm:rounded-2xl bg-gradient-to-br from-[#233e90] via-blue-700 to-indigo-800 px-4 py-5 sm:p-8 text-white shadow-xl">
       {/* decorative rings */}
       <div className="absolute -right-12 -top-12 w-48 h-48 sm:w-64 sm:h-64 rounded-full border-[32px] sm:border-[40px] border-white/5" />
       <div className="absolute -left-8 -bottom-8 w-32 h-32 sm:w-40 sm:h-40 rounded-full border-[20px] sm:border-[24px] border-white/5" />

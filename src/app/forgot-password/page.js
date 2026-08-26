@@ -181,7 +181,7 @@ export default function ForgotPasswordPage() {
               <button
                 type="submit"
                 disabled={isLoading}
-                className="flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-blue-600 text-base font-bold text-white shadow-lg shadow-blue-600/20 transition-all hover:bg-blue-700 active:scale-[0.98] disabled:opacity-70"
+                className="flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-[#233e90] text-base font-bold text-white shadow-lg shadow-blue-600/20 transition-all hover:bg-blue-700 active:scale-[0.98] disabled:opacity-70"
               >
                 {isLoading
                   ? <div className="h-5 w-5 animate-spin rounded-full border-2 border-white/30 border-t-white" />
