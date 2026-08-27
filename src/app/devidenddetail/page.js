@@ -286,7 +286,7 @@ function HeroTotalCard({ value }) {
           {t('detail.total')}
         </p>
         <p className="mt-2 text-3xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight tabular-nums">
-          {fmt(value)}
+          {fmt(value)}<span className="text-2xl p-0 sm:text-xl lg:text-2xl font-extrabold"> ETB</span>
         </p>
         <div className="mt-2 sm:mt-3 flex items-center gap-1.5 text-xs sm:text-sm text-blue-200">
           <FaMoneyBillWave className="shrink-0" />

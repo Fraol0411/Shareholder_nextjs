@@ -38,6 +38,12 @@ export default function UserManagementPage() {
   const [isDeleting, setIsDeleting] = useState(false);
   const [notification, setNotification] = useState(null);
 
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm]);
+
   useEffect(() => {
     const storedUser = getStoredUser();
     if (!isAdminRole(storedUser?.role)) {
@@ -86,6 +92,13 @@ export default function UserManagementPage() {
         user.name?.toLowerCase().includes(term)
     );
   }, [users, searchTerm]);
+
+    const totalItems = filteredUsers.length;
+    const totalPages = Math.ceil(totalItems / itemsPerPage);
+    const paginatedUsers = filteredUsers.slice(
+      (currentPage - 1) * itemsPerPage,
+      currentPage * itemsPerPage
+    );
 
   const handleFormChange = (event) => {
     const { name, value } = event.target;
@@ -316,15 +329,16 @@ export default function UserManagementPage() {
               />
             </div>
           </div>
-
-          <div className="overflow-x-auto">
+          <div className="overflow-x-auto max-h-[600px] overflow-y-auto">
             <table className="min-w-full divide-y divide-slate-100 dark:divide-slate-700">
-              <thead className="bg-slate-50 dark:bg-slate-900/60">
+              {/* Added sticky top-0 z-10 to keep header visible while scrolling */}
+              <thead className="bg-slate-50 dark:bg-slate-900/60 sticky top-0 z-10">
                 <tr className="text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
-                  <th className="px-4 py-3">Username</th>
-                  <th className="px-4 py-3">Role</th>
-                  <th className="px-4 py-3">Name</th>
-                  <th className="px-4 py-3 text-right">Actions</th>
+                  {/* Added background colors to th elements to prevent text bleed-through */}
+                  <th className="px-4 py-3 bg-slate-50 dark:bg-slate-900/60">Username</th>
+                  <th className="px-4 py-3 bg-slate-50 dark:bg-slate-900/60">Role</th>
+                  <th className="px-4 py-3 bg-slate-50 dark:bg-slate-900/60">Name</th>
+                  <th className="px-4 py-3 text-right bg-slate-50 dark:bg-slate-900/60">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 dark:divide-slate-700">
@@ -332,13 +346,14 @@ export default function UserManagementPage() {
                   <tr>
                     <td colSpan={4} className="px-4 py-10 text-center text-sm text-slate-500">Loading users...</td>
                   </tr>
-                ) : filteredUsers.length === 0 ? (
+                ) : paginatedUsers.length === 0 ? ( // Changed from filteredUsers to paginatedUsers
                   <tr>
                     <td colSpan={4} className="px-4 py-10 text-center text-sm text-slate-500">No users found.</td>
                   </tr>
                 ) : (
-                  filteredUsers.map((user) => (
+                  paginatedUsers.map((user) => ( // Changed from filteredUsers to paginatedUsers
                     <tr key={user.id} className="text-sm text-slate-700 dark:text-slate-200">
+                      {/* ... (keep your existing table row content exactly the same) ... */}
                       <td className="px-4 py-3 font-medium">{user.username}</td>
                       <td className="px-4 py-3">{getRoleLabel(user.role)}</td>
                       <td className="px-4 py-3">{user.name || '—'}</td>
@@ -377,6 +392,48 @@ export default function UserManagementPage() {
               </tbody>
             </table>
           </div>
+                    {/* Pagination Controls */}
+                    {totalItems > 0 && (
+            <div className="flex flex-col items-center justify-between gap-3 border-t border-slate-100 p-4 dark:border-slate-700 sm:flex-row">
+              <p className="text-sm text-slate-500 dark:text-slate-400">
+                Showing {((currentPage - 1) * itemsPerPage) + 1} to {Math.min(currentPage * itemsPerPage, totalItems)} of {totalItems} users
+              </p>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                  disabled={currentPage === 1}
+                  className="rounded-lg border border-slate-200 px-3 py-1.5 text-sm font-medium text-slate-600 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-700"
+                >
+                  Previous
+                </button>
+                
+                {/* Page Numbers (Hidden on very small screens to save space) */}
+                <div className="hidden sm:flex items-center gap-1">
+                  {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                    <button
+                      key={page}
+                      onClick={() => setCurrentPage(page)}
+                      className={`rounded-lg px-3 py-1.5 text-sm font-medium transition-colors ${
+                        currentPage === page
+                          ? 'bg-sky-500 text-white shadow-sm'
+                          : 'text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-700'
+                      }`}
+                    >
+                      {page}
+                    </button>
+                  ))}
+                </div>
+
+                <button
+                  onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                  disabled={currentPage === totalPages || totalPages === 0}
+                  className="rounded-lg border border-slate-200 px-3 py-1.5 text-sm font-medium text-slate-600 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-700"
+                >
+                  Next
+                </button>
+              </div>
+            </div>
+          )}
         </section>
       </div>
 
