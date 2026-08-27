@@ -9,6 +9,7 @@
   "nav.logout": "Logout",
   "nav.openMenu": "Open main menu",
   "profile.title": "Profile",
+  "profile.header": "Shareholder Profile",
   "profile.subtitle": "View the information saved in your account session.",
   "profile.name": "Full name",
   "profile.username": "Username",

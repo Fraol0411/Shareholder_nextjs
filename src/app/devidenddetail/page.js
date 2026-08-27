@@ -333,6 +333,7 @@ function MetricCard({ label, value, icon: Icon, accent = 'blue', showCurrency = 
 
 /* ── Profile Info Card ── */
 function ProfileCard({ record }) {
+  const { t } = useTranslation();
   const fields = [
     { icon: FaHashtag,      label: 'Registration No', value: record.reg_no },
     { icon: FaBuilding,     label: 'SIF No',          value: record.sif_no },
@@ -348,7 +349,7 @@ function ProfileCard({ record }) {
         <div className="p-1.5 bg-gray-100 rounded-lg text-gray-600 dark:bg-slate-700 dark:text-gray-300">
           <FaUser className="w-3.5 h-3.5" />
         </div>
-        <h3 className="text-sm sm:text-base font-bold text-gray-800 dark:text-gray-100">Shareholder Profile</h3>
+        <h3 className="text-sm sm:text-base font-bold text-gray-800 dark:text-gray-100">{t('profile.header')}</h3>
       </div>
       <div className="px-4 py-4 sm:p-5 grid grid-cols-2 sm:grid-cols-3 gap-x-4 gap-y-4 sm:gap-x-8 sm:gap-y-5">
         {fields.map(({ icon: Icon, label, value }) => (

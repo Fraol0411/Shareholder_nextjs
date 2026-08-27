@@ -364,7 +364,7 @@ export default function LoginPage() {
                     <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-2xl bg-amber-100 dark:bg-amber-900/40">
                       <FaKey className="text-xl text-amber-600 dark:text-amber-400" />
                     </div>
-                    <h2 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-100 sm:text-3xl">Set Your Password</h2>
+                    <h2 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-100 sm:text-3xl">Create Your Account</h2>
                     <p className="mt-1.5 text-sm text-slate-500 dark:text-slate-400 sm:mt-2">
                       Create a new password to secure your account. Your National ID is required.
                     </p>
@@ -466,7 +466,7 @@ export default function LoginPage() {
                         <div className="h-5 w-5 animate-spin rounded-full border-2 border-white/30 border-t-white" />
                       ) : (
                         <div className="flex items-center gap-2">
-                          <span>Set Password & Continue</span>
+                          <span>Continue</span>
                           <FaCheckCircle className="text-sm opacity-70" />
                         </div>
                       )}
