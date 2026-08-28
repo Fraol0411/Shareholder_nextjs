@@ -10,7 +10,7 @@ export default function Footer() {
   const { t } = useTranslation();
 
   return (
-    <footer className="mt-auto border-t border-sky-200/50 bg-gradient-to-br from-sky-50 via-blue-50/80 to-slate-50 dark:border-slate-700 dark:from-slate-900 dark:via-slate-900 dark:to-slate-950">
+    <footer className="mt-auto border-t border-brand-secondary/20 bg-gradient-to-br from-brand-secondary-soft via-white to-brand-primary-soft/40 dark:border-slate-700 dark:from-slate-900 dark:via-slate-900 dark:to-slate-950">
       <Container className="py-7 sm:py-9">
         <div className="grid gap-7 sm:gap-8 md:grid-cols-2 lg:grid-cols-4 lg:gap-10">
           {/* Brand */}
@@ -21,7 +21,7 @@ export default function Footer() {
               </span>
               <div>
                 <p className="text-base font-bold text-slate-800 dark:text-slate-100">Awash Insurance</p>
-                <p className="text-xs font-medium text-sky-600 dark:text-slate-400">{t('footer.portalSubtitle')}</p>
+                <p className="text-xs font-medium text-brand-secondary-hover dark:text-brand-secondary">{t('footer.portalSubtitle')}</p>
               </div>
             </div>
             <p className="mt-3 max-w-md text-xs leading-5 text-slate-600 dark:text-slate-300 sm:text-sm sm:leading-relaxed">
@@ -31,19 +31,19 @@ export default function Footer() {
 
           {/* Quick Links */}
           <div>
-            <h3 className="text-xs font-bold uppercase tracking-widest text-sky-700 dark:text-sky-300">
+            <h3 className="text-xs font-bold uppercase tracking-widest text-brand-primary dark:text-brand-secondary">
               {t('footer.quicklinks')}
             </h3>
             <ul className="mt-3 space-y-2 text-sm">
               <li>
-                <Link href="/home" className="group flex items-center gap-2 text-slate-600 transition-colors hover:text-sky-700 dark:text-slate-300 dark:hover:text-sky-300">
-                  <span className="h-1 w-1 rounded-full bg-sky-300 transition-all group-hover:w-3 group-hover:bg-sky-500" />
+                <Link href="/home" className="group flex items-center gap-2 text-slate-600 transition-colors hover:text-brand-primary dark:text-slate-300 dark:hover:text-brand-secondary">
+                  <span className="h-1 w-1 rounded-full bg-brand-secondary transition-all group-hover:w-3 group-hover:bg-brand-primary" />
                   {t('footer.portalHome')}
                 </Link>
               </li>
               <li>
-                <Link href="/devidenddetail" className="group flex items-center gap-2 text-slate-600 transition-colors hover:text-sky-700 dark:text-slate-300 dark:hover:text-sky-300">
-                  <span className="h-1 w-1 rounded-full bg-sky-300 transition-all group-hover:w-3 group-hover:bg-sky-500" />
+                <Link href="/devidenddetail" className="group flex items-center gap-2 text-slate-600 transition-colors hover:text-brand-primary dark:text-slate-300 dark:hover:text-brand-secondary">
+                  <span className="h-1 w-1 rounded-full bg-brand-secondary transition-all group-hover:w-3 group-hover:bg-brand-primary" />
                   {t('footer.checkDividend')}
                 </Link>
               </li>
@@ -52,41 +52,41 @@ export default function Footer() {
 
           {/* Contact */}
           <div>
-            <h3 className="text-xs font-bold uppercase tracking-widest text-sky-700 dark:text-sky-300">
+            <h3 className="text-xs font-bold uppercase tracking-widest text-brand-primary dark:text-brand-secondary">
               {t('footer.contact')}
             </h3>
             <ul className="mt-3 space-y-2.5 text-sm text-slate-600 dark:text-slate-300">
               <li className="flex items-start gap-2.5">
-                <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-sky-100 text-sky-600 dark:bg-slate-800 dark:text-sky-300">
+                <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-brand-secondary-soft text-brand-secondary-hover dark:bg-slate-800 dark:text-brand-secondary">
                   <FaMapMarkerAlt className="text-xs" />
                 </div>
                 <a
                   href="https://www.google.com/maps/search/?api=1&query=9.014764793341104,%2038.75101186069247"
                   target="_blank"
                   rel="noreferrer"
-                  className="rounded-md pt-0.5 transition-colors hover:text-sky-700 focus:outline-none focus:ring-2 focus:ring-sky-500/40 dark:hover:text-sky-300"
+                  className="rounded-md pt-0.5 transition-colors hover:text-brand-primary focus:outline-none focus:ring-2 focus:ring-brand-secondary/40 dark:hover:text-brand-secondary"
                 >
                   Ras Abebe Aregay Street, Mexico, Addis Ababa, Ethiopia
                 </a>
               </li>
               <li className="flex items-center gap-2.5">
-                <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-sky-100 text-sky-600 dark:bg-slate-800 dark:text-sky-300">
+                <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-brand-secondary-soft text-brand-secondary-hover dark:bg-slate-800 dark:text-brand-secondary">
                   <FaPhone className="text-xs" />
                 </div>
                 <a
                   href="tel:+251115570001"
-                  className="rounded-md transition-colors hover:text-sky-700 focus:outline-none focus:ring-2 focus:ring-sky-500/40 dark:hover:text-sky-300"
+                  className="rounded-md transition-colors hover:text-brand-primary focus:outline-none focus:ring-2 focus:ring-brand-secondary/40 dark:hover:text-brand-secondary"
                 >
                   +251 115 570 001
                 </a>
               </li>
               <li className="flex items-center gap-2.5">
-                <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-sky-100 text-sky-600 dark:bg-slate-800 dark:text-sky-300">
+                <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-brand-secondary-soft text-brand-secondary-hover dark:bg-slate-800 dark:text-brand-secondary">
                   <FaEnvelope className="text-xs" />
                 </div>
                 <a
                   href="mailto:aic@awashinsurance.com"
-                  className="break-all rounded-md transition-colors hover:text-sky-700 focus:outline-none focus:ring-2 focus:ring-sky-500/40 dark:hover:text-sky-300"
+                  className="break-all rounded-md transition-colors hover:text-brand-primary focus:outline-none focus:ring-2 focus:ring-brand-secondary/40 dark:hover:text-brand-secondary"
                 >
                   aic@awashinsurance.com
                 </a>
@@ -96,14 +96,14 @@ export default function Footer() {
         </div>
 
         {/* Bottom bar */}
-        <div className="mt-7 flex flex-col items-center justify-between gap-3 border-t border-sky-200/50 pt-4 dark:border-slate-700 sm:flex-row sm:gap-4 sm:pt-5">
+        <div className="mt-7 flex flex-col items-center justify-between gap-3 border-t border-brand-secondary/20 pt-4 dark:border-slate-700 sm:flex-row sm:gap-4 sm:pt-5">
           <p className="text-xs text-slate-500 dark:text-slate-400 sm:text-sm">
             © {year} Awash Insurance S.C. All rights reserved.
           </p>
           <div className="flex gap-4 text-xs text-slate-500 dark:text-slate-400 sm:gap-6 sm:text-sm">
-            <span className="cursor-default transition-colors hover:text-sky-700 dark:hover:text-slate-200">{t('footer.privacy')}</span>
-            <span className="cursor-default transition-colors hover:text-sky-700 dark:hover:text-slate-200">{t('footer.terms')}</span>
-            <span className="cursor-default transition-colors hover:text-sky-700 dark:hover:text-slate-200">{t('footer.support')}</span>
+            <span className="cursor-default transition-colors hover:text-brand-primary dark:hover:text-slate-200">{t('footer.privacy')}</span>
+            <span className="cursor-default transition-colors hover:text-brand-primary dark:hover:text-slate-200">{t('footer.terms')}</span>
+            <span className="cursor-default transition-colors hover:text-brand-primary dark:hover:text-slate-200">{t('footer.support')}</span>
           </div>
         </div>
       </Container>

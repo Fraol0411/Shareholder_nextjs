@@ -76,7 +76,7 @@ export default function NavBar() {
 
   const isActive = (href) => pathname === href || pathname.startsWith(`${href}/`);
 
-  if (!mounted) return <div className="h-16 w-full bg-white dark:bg-slate-950 border-b border-slate-100 dark:border-slate-800" />;
+  if (!mounted) return <div className="h-16 w-full border-b border-brand-secondary/15 bg-white dark:border-slate-800 dark:bg-slate-950" />;
 
   return (
     <>
@@ -106,7 +106,7 @@ export default function NavBar() {
                       key={href}
                       href={href}
                       className={`flex items-center gap-2 rounded-full px-3.5 py-2 text-[13px] font-semibold transition-all ${
-                        active ? 'bg-[#233e90] text-white shadow-md' : 'text-slate-500 hover:bg-blue-50 hover:text-blue-600'
+                        active ? 'bg-brand-primary text-white shadow-md shadow-brand-primary/20' : 'text-slate-500 hover:bg-brand-secondary-soft hover:text-brand-primary dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-brand-secondary'
                       }`}
                     >
                       <Icon className="w-4 h-4" />
@@ -130,9 +130,9 @@ export default function NavBar() {
                 <div ref={userMenuRef} className="relative flex items-center">
                   <button
                     onClick={() => setUserMenuOpen(!userMenuOpen)}
-                    className="flex items-center rounded-full bg-slate-50 dark:bg-slate-900 p-1 sm:pr-3 border border-transparent hover:border-blue-100 transition-all"
+                    className="flex items-center rounded-full bg-slate-50 dark:bg-slate-900 p-1 sm:pr-3 border border-transparent hover:border-brand-secondary/35 hover:bg-brand-secondary-soft/60 dark:hover:bg-slate-800 transition-all"
                   >
-                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#233e90] text-[11px] font-bold text-white shadow-sm shrink-0">
+                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-brand-primary text-[11px] font-bold text-white shadow-sm shrink-0">
                       {user.username?.charAt(0).toUpperCase() || 'U'}
                     </div>
                     {/* Username hidden on small screens to save space */}
@@ -144,11 +144,11 @@ export default function NavBar() {
 
                   {userMenuOpen && (
                     <div className="absolute right-0 top-full mt-3 w-52 overflow-hidden rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xl">
-                      <div className="px-4 py-3 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50">
-                        <p className="text-xs font-bold text-blue-600 uppercase tracking-widest">{getRoleLabel(role)}</p>
+                      <div className="px-4 py-3 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/60">
+                        <p className="text-xs font-bold text-brand-secondary-hover uppercase tracking-widest">{getRoleLabel(role)}</p>
                       </div>
                       <div className="p-1.5">
-                        <Link href="/profile" className="flex items-center gap-2 px-3 py-2 text-sm text-slate-600 dark:text-slate-300 hover:bg-slate-50 rounded-lg">
+                        <Link href="/profile" className="flex items-center gap-2 px-3 py-2 text-sm text-slate-600 dark:text-slate-300 hover:bg-brand-secondary-soft hover:text-brand-primary dark:hover:bg-slate-800 dark:hover:text-brand-secondary rounded-lg">
                           <HiOutlineUserCircle size={18} /> {t('profile.title')}
                         </Link>
                         <button onClick={handleLogout} className="w-full flex items-center gap-2 px-3 py-2 text-sm text-red-500 hover:bg-red-50 rounded-lg text-left">
@@ -164,7 +164,7 @@ export default function NavBar() {
               {user && (
                 <button
                   onClick={() => setMobileOpen(!mobileOpen)}
-                  className="lg:hidden p-1.5 text-slate-600 dark:text-slate-300 hover:bg-slate-100 rounded-lg"
+                  className="lg:hidden p-1.5 text-slate-600 dark:text-slate-300 hover:bg-brand-secondary-soft hover:text-brand-primary dark:hover:bg-slate-800 dark:hover:text-brand-secondary rounded-lg"
                 >
                   {mobileOpen ? <HiXMark size={24} /> : <HiBars3BottomRight size={24} />}
                 </button>
@@ -182,7 +182,7 @@ export default function NavBar() {
                   href={href}
                   onClick={() => setMobileOpen(false)}
                   className={`flex items-center gap-3 px-4 py-2 rounded-2xl text-sm font-semibold ${
-                    isActive(href) ? 'bg-[#233e90] text-white' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50'
+                    isActive(href) ? 'bg-brand-primary text-white' : 'text-slate-600 dark:text-slate-400 hover:bg-brand-secondary-soft hover:text-brand-primary dark:hover:bg-slate-800 dark:hover:text-brand-secondary'
                   }`}
                 >
                   <Icon className="w-5 h-5" />

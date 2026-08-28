@@ -40,12 +40,12 @@ function PortalCard({
   const { t } = useTranslation();
   const accents = {
     blue: {
-      icon: "bg-blue-600 text-white",
+    icon: "bg-brand-primary text-white",
       iconSoft:
-        "bg-blue-50 text-blue-600 dark:bg-blue-950/40 dark:text-blue-300",
-      iconText: "text-blue-600 dark:text-blue-300",
-      badge: "bg-blue-50 text-blue-700 dark:bg-blue-950/40 dark:text-blue-300",
-      hover: "group-hover:border-blue-200 dark:group-hover:border-blue-700",
+        "bg-brand-primary-soft text-brand-primary dark:bg-brand-primary-soft dark:text-brand-secondary",
+      iconText: "text-brand-primary dark:text-brand-secondary",
+      badge: "bg-brand-primary-soft text-brand-primary dark:bg-brand-primary-soft dark:text-brand-secondary",
+      hover: "group-hover:border-brand-primary/40 dark:group-hover:border-brand-secondary/40",
     },
 
     green: {
@@ -90,12 +90,12 @@ function PortalCard({
     },
 
     cyan: {
-      icon: "bg-cyan-600 text-white",
+      icon: "bg-brand-secondary text-brand-primary",
       iconSoft:
-        "bg-cyan-50 text-cyan-600 dark:bg-cyan-950/40 dark:text-cyan-300",
-      iconText: "text-cyan-600 dark:text-cyan-300",
-      badge: "bg-cyan-50 text-cyan-700 dark:bg-cyan-950/40 dark:text-cyan-300",
-      hover: "group-hover:border-cyan-200 dark:group-hover:border-cyan-700",
+        "bg-brand-secondary-soft text-brand-secondary-hover dark:bg-brand-secondary-soft dark:text-brand-secondary",
+      iconText: "text-brand-secondary-hover dark:text-brand-secondary",
+      badge: "bg-brand-secondary-soft text-brand-secondary-hover dark:bg-brand-secondary-soft dark:text-brand-secondary",
+      hover: "group-hover:border-brand-secondary/40 dark:group-hover:border-brand-secondary/40",
     },
   };
 
@@ -190,9 +190,9 @@ function SectionHeader({ eyebrow, title, description }) {
     <div className="mb-6 sm:mb-8">
       {eyebrow && (
         <div className="mb-2 flex items-center gap-2">
-          <span className="h-1.5 w-1.5 rounded-full bg-blue-600" />
+          <span className="h-1.5 w-1.5 rounded-full bg-brand-secondary" />
 
-          <span className="text-[10px] font-bold uppercase tracking-[0.18em] text-blue-600 dark:text-blue-300 sm:text-xs">
+          <span className="text-[10px] font-bold uppercase tracking-[0.18em] text-brand-secondary-hover dark:text-brand-secondary sm:text-xs">
             {t(eyebrow)}
           </span>
         </div>
