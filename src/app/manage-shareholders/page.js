@@ -55,7 +55,7 @@ export default function ManageShareholders() {
 
   const fetchFiscalYears = async () => {
     try {
-      const res = await fetch(`${process.env.API_BASE_URL}/fiscal-years`);
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/fiscal-years`);
       if (res.ok) setFiscalYears(await res.json());
     } catch {
       showNotification('error', 'Failed to load fiscal years.');
@@ -65,7 +65,7 @@ export default function ManageShareholders() {
   const fetchData = async (year) => {
     setIsLoading(true);
     try {
-      const res = await fetch(`${process.env.API_BASE_URL}/shareholders?fiscal_year=${encodeURIComponent(year)}`);
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/shareholders?fiscal_year=${encodeURIComponent(year)}`);
       if (!res.ok) throw new Error('Failed to fetch');
       setShareholders(await res.json());
     } catch {
@@ -109,7 +109,7 @@ export default function ManageShareholders() {
 
     setIsCreating(true);
     try {
-      const res = await fetch(`${process.env.API_BASE_URL}/shareholders`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/shareholders`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -209,7 +209,7 @@ export default function ManageShareholders() {
   const confirmDelete = async () => {
     setIsDeleting(true);
     try {
-      const res = await fetch(`${process.env.API_BASE_URL}/shareholders`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/shareholders`, {
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json' },
         // Only pass the dividend record ID. The user account will be preserved.
@@ -229,7 +229,7 @@ export default function ManageShareholders() {
   const confirmResetPassword = async () => {
     setIsResetting(true);
     try {
-      const res = await fetch(`${process.env.API_BASE_URL}/shareholders`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/shareholders`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ user_id: resetTarget.user_id }),
@@ -249,7 +249,7 @@ export default function ManageShareholders() {
     e.preventDefault();
     setIsSaving(true);
     try {
-      const res = await fetch(`${process.env.API_BASE_URL}/shareholders`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/shareholders`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(editingItem), // Contains both user_id and sh_dividend id

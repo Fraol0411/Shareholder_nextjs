@@ -38,8 +38,8 @@ export default function DividendDetail() {
     setError('');
     try {
       const url = year
-        ? `${process.env.API_BASE_URL}/dividend-detail?reg_no=${encodeURIComponent(currentRegNo)}&fiscal_year=${encodeURIComponent(year)}`
-        : `${process.env.API_BASE_URL}/dividend-detail?reg_no=${encodeURIComponent(currentRegNo)}`;
+        ? `${process.env.NEXT_PUBLIC_API_BASE_URL}/dividend-detail?reg_no=${encodeURIComponent(currentRegNo)}&fiscal_year=${encodeURIComponent(year)}`
+        : `${process.env.NEXT_PUBLIC_API_BASE_URL}/dividend-detail?reg_no=${encodeURIComponent(currentRegNo)}`;
 
       const res = await fetch(url);
       if (!res.ok) throw new Error('Failed to fetch details');

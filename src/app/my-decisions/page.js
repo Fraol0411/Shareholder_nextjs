@@ -56,7 +56,7 @@ export default function MyDecisionsPage() {
     setIsLoading(true);
     setError('');
     try {
-      const res = await fetch(`${process.env.API_BASE_URL}/decisions/my-decisions`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/decisions/my-decisions`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       const data = await res.json();

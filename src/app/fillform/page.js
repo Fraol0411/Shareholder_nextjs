@@ -74,7 +74,7 @@ export default function ShareholderFillForm() {
   // ── Fetch available fiscal years ──
   useEffect(() => {
     if (!token) return;
-    fetch(`${process.env.API_BASE_URL}/shareholder-dividend`, {
+    fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/shareholder-dividend`, {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then((r) => r.json())
@@ -88,7 +88,7 @@ export default function ShareholderFillForm() {
     setLoadingDividend(true);
     setDividendData(null);
 
-    fetch(`${process.env.API_BASE_URL}/shareholder-dividend?fiscal_year=${encodeURIComponent(selectedYear)}`, {
+    fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/shareholder-dividend?fiscal_year=${encodeURIComponent(selectedYear)}`, {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then((r) => r.json())
@@ -116,7 +116,7 @@ export default function ShareholderFillForm() {
     setSuccess('');
 
     try {
-      const res = await fetch(`${process.env.API_BASE_URL}/decisions/submit`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/decisions/submit`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

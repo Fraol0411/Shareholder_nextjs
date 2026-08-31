@@ -71,7 +71,7 @@ export default function UserManagementPage() {
   const fetchUsers = async () => {
     setIsLoading(true);
     try {
-      const res = await fetch(`${process.env.API_BASE_URL}/users`, { headers: authHeaders() });
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/users`, { headers: authHeaders() });
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || 'Failed to load users');
       setUsers(data);
@@ -116,7 +116,7 @@ export default function UserManagementPage() {
 
     setIsSaving(true);
     try {
-      const res = await fetch(`${process.env.API_BASE_URL}/users`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/users`, {
         method: 'POST',
         headers: authHeaders(),
         body: JSON.stringify({
@@ -141,7 +141,7 @@ export default function UserManagementPage() {
     event.preventDefault();
     setIsSaving(true);
     try {
-      const res = await fetch(`${process.env.API_BASE_URL}/users`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/users`, {
         method: 'PUT',
         headers: authHeaders(),
         body: JSON.stringify({
@@ -173,7 +173,7 @@ export default function UserManagementPage() {
 
     setIsSaving(true);
     try {
-      const res = await fetch(`${process.env.API_BASE_URL}/users`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/users`, {
         method: 'PUT',
         headers: authHeaders(),
         body: JSON.stringify({
@@ -198,7 +198,7 @@ export default function UserManagementPage() {
     if (!deleteTarget) return;
     setIsDeleting(true);
     try {
-      const res = await fetch(`${process.env.API_BASE_URL}/users?id=${deleteTarget.id}`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/users?id=${deleteTarget.id}`, {
         method: 'DELETE',
         headers: authHeaders(),
       });

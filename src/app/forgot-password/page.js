@@ -32,7 +32,7 @@ export default function ForgotPasswordPage() {
     setIsLoading(true);
 
     try {
-      const res = await fetch(`${process.env.API_BASE_URL}/auth/check-user`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/check-user`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ nationalId }),
@@ -68,7 +68,7 @@ export default function ForgotPasswordPage() {
     setIsLoading(true);
 
     try {
-      const res = await fetch(`${process.env.API_BASE_URL}/auth/set-password`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/set-password`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ nationalId, newPassword }),
