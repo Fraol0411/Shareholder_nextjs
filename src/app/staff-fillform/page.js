@@ -65,7 +65,7 @@ export default function StaffFillForm() {
 
   // ── Load fiscal years ──
   useEffect(() => {
-    fetch('/api/fiscal-years')
+    fetch(`${process.env.API_BASE_URL}/fiscal-years`)
       .then((r) => r.json())
       .then((data) => setFiscalYears(data || []))
       .catch(() => {});
@@ -81,7 +81,7 @@ export default function StaffFillForm() {
     setSelectedSH(null);
     resetForm();
 
-    fetch(`/api/shareholders?fiscal_year=${encodeURIComponent(selectedYear)}`)
+    fetch(`${process.env.API_BASE_URL}/shareholders?fiscal_year=${encodeURIComponent(selectedYear)}`)
       .then((r) => r.json())
       .then((data) => setShareholders(data || []))
       .catch(() => setShareholders([]))
@@ -144,7 +144,7 @@ export default function StaffFillForm() {
     setSuccess('');
 
     try {
-      const res = await fetch('/api/decisions/staff-submit', {
+      const res = await fetch(`${process.env.API_BASE_URL}/decisions/staff-submit`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

@@ -40,3 +40,9 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 .qoder/plans/Theme_and_i18n_a18e7734.md
+
+Dockerfile
+docker-compose.yaml
+.env.local
+.dockerignore
+next.config.mjs

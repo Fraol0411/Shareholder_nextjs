@@ -1,5 +1,3 @@
-# syntax=docker.io/docker/dockerfile:1
-
 # --- Stage 1: Base image ---
 FROM node:20-alpine AS base
 
@@ -8,23 +6,19 @@ FROM base AS deps
 RUN apk add --no-cache libc6-compat
 WORKDIR /app
 
-# Copy ONLY npm-specific files
+
 COPY package.json package-lock.json ./
 
-# 🟢 Streamlined npm cache mount
+
 RUN --mount=type=cache,target=/root/.npm \
     npm ci
 
-# --- Stage 3: Build the application ---
+
 FROM base AS builder
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
-# If you are using Prisma, uncomment the line below to generate the client
-# RUN npx prisma generate
-
-# Build Next.js
 RUN npm run build
 
 # --- Stage 4: Production runner ---

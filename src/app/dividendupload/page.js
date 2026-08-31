@@ -38,7 +38,7 @@ export default function UploadDividend() {
         return;
       }
 
-      const response = await fetch('../api/dividendupload', {
+      const response = await fetch(`${process.env.API_BASE_URL}/dividendupload`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,

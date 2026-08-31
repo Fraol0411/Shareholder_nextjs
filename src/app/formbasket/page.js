@@ -43,7 +43,7 @@ export default function FormBasket() {
 
   // ── Load fiscal years ──
   useEffect(() => {
-    fetch('/api/fiscal-years')
+    fetch(`${process.env.API_BASE_URL}/fiscal-years`)
       .then((r) => r.json())
       .then((data) => setFiscalYears(data || []))
       .catch(() => {});
@@ -66,7 +66,7 @@ export default function FormBasket() {
         const token = localStorage.getItem('token');
         if (!token) return router.push('/login');
 
-        const res = await fetch('/api/dividend/list', {
+        const res = await fetch(`${process.env.API_BASE_URL}/dividend/list`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         if (!res.ok) throw new Error('Failed to load forms');
