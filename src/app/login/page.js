@@ -132,12 +132,12 @@ export default function LoginPage() {
 
   /* ── Shared input classes ── */
   const inputCls =
-    'w-full rounded-xl border border-slate-200 bg-white py-3.5 pl-11 pr-4 text-base text-slate-900 shadow-sm outline-none transition-all placeholder:text-slate-400 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100';
+    'w-full rounded-xl border border-slate-200 bg-white py-3.5 pl-11 pr-4 text-base text-slate-900 shadow-sm outline-none transition-all placeholder:text-slate-400 focus:border-brand-secondary focus:ring-4 focus:ring-brand-secondary/10 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100';
   const inputClsWithToggle =
-    'w-full rounded-xl border border-slate-200 bg-white py-3.5 pl-11 pr-12 text-base text-slate-900 shadow-sm outline-none transition-all focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 [&::-ms-reveal]:hidden [&::-ms-clear]:hidden';
+    'w-full rounded-xl border border-slate-200 bg-white py-3.5 pl-11 pr-12 text-base text-slate-900 shadow-sm outline-none transition-all focus:border-brand-secondary focus:ring-4 focus:ring-brand-secondary/10 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 [&::-ms-reveal]:hidden [&::-ms-clear]:hidden';
 
   return (
-    <div className="relative flex min-h-dvh w-full bg-slate-50 dark:bg-slate-950 font-sans selection:bg-sky-100 dark:selection:bg-sky-900/40">
+    <div className="relative flex min-h-dvh w-full bg-slate-50 dark:bg-slate-950 font-sans">
       <style>{`
         @keyframes fadeIn {
           from { opacity: 0; transform: translateY(10px); }
@@ -159,10 +159,10 @@ export default function LoginPage() {
       {/* ────────────────────────────────────────── */}
       {/* LEFT PANEL — Branding (hidden on mobile)   */}
       {/* ────────────────────────────────────────── */}
-      <div className="relative hidden w-1/2 flex-col items-center justify-center overflow-hidden bg-[#233e90] lg:flex">
+      <div className="relative hidden w-1/2 flex-col items-center justify-center overflow-hidden bg-brand-primary lg:flex">
         <div className="absolute inset-0 z-0">
-          <div className="absolute top-[-10%] left-[-10%] w-[70%] h-[70%] rounded-full bg-sky-500/20 blur-[120px]" />
-          <div className="absolute bottom-[-10%] right-[-10%] w-[60%] h-[60%] rounded-full bg-blue-900/40 blur-[100px]" />
+          <div className="absolute top-[-10%] left-[-10%] w-[70%] h-[70%] rounded-full bg-brand-secondary/25 blur-[120px]" />
+          <div className="absolute bottom-[-10%] right-[-10%] w-[60%] h-[60%] rounded-full bg-black/25 blur-[100px]" />
           <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'linear-gradient(#fff 1px, transparent 1px), linear-gradient(90deg, #fff 1px, transparent 1px)', backgroundSize: '40px 40px' }}></div>
         </div>
 
@@ -173,15 +173,15 @@ export default function LoginPage() {
             </div>
             <div>
               <h1 className="text-3xl font-bold tracking-tight">አዋሽ ኢንሹራንስ</h1>
-              <p className="text-xs font-medium text-sky-200 uppercase tracking-[0.2em]">Awash Insurance S.C.</p>
+              <p className="text-xs font-medium text-brand-secondary uppercase tracking-[0.2em]">Awash Insurance S.C.</p>
             </div>
           </div>
 
           <div className="space-y-6">
             <h2 className="text-5xl font-extrabold leading-[1.1] text-white">
-              Securely Manage Your <span className="text-sky-300 underline decoration-sky-400/30 underline-offset-8">Shareholder</span> Portfolio.
+              Securely Manage Your <span className="text-brand-secondary underline decoration-brand-secondary/30 underline-offset-8">Shareholder</span> Portfolio.
             </h2>
-            <p className="text-lg text-blue-100/70 leading-relaxed max-w-md">
+            <p className="text-lg text-white/70 leading-relaxed max-w-md">
               Access real-time dividend tracking, reinvestment options, and secure data handling designed for our valued shareholders.
             </p>
           </div>
@@ -192,12 +192,12 @@ export default function LoginPage() {
               // { icon: FaClipboardCheck, title: 'Easy Compliance', desc: 'Manage tax documents and legal forms.' }
             ].map((item, i) => (
               <div key={i} className="flex items-center gap-4 rounded-2xl bg-white/5 p-5 backdrop-blur-md border border-white/10 hover:bg-white/10 transition-all cursor-default">
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-sky-400 text-blue-900">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-brand-secondary text-brand-primary">
                   <item.icon />
                 </div>
                 <div>
                   <h3 className="font-semibold text-white">{item.title}</h3>
-                  <p className="text-sm text-blue-100/50">{item.desc}</p>
+                  <p className="text-sm text-white/55">{item.desc}</p>
                 </div>
               </div>
             ))}
@@ -205,7 +205,7 @@ export default function LoginPage() {
         </div>
 
         <div className="absolute bottom-10 text-center w-full">
-          <p className="text-sm text-blue-200/40">
+          <p className="text-sm text-white/45">
             &copy; {new Date().getFullYear()} Awash Insurance Shareholder Portal. All rights reserved.
           </p>
         </div>
@@ -239,7 +239,7 @@ export default function LoginPage() {
                 <button
                   type="button"
                   onClick={goBackToSignIn}
-                  className="mb-4 inline-flex items-center gap-1.5 text-sm font-medium text-slate-500 transition-colors hover:text-blue-600 dark:text-slate-400 dark:hover:text-blue-400"
+                  className="mb-4 inline-flex items-center gap-1.5 text-sm font-medium text-slate-500 transition-colors hover:text-brand-primary dark:text-slate-400 dark:hover:text-brand-secondary"
                 >
                   <FaArrowLeft className="text-xs" />
                   Back to Sign In
@@ -275,7 +275,7 @@ export default function LoginPage() {
                     <div className="space-y-2">
                       <label className="ml-1 text-sm font-semibold text-slate-700 dark:text-slate-200">Login Identity</label>
                       <div className="group relative">
-                        <div className="absolute inset-y-0 left-0 flex items-center pl-4 text-slate-400 transition-colors group-focus-within:text-blue-600">
+                        <div className="absolute inset-y-0 left-0 flex items-center pl-4 text-slate-400 transition-colors group-focus-within:text-brand-secondary">
                           <FaUserAlt size={16} />
                         </div>
                         <input
@@ -295,10 +295,10 @@ export default function LoginPage() {
                     <div className="space-y-2">
                       <div className="ml-1 flex items-center justify-between">
                         <label className="text-sm font-semibold text-slate-700 dark:text-slate-200">Password</label>
-                        <button type="button" onClick={() => router.push('/forgot-password')} className="text-xs font-bold text-blue-600 transition-colors hover:text-blue-700">Forgot password?</button>
+                        <button type="button" onClick={() => router.push('/forgot-password')} className="text-xs font-bold text-brand-primary transition-colors hover:text-brand-primary-hover">Forgot password?</button>
                       </div>
                       <div className="group relative">
-                        <div className="absolute inset-y-0 left-0 flex items-center pl-4 text-slate-400 transition-colors group-focus-within:text-blue-600">
+                        <div className="absolute inset-y-0 left-0 flex items-center pl-4 text-slate-400 transition-colors group-focus-within:text-brand-secondary">
                           <FaLock size={16} />
                         </div>
                         <input
@@ -326,7 +326,7 @@ export default function LoginPage() {
                     <button
                       type="submit"
                       disabled={isLoading}
-                      className="relative flex min-h-12 w-full items-center justify-center overflow-hidden rounded-xl bg-[#233e90] py-3.5 text-base font-bold text-white shadow-lg shadow-blue-600/20 transition-all hover:bg-blue-700 active:scale-[0.98] disabled:opacity-70 sm:py-4"
+                      className="relative flex min-h-12 w-full items-center justify-center overflow-hidden rounded-xl bg-brand-primary py-3.5 text-base font-bold text-white shadow-lg shadow-brand-primary/25 transition-all hover:bg-brand-primary-hover active:scale-[0.98] disabled:opacity-70 sm:py-4"
                     >
                       {isLoading ? (
                         <div className="h-5 w-5 animate-spin rounded-full border-2 border-white/30 border-t-white" />
@@ -346,7 +346,7 @@ export default function LoginPage() {
                       <button
                         type="button"
                         onClick={() => { setShowChangePassword(true); setError(''); setPasswordSetSuccess(false); }}
-                        className="font-bold text-blue-600 transition-colors hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300"
+                        className="font-bold text-brand-primary transition-colors hover:text-brand-primary-hover dark:text-brand-secondary dark:hover:text-brand-secondary-hover"
                       >
                         Enroll Now!
                       </button>
@@ -384,7 +384,7 @@ export default function LoginPage() {
                         National ID <span className="text-red-500">*</span>
                       </label>
                       <div className="group relative">
-                        <div className="absolute inset-y-0 left-0 flex items-center pl-4 text-slate-400 transition-colors group-focus-within:text-blue-600">
+                        <div className="absolute inset-y-0 left-0 flex items-center pl-4 text-slate-400 transition-colors group-focus-within:text-brand-secondary">
                           <FaIdCard size={16} />
                         </div>
                         <input
@@ -402,7 +402,7 @@ export default function LoginPage() {
                     <div className="space-y-2">
                       <label className="ml-1 text-sm font-semibold text-slate-700 dark:text-slate-200">New Password</label>
                       <div className="group relative">
-                        <div className="absolute inset-y-0 left-0 flex items-center pl-4 text-slate-400 transition-colors group-focus-within:text-blue-600">
+                        <div className="absolute inset-y-0 left-0 flex items-center pl-4 text-slate-400 transition-colors group-focus-within:text-brand-secondary">
                           <FaLock size={16} />
                         </div>
                         <input
@@ -431,7 +431,7 @@ export default function LoginPage() {
                     <div className="space-y-2">
                       <label className="ml-1 text-sm font-semibold text-slate-700 dark:text-slate-200">Confirm Password</label>
                       <div className="group relative">
-                        <div className="absolute inset-y-0 left-0 flex items-center pl-4 text-slate-400 transition-colors group-focus-within:text-blue-600">
+                        <div className="absolute inset-y-0 left-0 flex items-center pl-4 text-slate-400 transition-colors group-focus-within:text-brand-secondary">
                           <FaLock size={16} />
                         </div>
                         <input
@@ -460,7 +460,7 @@ export default function LoginPage() {
                     <button
                       type="submit"
                       disabled={isLoading}
-                      className="relative flex min-h-12 w-full items-center justify-center overflow-hidden rounded-xl bg-[#233e90] py-3.5 text-base font-bold text-white shadow-lg shadow-blue-600/20 transition-all hover:bg-blue-700 active:scale-[0.98] disabled:opacity-70 sm:py-4"
+                      className="relative flex min-h-12 w-full items-center justify-center overflow-hidden rounded-xl bg-brand-primary py-3.5 text-base font-bold text-white shadow-lg shadow-brand-primary/25 transition-all hover:bg-brand-primary-hover active:scale-[0.98] disabled:opacity-70 sm:py-4"
                     >
                       {isLoading ? (
                         <div className="h-5 w-5 animate-spin rounded-full border-2 border-white/30 border-t-white" />

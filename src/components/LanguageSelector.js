@@ -57,8 +57,8 @@ export default function LanguageSelector() {
         // }`}
         className={`flex h-10 max-w-[8.5rem] items-center gap-2 rounded-xl border px-2.5 text-xs font-semibold outline-none transition-all duration-200 sm:max-w-none sm:px-3 ${
   open
-    ? 'border-blue-400/50 bg-white/[0.08] text-white ring-2 ring-blue-400/20'
-    : 'border-sky-200 bg-white/60 text-slate-700 hover:border-sky-300 hover:bg-white dark:border-white/[0.08] dark:bg-white/[0.04] dark:text-slate-200 dark:hover:border-white/[0.14] dark:hover:bg-white/[0.08]'
+    ? 'border-brand-secondary/50 bg-white/[0.08] text-white ring-2 ring-brand-secondary/20'
+    : 'border-brand-secondary/25 bg-white/60 text-slate-700 hover:border-brand-secondary/50 hover:bg-white dark:border-white/[0.08] dark:bg-white/[0.04] dark:text-slate-200 dark:hover:border-white/[0.14] dark:hover:bg-white/[0.08]'
 }`}
       >
         {selectedLanguage.country ? (
@@ -70,7 +70,7 @@ export default function LanguageSelector() {
             aria-hidden="true"
           />
         ) : (
-          <FaGlobeAfrica className="shrink-0 text-sky-600" aria-hidden="true" />
+          <FaGlobeAfrica className="shrink-0 text-brand-secondary" aria-hidden="true" />
         )}
         <span className="min-w-0 truncate">{t(selectedLanguage.key)}</span>
         <FaChevronDown
@@ -105,10 +105,10 @@ export default function LanguageSelector() {
                       handleSelect(language.code);
                     }
                   }}
-                  className={`flex min-h-11 cursor-pointer items-center gap-3 px-3 py-2.5 text-sm transition-colors duration-150 focus:bg-sky-50 focus:outline-none dark:focus:bg-slate-700 ${
+                  className={`flex min-h-11 cursor-pointer items-center gap-3 px-3 py-2.5 text-sm transition-colors duration-150 focus:bg-brand-secondary-soft focus:outline-none dark:focus:bg-slate-700 ${
                     isSelected
-                      ? 'bg-sky-50 font-semibold text-sky-700 dark:bg-slate-700 dark:text-sky-300'
-                      : 'text-slate-700 hover:bg-sky-50 active:bg-sky-100 dark:text-slate-200 dark:hover:bg-slate-700'
+                      ? 'bg-brand-secondary-soft font-semibold text-brand-secondary-hover dark:bg-slate-700 dark:text-brand-secondary'
+                      : 'text-slate-700 hover:bg-brand-secondary-soft active:bg-brand-secondary/15 dark:text-slate-200 dark:hover:bg-slate-700'
                   }`}
                 >
                   {language.country ? (
@@ -120,10 +120,10 @@ export default function LanguageSelector() {
                       aria-hidden="true"
                     />
                   ) : (
-                    <FaGlobeAfrica className="shrink-0 text-sky-600" aria-hidden="true" />
+                    <FaGlobeAfrica className="shrink-0 text-brand-secondary" aria-hidden="true" />
                   )}
                   <span className="min-w-0 flex-1 truncate">{t(language.key)}</span>
-                  {isSelected && <FaCheck className="shrink-0 text-xs text-sky-600" aria-hidden="true" />}
+                  {isSelected && <FaCheck className="shrink-0 text-xs text-brand-secondary" aria-hidden="true" />}
                 </li>
               );
             })}

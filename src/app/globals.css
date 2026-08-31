@@ -5,8 +5,12 @@
 :root {
   --background: #f8fafc;
   --foreground: #0f172a;
-  --brand-blue: #1d4ed8;
-  --brand-teal: #0d9488;
+  --brand-primary: #233e90;
+  --brand-primary-hover: #1b3070;
+  --brand-primary-soft: #e8edfb;
+  --brand-secondary: #04a2cc;
+  --brand-secondary-hover: #037f9f;
+  --brand-secondary-soft: #e5f7fb;
   --surface: #ffffff;
   --surface-elevated: #f8fafc;
   --border: #e2e8f0;
@@ -16,8 +20,12 @@
 .dark {
   --background: #0f172a;
   --foreground: #f1f5f9;
-  --brand-blue: #60a5fa;
-  --brand-teal: #2dd4bf;
+  --brand-primary: #233e90;
+  --brand-primary-hover: #2d50ad;
+  --brand-primary-soft: #1d2c58;
+  --brand-secondary: #45c7e8;
+  --brand-secondary-hover: #78d8ef;
+  --brand-secondary-soft: #123b48;
   --surface: #1e293b;
   --surface-elevated: #334155;
   --border: #475569;
@@ -27,6 +35,12 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-brand-primary: var(--brand-primary);
+  --color-brand-primary-hover: var(--brand-primary-hover);
+  --color-brand-primary-soft: var(--brand-primary-soft);
+  --color-brand-secondary: var(--brand-secondary);
+  --color-brand-secondary-hover: var(--brand-secondary-hover);
+  --color-brand-secondary-soft: var(--brand-secondary-soft);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
@@ -36,6 +50,19 @@ body {
   color: var(--foreground);
   font-family: var(--font-geist-sans), system-ui, sans-serif;
   transition: background-color 200ms ease, color 200ms ease;
+}
+
+::selection {
+  background: var(--brand-secondary);
+  color: #ffffff;
+}
+
+button,
+a,
+input,
+select,
+textarea {
+  accent-color: var(--brand-secondary);
 }
 
 :root[lang="am"] body,

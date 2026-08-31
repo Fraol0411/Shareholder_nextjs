@@ -40,14 +40,14 @@ export default function Breadcrumbs() {
       <div className="flex items-center gap-2 overflow-x-auto">
         <Link
           href="/home"
-          className={`inline-flex shrink-0 items-center gap-1.5 rounded-md px-1.5 py-1 font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-sky-500/40 ${
+          className={`inline-flex shrink-0 items-center gap-1.5 rounded-md px-1.5 py-1 font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-brand-secondary/40 ${
             isHome
               ? 'text-slate-700 dark:text-slate-200'
-              : 'text-slate-500 hover:bg-sky-50 hover:text-sky-700 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-sky-300'
+              : 'text-slate-500 hover:bg-brand-secondary-soft hover:text-brand-secondary-hover dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-brand-secondary'
           }`}
           aria-current={isHome ? 'page' : undefined}
         >
-          <FaHome className="text-[11px] text-sky-600" aria-hidden="true" />
+          <FaHome className="text-[11px] text-brand-secondary" aria-hidden="true" />
           {t('nav.home')}
         </Link>
 
