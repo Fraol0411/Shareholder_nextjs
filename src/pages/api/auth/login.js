@@ -23,13 +23,14 @@ export default async function handler(req, res) {
     // Search across username, phone, reg_no, and national_id
     const userResult = await pool.query(
       `SELECT * FROM users 
-       WHERE username = $1 
-          OR phone = $1 
+       WHERE phone = $1 
           OR reg_no = $1 
           OR national_id = $1 
        LIMIT 1`,
       [loginId]
     );
+
+    
 
     const user = userResult.rows[0];
     if (!user) {

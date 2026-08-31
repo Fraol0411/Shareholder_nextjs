@@ -34,7 +34,7 @@ export async function GET(request) {
     const result = await pool.query(
       `SELECT id, username, role, name, phone
        FROM public.users
-       WHERE role IN ('staff', 'admin', 'user')
+       WHERE role IN ('staff', 'admin')
        ORDER BY username ASC`
     );
     return NextResponse.json(result.rows, { status: 200 });

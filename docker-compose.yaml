@@ -1,0 +1,53 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  db:
+    image: postgres:16-alpine
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: Pg@0411
+      POSTGRES_DB: Shareholder
+    ports:
+      - "5433:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d Shareholder"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # Next.js Application
+  # Next.js Application
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: always
+    ports:
+      - "3000:3000"
+    environment:
+      # 1. Standard connection string (used by Prisma, Drizzle, etc.)
+      - DATABASE_URL=postgresql://postgres:Pg@0411@db:5432/Shareholder
+      
+      # 2. Individual variables (in case your app reads them separately like process.env.DB_HOST)
+      - DB_HOST=db
+      - DB_PORT=5432
+      - DB_USER=postgres
+      - DB_PASSWORD=Pg@0411
+      - DB_NAME=Shareholder
+      
+      # 3. Alternative naming conventions (just to be safe)
+      - POSTGRES_HOST=db
+      - POSTGRES_PORT=5432
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=Pg@0411
+      - POSTGRES_DB=Shareholder
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  pgdata:
