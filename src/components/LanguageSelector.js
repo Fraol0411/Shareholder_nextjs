@@ -47,7 +47,7 @@ export default function LanguageSelector() {
       <button
         type="button"
         onClick={() => setOpen((isOpen) => !isOpen)}
-        aria-label="Language"
+        aria-label={t('language.label')}
         aria-haspopup="listbox"
         aria-expanded={open}
         // className={`flex h-10 max-w-[8.5rem] items-center gap-2 rounded-lg border px-2.5 text-xs font-semibold text-slate-600 shadow-sm outline-none transition-all focus:ring-2 focus:ring-blue-500/40 dark:text-slate-200 sm:max-w-none sm:px-3 ${
@@ -84,11 +84,11 @@ export default function LanguageSelector() {
           <div className="fixed inset-0 z-40 bg-black/20 sm:bg-transparent" onClick={() => setOpen(false)} />
           <ul
             role="listbox"
-            aria-label="Language"
+            aria-label={t('language.label')}
             className="theme-surface absolute right-0 top-full z-50 mt-1.5 w-[min(15rem,calc(100vw-2rem))] overflow-hidden rounded-lg border py-1 shadow-lg ring-1 ring-black/5 animate-[slideUp_0.15s_ease]"
           >
             <li className="border-b border-slate-200 px-3 py-2 text-xs font-semibold text-slate-500 dark:border-slate-700 dark:text-slate-300">
-              Select language
+              {t('language.select')}
             </li>
             {languages.map((language) => {
               const isSelected = language.code === lang;

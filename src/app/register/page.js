@@ -14,6 +14,7 @@ import {
   FaExclamationTriangle,
 } from 'react-icons/fa';
 import AppShell from '../../components/AppShell';
+import { useTranslation } from '../../components/LanguageProvider';
 import { getStoredUser, getToken, isAdminRole, getRoleLabel } from '../../libs/auth';
 
 const EMPTY_FORM = {
@@ -25,6 +26,7 @@ const EMPTY_FORM = {
 
 export default function UserManagementPage() {
   const router = useRouter();
+  const { t } = useTranslation();
   const [authorized, setAuthorized] = useState(false);
   const [currentUser, setCurrentUser] = useState(null);
   const [users, setUsers] = useState([]);
@@ -73,7 +75,7 @@ export default function UserManagementPage() {
     try {
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/users`, { headers: authHeaders() });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.message || 'Failed to load users');
+      if (!res.ok) throw new Error(data.message || t('admin.loadFailed'));
       setUsers(data);
     } catch (err) {
       showNotification('error', err.message);
@@ -108,10 +110,10 @@ export default function UserManagementPage() {
   const handleCreate = async (event) => {
     event.preventDefault();
     if (formData.password.length < 6) {
-      return showNotification('error', 'Password must be at least 6 characters long.');
+      return showNotification('error', t('admin.passwordMinLength'));
     }
     if (formData.password !== formData.confirmPassword) {
-      return showNotification('error', 'Passwords do not match.');
+      return showNotification('error', t('admin.passwordsMismatch'));
     }
 
     setIsSaving(true);
@@ -126,9 +128,9 @@ export default function UserManagementPage() {
         }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.message || 'Failed to create user');
+      if (!res.ok) throw new Error(data.message || t('admin.createFailed'));
       setFormData(EMPTY_FORM);
-      showNotification('success', 'User created successfully.');
+      showNotification('success', t('admin.userCreated'));
       fetchUsers();
     } catch (err) {
       showNotification('error', err.message);
@@ -151,9 +153,9 @@ export default function UserManagementPage() {
         }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.message || 'Failed to update user');
+      if (!res.ok) throw new Error(data.message || t('admin.updateFailed'));
       setEditingUser(null);
-      showNotification('success', 'User updated successfully.');
+      showNotification('success', t('admin.userUpdated'));
       fetchUsers();
     } catch (err) {
       showNotification('error', err.message);
@@ -165,10 +167,10 @@ export default function UserManagementPage() {
   const handleChangePassword = async (event) => {
     event.preventDefault();
     if (!passwordUser.password || passwordUser.password.length < 6) {
-      return showNotification('error', 'Password must be at least 6 characters long.');
+      return showNotification('error', t('admin.passwordMinLength'));
     }
     if (passwordUser.password !== passwordUser.confirmPassword) {
-      return showNotification('error', 'Passwords do not match.');
+      return showNotification('error', t('admin.passwordsMismatch'));
     }
 
     setIsSaving(true);
@@ -184,9 +186,9 @@ export default function UserManagementPage() {
         }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.message || 'Failed to change password');
+      if (!res.ok) throw new Error(data.message || t('admin.changePasswordFailed'));
       setPasswordUser(null);
-      showNotification('success', 'Password updated successfully.');
+      showNotification('success', t('admin.passwordUpdated'));
     } catch (err) {
       showNotification('error', err.message);
     } finally {
@@ -203,9 +205,9 @@ export default function UserManagementPage() {
         headers: authHeaders(),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.message || 'Failed to delete user');
+      if (!res.ok) throw new Error(data.message || t('admin.deleteFailed'));
       setDeleteTarget(null);
-      showNotification('success', 'User deleted successfully.');
+      showNotification('success', t('admin.userDeleted'));
       fetchUsers();
     } catch (err) {
       showNotification('error', err.message);
@@ -242,65 +244,65 @@ export default function UserManagementPage() {
         <div className="mb-6">
           <h1 className="flex items-center gap-3 text-2xl font-bold text-slate-800 dark:text-slate-100 sm:text-3xl">
             <FaUsers className="text-sky-600" />
-            User Management
+            {t('admin.userManagement')}
           </h1>
           <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">
-            Create, update, delete, and reset passwords for staff and admin accounts.
+            {t('admin.userManagementDesc')}
           </p>
         </div>
 
         <section className="mb-6 rounded-xl border border-sky-100 bg-white p-5 shadow-sm dark:border-slate-700 dark:bg-slate-800 sm:p-6">
           <h2 className="mb-4 flex items-center gap-2 text-sm font-semibold text-slate-700 dark:text-slate-200">
             <FaUserPlus className="text-sky-600" />
-            Create user
+            {t('admin.createUser')}
           </h2>
           <form onSubmit={handleCreate} className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-5">
             <div>
-              <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-slate-500">Username</label>
+              <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-slate-500">{t('common.username')}</label>
               <input
                 name="username"
                 value={formData.username}
                 onChange={handleFormChange}
                 className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-800 outline-none focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-100"
-                placeholder="Username"
+                placeholder={t('common.username')}
                 required
               />
             </div>
             <div>
-              <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-slate-500">Password</label>
+              <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-slate-500">{t('auth.password')}</label>
               <input
                 name="password"
                 type="password"
                 value={formData.password}
                 onChange={handleFormChange}
                 className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-800 outline-none focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-100"
-                placeholder="Min. 6 characters"
+                placeholder={t('admin.minPassword')}
                 minLength={6}
                 required
               />
             </div>
             <div>
-              <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-slate-500">Confirm password</label>
+              <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-slate-500">{t('admin.confirmPassword')}</label>
               <input
                 name="confirmPassword"
                 type="password"
                 value={formData.confirmPassword}
                 onChange={handleFormChange}
                 className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-800 outline-none focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-100"
-                placeholder="Repeat password"
+                placeholder={t('admin.repeatPassword')}
                 required
               />
             </div>
             <div>
-              <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-slate-500">Role</label>
+              <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-slate-500">{t('common.role')}</label>
               <select
                 name="role"
                 value={formData.role}
                 onChange={handleFormChange}
                 className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-800 outline-none focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-100"
               >
-                <option value="staff">Staff</option>
-                <option value="admin">Admin</option>
+                <option value="staff">{t('admin.staff')}</option>
+                <option value="admin">{t('admin.admin')}</option>
               </select>
             </div>
             <div className="flex items-end">
@@ -310,7 +312,7 @@ export default function UserManagementPage() {
                 className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-[#233e90] px-4 py-2.5 text-sm font-semibold text-white hover:bg-blue-700 disabled:opacity-70"
               >
                 <FaUserPlus />
-                {isSaving ? 'Saving...' : 'Create user'}
+                {isSaving ? t('common.saving') : t('admin.createUserBtn')}
               </button>
             </div>
           </form>
@@ -318,13 +320,13 @@ export default function UserManagementPage() {
 
         <section className="overflow-hidden rounded-xl border border-sky-100 bg-white shadow-sm dark:border-slate-700 dark:bg-slate-800">
           <div className="flex flex-col gap-3 border-b border-slate-100 p-4 dark:border-slate-700 sm:flex-row sm:items-center sm:justify-between">
-            <h2 className="text-sm font-semibold text-slate-700 dark:text-slate-200">Existing users</h2>
+            <h2 className="text-sm font-semibold text-slate-700 dark:text-slate-200">{t('admin.existingUsers')}</h2>
             <div className="relative w-full sm:w-72">
               <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-xs text-slate-400" />
               <input
                 value={searchTerm}
                 onChange={(event) => setSearchTerm(event.target.value)}
-                placeholder="Search by username or role"
+                placeholder={t('admin.searchPlaceholder')}
                 className="w-full rounded-lg border border-slate-200 bg-white py-2 pl-9 pr-3 text-sm outline-none focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-100"
               />
             </div>
@@ -335,20 +337,20 @@ export default function UserManagementPage() {
               <thead className="bg-slate-50 dark:bg-slate-900/60 sticky top-0 z-10">
                 <tr className="text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
                   {/* Added background colors to th elements to prevent text bleed-through */}
-                  <th className="px-4 py-3 bg-slate-50 dark:bg-slate-900/60">Username</th>
-                  <th className="px-4 py-3 bg-slate-50 dark:bg-slate-900/60">Role</th>
-                  <th className="px-4 py-3 bg-slate-50 dark:bg-slate-900/60">Name</th>
-                  <th className="px-4 py-3 text-right bg-slate-50 dark:bg-slate-900/60">Actions</th>
+                  <th className="px-4 py-3 bg-slate-50 dark:bg-slate-900/60">{t('common.username')}</th>
+                  <th className="px-4 py-3 bg-slate-50 dark:bg-slate-900/60">{t('common.role')}</th>
+                  <th className="px-4 py-3 bg-slate-50 dark:bg-slate-900/60">{t('common.name')}</th>
+                  <th className="px-4 py-3 text-right bg-slate-50 dark:bg-slate-900/60">{t('common.actions')}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 dark:divide-slate-700">
                 {isLoading ? (
                   <tr>
-                    <td colSpan={4} className="px-4 py-10 text-center text-sm text-slate-500">Loading users...</td>
+                    <td colSpan={4} className="px-4 py-10 text-center text-sm text-slate-500">{t('admin.loadingUsers')}</td>
                   </tr>
                 ) : paginatedUsers.length === 0 ? ( // Changed from filteredUsers to paginatedUsers
                   <tr>
-                    <td colSpan={4} className="px-4 py-10 text-center text-sm text-slate-500">No users found.</td>
+                    <td colSpan={4} className="px-4 py-10 text-center text-sm text-slate-500">{t('admin.noUsersFound')}</td>
                   </tr>
                 ) : (
                   paginatedUsers.map((user) => ( // Changed from filteredUsers to paginatedUsers
@@ -363,7 +365,7 @@ export default function UserManagementPage() {
                             type="button"
                             onClick={() => setEditingUser({ ...user })}
                             className="rounded-lg border border-slate-200 p-2 text-slate-600 hover:bg-slate-50 dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-700"
-                            title="Edit user"
+                            title={t('admin.editUser')}
                           >
                             <FaEdit />
                           </button>
@@ -371,7 +373,7 @@ export default function UserManagementPage() {
                             type="button"
                             onClick={() => setPasswordUser({ ...user, password: '', confirmPassword: '' })}
                             className="rounded-lg border border-slate-200 p-2 text-slate-600 hover:bg-slate-50 dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-700"
-                            title="Change password"
+                            title={t('admin.changePassword')}
                           >
                             <FaKey />
                           </button>
@@ -380,7 +382,7 @@ export default function UserManagementPage() {
                             onClick={() => setDeleteTarget(user)}
                             disabled={String(currentUser?.id) === String(user.id)}
                             className="rounded-lg border border-red-200 p-2 text-red-600 hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-40 dark:border-red-800 dark:hover:bg-red-950/40"
-                            title="Delete user"
+                            title={t('admin.deleteUser')}
                           >
                             <FaTrash />
                           </button>
@@ -396,7 +398,10 @@ export default function UserManagementPage() {
                     {totalItems > 0 && (
             <div className="flex flex-col items-center justify-between gap-3 border-t border-slate-100 p-4 dark:border-slate-700 sm:flex-row">
               <p className="text-sm text-slate-500 dark:text-slate-400">
-                Showing {((currentPage - 1) * itemsPerPage) + 1} to {Math.min(currentPage * itemsPerPage, totalItems)} of {totalItems} users
+                {t('admin.showingUsers')
+                  .replace('{from}', String((currentPage - 1) * itemsPerPage + 1))
+                  .replace('{to}', String(Math.min(currentPage * itemsPerPage, totalItems)))
+                  .replace('{total}', String(totalItems))}
               </p>
               <div className="flex items-center gap-2">
                 <button
@@ -404,7 +409,7 @@ export default function UserManagementPage() {
                   disabled={currentPage === 1}
                   className="rounded-lg border border-slate-200 px-3 py-1.5 text-sm font-medium text-slate-600 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-700"
                 >
-                  Previous
+                  {t('common.previous')}
                 </button>
                 
                 {/* Page Numbers (Hidden on very small screens to save space) */}
@@ -429,7 +434,7 @@ export default function UserManagementPage() {
                   disabled={currentPage === totalPages || totalPages === 0}
                   className="rounded-lg border border-slate-200 px-3 py-1.5 text-sm font-medium text-slate-600 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-700"
                 >
-                  Next
+                  {t('common.next')}
                 </button>
               </div>
             </div>
@@ -441,14 +446,14 @@ export default function UserManagementPage() {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 p-4">
           <form onSubmit={handleUpdate} className="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl dark:bg-slate-800">
             <div className="mb-4 flex items-center justify-between">
-              <h3 className="text-lg font-semibold text-slate-800 dark:text-slate-100">Edit user</h3>
+              <h3 className="text-lg font-semibold text-slate-800 dark:text-slate-100">{t('admin.editUser')}</h3>
               <button type="button" onClick={() => setEditingUser(null)} className="text-slate-400 hover:text-slate-600">
                 <FaTimes />
               </button>
             </div>
             <div className="space-y-4">
               <div>
-                <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-slate-500">Username</label>
+                <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-slate-500">{t('common.username')}</label>
                 <input
                   value={editingUser.username}
                   onChange={(event) => setEditingUser((prev) => ({ ...prev, username: event.target.value }))}
@@ -457,24 +462,24 @@ export default function UserManagementPage() {
                 />
               </div>
               <div>
-                <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-slate-500">Role</label>
+                <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-slate-500">{t('common.role')}</label>
                 <select
                   value={editingUser.role}
                   onChange={(event) => setEditingUser((prev) => ({ ...prev, role: event.target.value }))}
                   className="w-full rounded-lg border border-slate-200 px-3 py-2.5 text-sm outline-none focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-100"
                 >
-                  <option value="staff">Staff</option>
-                  <option value="admin">Admin</option>
+                  <option value="staff">{t('admin.staff')}</option>
+                  <option value="admin">{t('admin.admin')}</option>
                 </select>
               </div>
             </div>
             <div className="mt-6 flex justify-end gap-3">
               <button type="button" onClick={() => setEditingUser(null)} className="rounded-lg border border-slate-200 px-4 py-2 text-sm font-medium text-slate-600 dark:border-slate-600 dark:text-slate-300">
-                Cancel
+                {t('common.cancel')}
               </button>
               <button type="submit" disabled={isSaving} className="inline-flex items-center gap-2 rounded-lg bg-[#233e90] px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700 disabled:opacity-70">
                 <FaSave />
-                {isSaving ? 'Saving...' : 'Save changes'}
+                {isSaving ? t('common.saving') : t('admin.saveChanges')}
               </button>
             </div>
           </form>
@@ -485,15 +490,17 @@ export default function UserManagementPage() {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 p-4">
           <form onSubmit={handleChangePassword} className="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl dark:bg-slate-800">
             <div className="mb-4 flex items-center justify-between">
-              <h3 className="text-lg font-semibold text-slate-800 dark:text-slate-100">Change password</h3>
+              <h3 className="text-lg font-semibold text-slate-800 dark:text-slate-100">{t('admin.changePassword')}</h3>
               <button type="button" onClick={() => setPasswordUser(null)} className="text-slate-400 hover:text-slate-600">
                 <FaTimes />
               </button>
             </div>
-            <p className="mb-4 text-sm text-slate-500">Reset password for <span className="font-semibold text-slate-700 dark:text-slate-200">{passwordUser.username}</span>.</p>
+            <p className="mb-4 text-sm text-slate-500">
+              {t('admin.resetPasswordFor').replace('{username}', passwordUser.username)}
+            </p>
             <div className="space-y-4">
               <div>
-                <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-slate-500">New password</label>
+                <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-slate-500">{t('admin.newPassword')}</label>
                 <input
                   type="password"
                   value={passwordUser.password}
@@ -504,7 +511,7 @@ export default function UserManagementPage() {
                 />
               </div>
               <div>
-                <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-slate-500">Confirm password</label>
+                <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-slate-500">{t('admin.confirmPassword')}</label>
                 <input
                   type="password"
                   value={passwordUser.confirmPassword}
@@ -516,11 +523,11 @@ export default function UserManagementPage() {
             </div>
             <div className="mt-6 flex justify-end gap-3">
               <button type="button" onClick={() => setPasswordUser(null)} className="rounded-lg border border-slate-200 px-4 py-2 text-sm font-medium text-slate-600 dark:border-slate-600 dark:text-slate-300">
-                Cancel
+                {t('common.cancel')}
               </button>
               <button type="submit" disabled={isSaving} className="inline-flex items-center gap-2 rounded-lg bg-[#233e90] px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700 disabled:opacity-70">
                 <FaKey />
-                {isSaving ? 'Saving...' : 'Update password'}
+                {isSaving ? t('common.saving') : t('admin.updatePassword')}
               </button>
             </div>
           </form>
@@ -533,13 +540,13 @@ export default function UserManagementPage() {
             <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-red-100 text-red-600">
               <FaExclamationTriangle />
             </div>
-            <h3 className="text-lg font-semibold text-slate-800 dark:text-slate-100">Delete user?</h3>
+            <h3 className="text-lg font-semibold text-slate-800 dark:text-slate-100">{t('admin.deleteUserTitle')}</h3>
             <p className="mt-2 text-sm text-slate-500">
-              This will permanently remove <span className="font-semibold">{deleteTarget.username}</span>.
+              {t('admin.deleteUserDesc').replace('{username}', deleteTarget.username)}
             </p>
             <div className="mt-6 flex justify-center gap-3">
               <button type="button" onClick={() => setDeleteTarget(null)} className="rounded-lg border border-slate-200 px-4 py-2 text-sm font-medium text-slate-600 dark:border-slate-600 dark:text-slate-300">
-                Cancel
+                {t('common.cancel')}
               </button>
               <button
                 type="button"
@@ -547,7 +554,7 @@ export default function UserManagementPage() {
                 disabled={isDeleting}
                 className="rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold text-white hover:bg-red-700 disabled:opacity-70"
               >
-                {isDeleting ? 'Deleting...' : 'Delete'}
+                {isDeleting ? t('common.deleting') : t('common.delete')}
               </button>
             </div>
           </div>

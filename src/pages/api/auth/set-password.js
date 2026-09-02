@@ -8,10 +8,21 @@ export default async function handler(req, res) {
     return res.status(405).json({ message: 'Method not allowed' });
   }
 
-  const { nationalId, newPassword } = req.body;
+  const { nationalId, identifier, userType, newPassword } = req.body;
 
-  if (!nationalId || !newPassword) {
-    return res.status(400).json({ message: 'National ID and new password are required' });
+  const loginId = (identifier ?? nationalId ?? '').trim();
+  const type = userType || (nationalId ? 'individual' : null);
+
+  if (!loginId || !newPassword) {
+    return res.status(400).json({ message: 'Identification number and new password are required' });
+  }
+
+  if (!type || !['individual', 'corporate'].includes(type)) {
+    return res.status(400).json({ message: 'User type (individual or corporate) is required' });
+  }
+
+  if (!/^\d+$/.test(loginId)) {
+    return res.status(400).json({ message: 'Identification number must contain digits only' });
   }
 
   if (newPassword.length < 6) {
@@ -25,10 +36,10 @@ export default async function handler(req, res) {
   try {
     const pool = await connect();
 
-    // Verify user exists and still has default password
+    // Both individual National ID and corporate TIN are stored in national_id
     const result = await pool.query(
       'SELECT id, password_hash FROM users WHERE national_id = $1 LIMIT 1',
-      [nationalId]
+      [loginId]
     );
 
     if (result.rows.length === 0) {

@@ -6,6 +6,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import ThemeToggle from './ThemeToggle';
 import LanguageSelector from './LanguageSelector';
 import Container from './Container';
+import ChangePasswordModal from './ChangePasswordModal';
 import { useTranslation } from './LanguageProvider';
 
 import { 
@@ -18,7 +19,8 @@ import {
   HiChevronDown,
   HiBars3BottomRight,
   HiXMark,
-  HiOutlineUserCircle
+  HiOutlineUserCircle,
+  HiOutlineKey,
 } from "react-icons/hi2";
 
 import {
@@ -35,6 +37,7 @@ export default function NavBar() {
 
   const [mobileOpen, setMobileOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const [changePasswordOpen, setChangePasswordOpen] = useState(false);
   const [user, setUser] = useState(null);
   const [mounted, setMounted] = useState(false);
   const { t } = useTranslation();
@@ -72,6 +75,12 @@ export default function NavBar() {
   const handleLogout = () => {
     setMobileOpen(false);
     logout(router);
+  };
+
+  const openChangePassword = () => {
+    setUserMenuOpen(false);
+    setMobileOpen(false);
+    setChangePasswordOpen(true);
   };
 
   const isActive = (href) => pathname === href || pathname.startsWith(`${href}/`);
@@ -148,10 +157,17 @@ export default function NavBar() {
                         <p className="text-xs font-bold text-brand-secondary-hover uppercase tracking-widest">{getRoleLabel(role)}</p>
                       </div>
                       <div className="p-1.5">
-                        <Link href="/profile" className="flex items-center gap-2 px-3 py-2 text-sm text-slate-600 dark:text-slate-300 hover:bg-brand-secondary-soft hover:text-brand-primary dark:hover:bg-slate-800 dark:hover:text-brand-secondary rounded-lg">
+                        <Link href="/profile" onClick={() => setUserMenuOpen(false)} className="flex items-center gap-2 px-3 py-2 text-sm text-slate-600 dark:text-slate-300 hover:bg-brand-secondary-soft hover:text-brand-primary dark:hover:bg-slate-800 dark:hover:text-brand-secondary rounded-lg">
                           <HiOutlineUserCircle size={18} /> {t('profile.title')}
                         </Link>
-                        <button onClick={handleLogout} className="w-full flex items-center gap-2 px-3 py-2 text-sm text-red-500 hover:bg-red-50 rounded-lg text-left">
+                        <button
+                          type="button"
+                          onClick={openChangePassword}
+                          className="w-full flex items-center gap-2 px-3 py-2 text-sm text-slate-600 dark:text-slate-300 hover:bg-brand-secondary-soft hover:text-brand-primary dark:hover:bg-slate-800 dark:hover:text-brand-secondary rounded-lg text-left"
+                        >
+                          <HiOutlineKey size={18} /> {t('nav.changePassword')}
+                        </button>
+                        <button onClick={handleLogout} className="w-full flex items-center gap-2 px-3 py-2 text-sm text-red-500 hover:bg-red-50 dark:hover:bg-red-950/30 rounded-lg text-left">
                           <HiOutlineArrowRightOnRectangle size={18} /> {t('nav.signout')}
                         </button>
                       </div>
@@ -190,12 +206,22 @@ export default function NavBar() {
                 </Link>
              ))}
 
-             <button onClick={handleLogout} className="w-full flex items-center gap-2 px-4 py-2 text-sm text-red-500 hover:bg-red-50 rounded-lg text-left">
+             <button
+               type="button"
+               onClick={openChangePassword}
+               className="w-full flex items-center gap-2 px-4 py-2 text-sm text-slate-600 dark:text-slate-300 hover:bg-brand-secondary-soft hover:text-brand-primary dark:hover:bg-slate-800 dark:hover:text-brand-secondary rounded-lg text-left"
+             >
+               <HiOutlineKey size={18} /> {t('nav.changePassword')}
+             </button>
+
+             <button onClick={handleLogout} className="w-full flex items-center gap-2 px-4 py-2 text-sm text-red-500 hover:bg-red-50 dark:hover:bg-red-950/30 rounded-lg text-left">
                 <HiOutlineArrowRightOnRectangle size={18} /> {t('nav.signout')}
               </button>
           </div>
         )}
       </nav>
+
+      <ChangePasswordModal open={changePasswordOpen} onClose={() => setChangePasswordOpen(false)} />
     </>
   );
 }

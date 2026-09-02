@@ -8,31 +8,44 @@ export default async function handler(req, res) {
     return res.status(405).json({ message: 'Method not allowed' });
   }
 
-  const { nationalId } = req.body;
+  const { nationalId, identifier, userType } = req.body;
 
-  if (!nationalId) {
-    return res.status(400).json({ message: 'National ID is required' });
+  const loginId = (identifier ?? nationalId ?? '').trim();
+  const type = userType || (nationalId ? 'individual' : null);
+
+  if (!loginId) {
+    return res.status(400).json({ message: 'Identification number is required' });
+  }
+
+  if (!type || !['individual', 'corporate'].includes(type)) {
+    return res.status(400).json({ message: 'User type (individual or corporate) is required' });
+  }
+
+  if (!/^\d+$/.test(loginId)) {
+    return res.status(400).json({ message: 'Identification number must contain digits only' });
   }
 
   try {
     const pool = await connect();
 
-    // Look up user by national_id
+    // Both individual National ID and corporate TIN are stored in national_id
     const result = await pool.query(
       `SELECT id, username, password_hash, name, phone, reg_no, national_id, role
        FROM users
        WHERE national_id = $1
        LIMIT 1`,
-      [nationalId]
+      [loginId]
     );
 
     if (result.rows.length === 0) {
-      return res.status(404).json({ message: 'No account found with this National ID. Please contact support.' });
+      const message =
+        type === 'corporate'
+          ? 'No account found with this TIN. Please contact support.'
+          : 'No account found with this National ID. Please contact support.';
+      return res.status(404).json({ message });
     }
 
     const user = result.rows[0];
-
-    // Check if the password is still the default
     const isDefaultPassword = await bcrypt.compare(DEFAULT_PASSWORD, user.password_hash);
 
     return res.status(200).json({

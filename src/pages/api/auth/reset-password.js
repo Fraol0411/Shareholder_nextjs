@@ -1,103 +1,70 @@
-/**
- * API ROUTE: POST /api/auth/reset-password
- * ─────────────────────────────────────────
- * Step 3 of the OTP password-reset flow.
- *
- * REQUEST BODY:
- *   { resetToken: string, newPassword: string }
- *
- * SUCCESS RESPONSE (200):
- *   { message: "Password updated successfully." }
- *
- * WHAT NEEDS TO BE IMPLEMENTED:
- *
- * 1. ENV VARIABLES REQUIRED:
- *      OTP_RESET_SECRET=...   (same secret used in verify-otp.js)
- *      JWT_SECRET=...         (already set)
- *
- * 2. VALIDATION:
- *      - Verify the reset token with jwt.verify() using OTP_RESET_SECRET.
- *      - Confirm token payload contains { purpose: 'password_reset' }.
- *      - Reject expired tokens (jwt.verify throws TokenExpiredError automatically).
- *
- * 3. PASSWORD UPDATE:
- *      - Hash the new password with bcrypt (cost factor 10 minimum).
- *      - UPDATE users SET password_hash = $1 WHERE id = $2
- *
- * 4. POST-RESET CLEANUP:
- *      - Invalidate all remaining unused OTPs for this user (belt-and-suspenders).
- *      - Optionally invalidate all existing session tokens (requires token revocation
- *        table or changing a per-user token version column).
- *
- * 5. SECURITY:
- *      - The reset token is single-use by design (verified via OTP which was
- *        already marked used in verify-otp.js).
- *      - Minimum password length: 6 characters (enforced here AND on the client).
- */
+import { connect } from '../../../libs/db';
+import bcrypt from 'bcryptjs';
 
-// import { connect } from '../../../libs/db';  // uncomment when implementing
-// import bcrypt from 'bcryptjs';               // uncomment when implementing
-// import jwt from 'jsonwebtoken';              // uncomment when implementing
+const DEFAULT_PASSWORD = 'shareholder@awash';
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ message: 'Method not allowed' });
   }
 
-  // ── STUB: remove this block and implement the real logic below ──
-  return res.status(503).json({
-    message: 'Password reset is not yet configured.',
-  });
+  const { nationalId, identifier, userType, newPassword } = req.body;
 
-  /* ── REAL IMPLEMENTATION (uncomment and complete) ──────────────
-  const { resetToken, newPassword } = req.body;
+  const loginId = (identifier ?? nationalId ?? '').trim();
+  const type = userType || (nationalId ? 'individual' : null);
 
-  if (!resetToken || !newPassword) {
-    return res.status(400).json({ message: 'Reset token and new password are required.' });
+  if (!loginId || !newPassword) {
+    return res.status(400).json({ message: 'Identification number and new password are required' });
+  }
+
+  if (!type || !['individual', 'corporate'].includes(type)) {
+    return res.status(400).json({ message: 'User type (individual or corporate) is required' });
+  }
+
+  if (!/^\d+$/.test(loginId)) {
+    return res.status(400).json({ message: 'Identification number must contain digits only' });
   }
 
   if (newPassword.length < 6) {
-    return res.status(400).json({ message: 'Password must be at least 6 characters.' });
+    return res.status(400).json({ message: 'Password must be at least 6 characters long' });
+  }
+
+  if (newPassword === DEFAULT_PASSWORD) {
+    return res.status(400).json({ message: 'New password must be different from the default password' });
   }
 
   try {
-    // 1. Verify reset token
-    let payload;
-    try {
-      payload = jwt.verify(
-        resetToken,
-        process.env.OTP_RESET_SECRET || process.env.JWT_SECRET
-      );
-    } catch {
-      return res.status(400).json({ message: 'Reset link is invalid or has expired.' });
+    const pool = await connect();
+
+    const result = await pool.query(
+      `SELECT id, password_hash, role FROM users WHERE national_id = $1 LIMIT 1`,
+      [loginId]
+    );
+
+    if (result.rows.length === 0) {
+      const message =
+        type === 'corporate'
+          ? 'No account found with this TIN.'
+          : 'No account found with this National ID.';
+      return res.status(404).json({ message });
     }
 
-    if (payload.purpose !== 'password_reset') {
-      return res.status(400).json({ message: 'Invalid reset token.' });
+    const user = result.rows[0];
+
+    if (user.role === 'staff' || user.role === 'admin') {
+      return res.status(403).json({ message: 'Please contact an administrator to reset your password.' });
     }
 
-    const userId = payload.userId;
-
-    // 2. Hash new password
     const passwordHash = await bcrypt.hash(newPassword, 10);
 
-    // 3. Update users table
-    const pool = await connect();
-    await pool.query(
-      `UPDATE users SET password_hash = $1 WHERE id = $2`,
-      [passwordHash, userId]
-    );
+    await pool.query('UPDATE users SET password_hash = $1, updated_at = CURRENT_TIMESTAMP WHERE id = $2', [
+      passwordHash,
+      user.id,
+    ]);
 
-    // 4. Clean up any remaining OTPs
-    await pool.query(
-      `UPDATE otp_requests SET used = TRUE WHERE user_id = $1 AND used = FALSE`,
-      [userId]
-    );
-
-    return res.status(200).json({ message: 'Password updated successfully.' });
+    return res.status(200).json({ message: 'Password updated successfully. You can now sign in.' });
   } catch (error) {
-    console.error('reset-password error:', error);
-    return res.status(500).json({ message: 'Internal server error.' });
+    console.error('Reset password error:', error);
+    return res.status(500).json({ message: 'Internal server error' });
   }
-  ────────────────────────────────────────────────────────────── */
 }
