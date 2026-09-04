@@ -101,7 +101,7 @@ export default function LoginPage() {
         localStorage.setItem(key, String(data.user[key]));
       });
 
-      window.location.href = '/home';
+      window.location.href = '/shareholder/home';
     } catch (err) {
       setError(err.message || t('auth.unexpectedError'));
       setIsLoading(false);
