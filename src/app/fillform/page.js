@@ -21,10 +21,38 @@ import {
 } from 'react-icons/fa';
 import AppShell from '../../components/AppShell';
 import { getToken, getStoredUser } from '../../libs/auth';
+import { useTranslation } from '../../components/LanguageProvider';
 
 const fmt = (v) =>
   Number(v || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-import { useTranslation } from '../../components/LanguageProvider';
+
+const toNumber = (value) => {
+  const n = Number(value);
+  return Number.isFinite(n) ? n : 0;
+};
+
+const buildBalanceError = ({ availableBalance, amountToConvert, amountToWithdraw, t }) => {
+  const convert = toNumber(amountToConvert);
+  const withdraw = toNumber(amountToWithdraw);
+
+  if (convert < 0 || withdraw < 0) {
+    return t('staff.negativeAmountError');
+  }
+
+  if (withdraw > 0 && convert + withdraw > availableBalance + 0.000001) {
+    return `${t('staff.totalExceedsBalance')} ${fmt(convert + withdraw)} ETB ${t('staff.exceedsBalanceDivider')} ${fmt(availableBalance)} ETB.`;
+  }
+
+  if (convert > availableBalance + 0.000001) {
+    return `${t('staff.reinvestmentExceedsBalance')} ${fmt(convert)} ETB ${t('staff.exceedsBalanceDivider')} ${fmt(availableBalance)} ETB.`;
+  }
+
+  if (withdraw > availableBalance + 0.000001) {
+    return `${t('staff.withdrawalExceedsBalance')} ${fmt(withdraw)} ETB ${t('staff.exceedsBalanceDivider')} ${fmt(availableBalance)} ETB.`;
+  }
+
+  return '';
+};
 
 export default function ShareholderFillForm() {
   const router = useRouter();
@@ -51,6 +79,14 @@ export default function ShareholderFillForm() {
   const [bankName, setBankName] = useState('');
   const [branchName, setBranchName] = useState('');
   const [accountNumber, setAccountNumber] = useState('');
+
+  const availableBalance = toNumber(dividendData?.total_dividend);
+  const availableToReinvest = amountToWithdraw === ''
+    ? availableBalance
+    : Math.max(availableBalance - toNumber(amountToWithdraw), 0);
+  const availableToWithdraw = amountToConvert === ''
+    ? availableBalance
+    : Math.max(availableBalance - toNumber(amountToConvert), 0);
 
   // ── Submission state ──
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -111,6 +147,38 @@ export default function ShareholderFillForm() {
     e.preventDefault();
     if (!decision || !selectedYear) return;
 
+    const currentBalance = Number(dividendData?.total_dividend || 0);
+    const convertAmount = decision === 'withdraw' ? toNumber(amountToConvert) : currentBalance;
+    const withdrawAmount = decision === 'withdraw' ? toNumber(amountToWithdraw) : 0;
+
+    if (decision === 'withdraw') {
+      if (!amountToWithdraw || withdrawAmount <= 0) {
+        setError(t('staff.withdrawAmountRequired'));
+        return;
+      }
+    }
+
+    if (decision === 'withdraw') {
+      const balanceError = buildBalanceError({
+        availableBalance: currentBalance,
+        amountToConvert: amountToConvert || 0,
+        amountToWithdraw: amountToWithdraw || 0,
+        t,
+      });
+
+      if (balanceError) {
+        setError(balanceError);
+        return;
+      }
+    }
+
+    if (['reinvest', 'fiscalreinvest'].includes(decision)) {
+      if (currentBalance <= 0) {
+        setError(t('staff.noAvailableBalance'));
+        return;
+      }
+    }
+
     setIsSubmitting(true);
     setError('');
     setSuccess('');
@@ -123,13 +191,14 @@ export default function ShareholderFillForm() {
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
+          file_number: dividendData?.file_number || null,
           shareholder_name: shareholderName,
           email: email || null,
           phone: phone || null,
           fiscal_year: selectedYear,
           decision_type: decision,
-          amount_to_convert: amountToConvert || null,
-          amount_to_withdraw: amountToWithdraw || null,
+          amount_to_convert: ['reinvest', 'fiscalreinvest'].includes(decision) ? convertAmount : (amountToConvert || null),
+          amount_to_withdraw: decision === 'withdraw' ? withdrawAmount : null,
           payment_method: paymentMethod || null,
           bank_name: bankName || null,
           branch_name: branchName || null,
@@ -141,7 +210,7 @@ export default function ShareholderFillForm() {
       const result = await res.json();
       if (!res.ok) throw new Error(result.message || 'Submission failed');
 
-      setSuccess('Your decision has been submitted successfully!');
+      setSuccess(t('dashboard.submitted'));
       // Reset form
       setDecision('');
       setPaymentMethod('');
@@ -151,7 +220,7 @@ export default function ShareholderFillForm() {
       setBranchName('');
       setAccountNumber('');
     } catch (err) {
-      setError(err.message || 'Something went wrong.');
+      setError(err.message || t('staff.error'));
     } finally {
       setIsSubmitting(false);
     }
@@ -175,10 +244,10 @@ export default function ShareholderFillForm() {
         {/* ── Page Header ── */}
         <div className="mb-8">
           <h1 className="text-2xl font-bold text-slate-800 dark:text-slate-100 sm:text-3xl">
-            Dividend Decision Form
+            {t('fill.title')}
           </h1>
           <p className="mt-2 text-slate-500 dark:text-slate-400">
-            Select a fiscal year, review your dividend information, and submit your decision.
+            {t('fill.subtitle')}
           </p>
         </div>
 
@@ -188,10 +257,10 @@ export default function ShareholderFillForm() {
             <FaCheckCircle className="mt-0.5 shrink-0" />
             <div>
               <p className="font-semibold">{success}</p>
-              <p className="mt-1 text-sm text-emerald-600 dark:text-emerald-300">
-                You can view your submission on the{' '}
+                <p className="mt-1 text-sm text-emerald-600 dark:text-emerald-300">
+                {t('fill.viewSubmissionOn')}{' '}
                 <button onClick={() => router.push('/my-decisions')} className="font-semibold underline">
-                  My Submissions
+                  {t('fill.mySubmissions')}
                 </button>{' '}
                 page.
               </p>
@@ -199,22 +268,14 @@ export default function ShareholderFillForm() {
           </div>
         )}
 
-        {/* ── Error Banner ── */}
-        {error && (
-          <div className="mb-6 flex items-start gap-3 rounded-xl border border-red-100 bg-red-50 p-4 text-red-700 shadow-sm dark:border-red-900/70 dark:bg-red-950/40 dark:text-red-300">
-            <FaExclamationCircle className="mt-0.5 shrink-0" />
-            <span>{error}</span>
-          </div>
-        )}
-
         {/* ── Step 1: Fiscal Year Selector ── */}
         <div className="mb-6 rounded-xl border border-sky-100 bg-white p-6 shadow-sm dark:border-slate-700 dark:bg-slate-800">
           <label className="mb-2 block text-sm font-semibold text-slate-700 dark:text-slate-200">
             <FaCalendarAlt className="mr-1.5 inline text-sky-500" />
-            Select Fiscal Year
+            {t('staff.selectFiscalYear')}
           </label>
           {fiscalYears.length === 0 ? (
-            <p className="text-sm text-slate-400">No fiscal years available for your account.</p>
+            <p className="text-sm text-slate-400">{t('fill.noFiscalYears')}</p>
           ) : (
             <FiscalYearDropdown
               years={fiscalYears}
@@ -238,7 +299,7 @@ export default function ShareholderFillForm() {
         {selectedYear && !loadingDividend && !dividendData && (
           <div className="mb-6 rounded-xl border border-amber-100 bg-amber-50 p-6 text-amber-700 dark:border-amber-800 dark:bg-amber-950/40 dark:text-amber-300">
             <FaExclamationCircle className="mr-2 inline" />
-            No dividend record found for fiscal year {selectedYear}.
+            {t('fill.noDividendRecord')} {selectedYear}.
           </div>
         )}
 
@@ -247,16 +308,16 @@ export default function ShareholderFillForm() {
             <div className="border-b border-sky-100 bg-gradient-to-r from-sky-50 to-blue-50 px-6 py-4 dark:border-slate-700 dark:from-slate-700 dark:to-slate-700">
               <h3 className="flex items-center gap-2 font-semibold text-slate-800 dark:text-slate-100">
                 <FaChartLine className="text-sky-600" />
-                Your Dividend Summary — FY {dividendData.fiscal_year}
+                {t('fill.dividendSummary')} — FY {dividendData.fiscal_year}
               </h3>
             </div>
             <div className="grid gap-4 p-6 sm:grid-cols-2">
-              <InfoBox icon={FaWallet} label="Paid-up Capital" value={fmt(dividendData.paidup_capital)} suffix="ETB" />
-              <InfoBox icon={FaChartLine} label="Dividend Declared" value={fmt(dividendData.dividend_declared)} suffix="ETB" />
-              <InfoBox icon={FaHistory} label="Dividend Brought Forward" value={fmt(dividendData.dividend_bf)} suffix="ETB" />
+              <InfoBox icon={FaWallet} label={t('dashboard.paidCapital')} value={fmt(dividendData.paidup_capital)} suffix="ETB" />
+              <InfoBox icon={FaChartLine} label={t('dashboard.grossDividend')} value={fmt(dividendData.dividend_declared)} suffix="ETB" />
+              <InfoBox icon={FaHistory} label={t('dashboard.broughtForward')} value={fmt(dividendData.dividend_bf)} suffix="ETB" />
               <div className="rounded-lg border border-sky-200 bg-gradient-to-br from-sky-50 to-blue-50 p-4 shadow-sm dark:border-slate-600 dark:from-slate-700 dark:to-slate-700">
                 <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-sky-600">
-                  <FaMoneyBillWave /> Total Dividend
+                  <FaMoneyBillWave /> {t('dashboard.totalDividend')}
                 </div>
                 <p className="mt-1 text-2xl font-bold text-slate-800 dark:text-slate-100">
                   {fmt(dividendData.total_dividend)} <span className="text-xs font-medium text-sky-500">ETB</span>
@@ -272,13 +333,13 @@ export default function ShareholderFillForm() {
             {/* Personal Info */}
             <div className="rounded-xl border border-sky-100 bg-white p-6 shadow-sm dark:border-slate-700 dark:bg-slate-800">
               <h3 className="mb-4 flex items-center gap-2 font-semibold text-slate-800 dark:text-slate-100">
-                <FaUser className="text-sky-500" /> Personal Information
+                <FaUser className="text-sky-500" /> {t('dashboard.personalInfo')}
               </h3>
               <div className="grid gap-4 sm:grid-cols-2">
-                <Field label="Full Name" icon={FaUser} value={shareholderName} onChange={setShareholderName} required />
-                <Field label="Phone" icon={FaPhone} value={phone} onChange={setPhone} type="tel" />
+                <Field label={t('profile.name')} icon={FaUser} value={shareholderName} onChange={setShareholderName} required />
+                <Field label={t('dashboard.phone')} icon={FaPhone} value={phone} onChange={setPhone} type="tel" />
                 <div className="sm:col-span-2">
-                  <Field label="Email (optional)" icon={FaEnvelope} value={email} onChange={setEmail} type="email" />
+                  <Field label={`${t('dashboard.email')} (${t('fill.optional')})`} icon={FaEnvelope} value={email} onChange={setEmail} type="email" />
                 </div>
               </div>
             </div>
@@ -286,7 +347,7 @@ export default function ShareholderFillForm() {
             {/* Decision Type */}
             <div className="rounded-xl border border-sky-100 bg-white p-6 shadow-sm dark:border-slate-700 dark:bg-slate-800">
               <h3 className="mb-4 flex items-center gap-2 font-semibold text-slate-800 dark:text-slate-100">
-                <FaFileInvoiceDollar className="text-sky-500" /> Choose Your Decision
+                <FaFileInvoiceDollar className="text-sky-500" /> {t('dashboard.makeDecision')}
               </h3>
               <div className="space-y-3">
                 {/* Reinvest */}
@@ -297,8 +358,8 @@ export default function ShareholderFillForm() {
                 >
                   <input type="radio" name="decision" value="reinvest" checked={decision === 'reinvest'} onChange={() => setDecision('reinvest')} className="mt-1 h-4 w-4 text-sky-600 focus:ring-sky-500" />
                   <div>
-                      <span className="font-semibold text-slate-800 dark:text-slate-100">Reinvest full dividend in capital</span>
-                      <p className="mt-0.5 text-sm text-slate-500 dark:text-slate-400">All undrawn dividend will be converted to capital.</p>
+                      <span className="font-semibold text-slate-800 dark:text-slate-100">{t('form.reinvestFull')}</span>
+                      <p className="mt-0.5 text-sm text-slate-500 dark:text-slate-400">{t('form.reinvestFullHelp')}</p>
                   </div>
                 </label>
 
@@ -310,8 +371,8 @@ export default function ShareholderFillForm() {
                 >
                   <input type="radio" name="decision" value="fiscalreinvest" checked={decision === 'fiscalreinvest'} onChange={() => setDecision('fiscalreinvest')} className="mt-1 h-4 w-4 text-sky-600 focus:ring-sky-500" />
                   <div>
-                      <span className="font-semibold text-slate-800 dark:text-slate-100">Reinvest this fiscal year dividend in capital</span>
-                      <p className="mt-0.5 text-sm text-slate-500 dark:text-slate-400">Only this year&apos;s dividend will be converted to capital.</p>
+                      <span className="font-semibold text-slate-800 dark:text-slate-100">{t('form.reinvestYear')}</span>
+                      <p className="mt-0.5 text-sm text-slate-500 dark:text-slate-400">{t('form.reinvestYearHelp')}</p>
                   </div>
                 </label>
 
@@ -323,8 +384,8 @@ export default function ShareholderFillForm() {
                 >
                   <input type="radio" name="decision" value="withdraw" checked={decision === 'withdraw'} onChange={() => setDecision('withdraw')} className="mt-1 h-4 w-4 text-sky-600 focus:ring-sky-500" />
                   <div>
-                      <span className="font-semibold text-slate-800 dark:text-slate-100">Withdraw my dividend</span>
-                      <p className="mt-0.5 text-sm text-slate-500 dark:text-slate-400">Receive your dividend as a cash payment.</p>
+                      <span className="font-semibold text-slate-800 dark:text-slate-100">{t('form.withdraw')}</span>
+                      <p className="mt-0.5 text-sm text-slate-500 dark:text-slate-400">{t('form.withdrawHelp')}</p>
                   </div>
                 </label>
               </div>
@@ -334,44 +395,53 @@ export default function ShareholderFillForm() {
             {decision === 'withdraw' && (
               <div className="space-y-4 rounded-xl border border-sky-100 bg-white p-6 shadow-sm dark:border-slate-700 dark:bg-slate-800">
                 <h3 className="flex items-center gap-2 font-semibold text-slate-800 dark:text-slate-100">
-                  <FaMoneyBillWave className="text-sky-500" /> Withdrawal Details
+                  <FaMoneyBillWave className="text-sky-500" /> {t('staff.withdrawalDetails')}
                 </h3>
 
                 {/* Amount to convert */}
                 <div className="rounded-lg border border-sky-100 bg-sky-50/40 p-4 dark:border-slate-600 dark:bg-slate-700/60">
                   <label className="mb-1 block text-sm font-medium text-slate-700 dark:text-slate-200">
-                    Portion to convert to capital (optional)
+                    {t('form.partialReinvest')}
                   </label>
                   <input
                     type="number"
                     value={amountToConvert}
-                    onChange={(e) => setAmountToConvert(e.target.value)}
-                    placeholder="Amount in ETB"
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      setAmountToConvert(value);
+                    }}
+                    placeholder={t('dashboard.amountPlaceholder')}
                     className="block w-full rounded-lg border border-sky-100 bg-white px-3 py-2.5 text-slate-800 shadow-sm focus:border-sky-400 focus:outline-none focus:ring-4 focus:ring-sky-500/10 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100"
                   />
+                  <p className="mt-1 text-xs text-slate-400">
+                    {t('dashboard.maximum')}: ETB {fmt(availableToReinvest)}
+                  </p>
                 </div>
 
                 {/* Amount to withdraw */}
                 <div>
                   <label className="mb-1 block text-sm font-semibold text-slate-700 dark:text-slate-200">
-                    Amount to withdraw (cash)
+                    {t('form.cashAmount')}
                   </label>
                   <input
                     type="number"
                     value={amountToWithdraw}
-                    onChange={(e) => setAmountToWithdraw(e.target.value)}
-                    placeholder="Amount in ETB"
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      setAmountToWithdraw(value);
+                    }}
+                    placeholder={t('dashboard.amountPlaceholder')}
                     required
                     className="block w-full rounded-lg border border-sky-100 bg-white px-3 py-2.5 text-slate-800 shadow-sm focus:border-sky-400 focus:outline-none focus:ring-4 focus:ring-sky-500/10 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100"
                   />
                   <p className="mt-1 text-xs text-slate-400">
-                    Maximum: ETB {fmt(dividendData.total_dividend)}
+                    {t('dashboard.maximum')}: ETB {fmt(availableToWithdraw)}
                   </p>
                 </div>
 
                 {/* Payment Method */}
                 <div className="space-y-3">
-                  <p className="text-sm font-semibold text-slate-700 dark:text-slate-200">Payment Method</p>
+                  <p className="text-sm font-semibold text-slate-700 dark:text-slate-200">{t('staff.paymentMethod')}</p>
 
                   <label
                     className={`flex cursor-pointer items-start gap-3 rounded-lg border p-4 transition ${
@@ -380,12 +450,12 @@ export default function ShareholderFillForm() {
                   >
                     <input type="radio" name="payment" value="bank-transfer" checked={paymentMethod === 'bank-transfer'} onChange={() => setPaymentMethod('bank-transfer')} className="mt-1 h-4 w-4 text-sky-600 focus:ring-sky-500" />
                     <div className="flex-1">
-                      <span className="font-medium text-slate-800 dark:text-slate-100 flex items-center gap-2"><FaUniversity className="text-sky-500" /> Bank Transfer</span>
+                      <span className="font-medium text-slate-800 dark:text-slate-100 flex items-center gap-2"><FaUniversity className="text-sky-500" /> {t('form.bankTransfer')}</span>
                       {paymentMethod === 'bank-transfer' && (
                         <div className="mt-3 space-y-2">
-                          <input type="text" value={bankName} onChange={(e) => setBankName(e.target.value)} placeholder="Bank Name" required className="block w-full rounded-lg border border-sky-100 bg-white px-3 py-2.5 text-sm text-slate-800 focus:border-sky-400 focus:outline-none focus:ring-4 focus:ring-sky-500/10 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100" />
-                          <input type="text" value={branchName} onChange={(e) => setBranchName(e.target.value)} placeholder="Branch Name" className="block w-full rounded-lg border border-sky-100 bg-white px-3 py-2.5 text-sm text-slate-800 focus:border-sky-400 focus:outline-none focus:ring-4 focus:ring-sky-500/10 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100" />
-                          <input type="text" value={accountNumber} onChange={(e) => setAccountNumber(e.target.value)} placeholder="Account Number" required className="block w-full rounded-lg border border-sky-100 bg-white px-3 py-2.5 text-sm text-slate-800 focus:border-sky-400 focus:outline-none focus:ring-4 focus:ring-sky-500/10 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100" />
+                          <input type="text" value={bankName} onChange={(e) => setBankName(e.target.value)} placeholder={t('dashboard.bankName')} required className="block w-full rounded-lg border border-sky-100 bg-white px-3 py-2.5 text-sm text-slate-800 focus:border-sky-400 focus:outline-none focus:ring-4 focus:ring-sky-500/10 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100" />
+                          <input type="text" value={branchName} onChange={(e) => setBranchName(e.target.value)} placeholder={t('dashboard.branchName')} className="block w-full rounded-lg border border-sky-100 bg-white px-3 py-2.5 text-sm text-slate-800 focus:border-sky-400 focus:outline-none focus:ring-4 focus:ring-sky-500/10 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100" />
+                          <input type="text" value={accountNumber} onChange={(e) => setAccountNumber(e.target.value)} placeholder={t('dashboard.accountNumber')} required className="block w-full rounded-lg border border-sky-100 bg-white px-3 py-2.5 text-sm text-slate-800 focus:border-sky-400 focus:outline-none focus:ring-4 focus:ring-sky-500/10 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100" />
                         </div>
                       )}
                     </div>
@@ -397,9 +467,16 @@ export default function ShareholderFillForm() {
                     }`}
                   >
                     <input type="radio" name="payment" value="check" checked={paymentMethod === 'check'} onChange={() => setPaymentMethod('check')} className="mt-1 h-4 w-4 text-sky-600 focus:ring-sky-500" />
-                    <span className="font-medium text-slate-800 dark:text-slate-100">Receive by Check</span>
+                    <span className="font-medium text-slate-800 dark:text-slate-100">{t('form.check')}</span>
                   </label>
                 </div>
+              </div>
+            )}
+
+            {error && (
+              <div role="alert" className="flex items-start gap-3 rounded-xl border border-red-100 bg-red-50 p-3 text-sm text-red-700 shadow-sm dark:border-red-900/70 dark:bg-red-950/40 dark:text-red-300">
+                <FaExclamationCircle className="mt-0.5 shrink-0" />
+                <span>{error}</span>
               </div>
             )}
 
@@ -417,11 +494,11 @@ export default function ShareholderFillForm() {
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                   </svg>
-                  Submitting...
+                  {t('dashboard.submitting')}
                 </>
               ) : (
                 <>
-                  <FaFileInvoiceDollar /> Submit Decision
+                  <FaFileInvoiceDollar /> {t('dashboard.submit')}
                 </>
               )}
             </button>

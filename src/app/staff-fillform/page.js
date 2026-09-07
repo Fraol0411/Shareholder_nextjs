@@ -134,10 +134,66 @@ export default function StaffFillForm() {
     setError('');
   };
 
+  const toNumber = (value) => {
+    const n = Number(value);
+    return Number.isFinite(n) ? n : 0;
+  };
+
+  const buildBalanceError = ({ availableBalance, amountToConvert, amountToWithdraw, t }) => {
+    const convert = toNumber(amountToConvert);
+    const withdraw = toNumber(amountToWithdraw);
+
+    if (convert < 0 || withdraw < 0) {
+      return t('staff.negativeAmountError');
+    }
+
+    if (withdraw > 0 && convert + withdraw > availableBalance + 0.000001) {
+      return `${t('staff.totalExceedsBalance')} ${fmt(convert + withdraw)} ETB ${t('staff.exceedsBalanceDivider')} ${fmt(availableBalance)} ETB.`;
+    }
+
+    if (convert > availableBalance + 0.000001) {
+      return `${t('staff.reinvestmentExceedsBalance')} ${fmt(convert)} ETB ${t('staff.exceedsBalanceDivider')} ${fmt(availableBalance)} ETB.`;
+    }
+
+    if (withdraw > availableBalance + 0.000001) {
+      return `${t('staff.withdrawalExceedsBalance')} ${fmt(withdraw)} ETB ${t('staff.exceedsBalanceDivider')} ${fmt(availableBalance)} ETB.`;
+    }
+
+    return '';
+  };
+
   // ── Submit ──
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!decision || !selectedSH) return;
+
+    const availableBalance = Number(selectedSH.total_dividend || 0);
+
+    if (decision === 'withdraw') {
+      if (!amountToWithdraw || toNumber(amountToWithdraw) <= 0) {
+        setError(t('staff.withdrawAmountRequired'));
+        return;
+      }
+
+      const balanceError = buildBalanceError({
+        availableBalance,
+        amountToConvert: amountToConvert || 0,
+        amountToWithdraw: amountToWithdraw || 0,
+        t,
+      });
+
+      if (balanceError) {
+        setError(balanceError);
+        return;
+      }
+    }
+
+    if (['reinvest', 'fiscalreinvest'].includes(decision)) {
+      if (availableBalance <= 0) {
+        setError(t('staff.noAvailableBalance'));
+        return;
+      }
+    }
 
     setIsSubmitting(true);
     setError('');
@@ -158,8 +214,8 @@ export default function StaffFillForm() {
           phone: phone || null,
           fiscal_year: selectedYear,
           decision_type: decision,
-          amount_to_convert: amountToConvert || null,
-          amount_to_withdraw: amountToWithdraw || null,
+          amount_to_convert: ['reinvest', 'fiscalreinvest'].includes(decision) ? availableBalance : (amountToConvert || null),
+          amount_to_withdraw: decision === 'withdraw' ? toNumber(amountToWithdraw) : null,
           payment_method: paymentMethod || null,
           bank_name: bankName || null,
           branch_name: branchName || null,
@@ -204,17 +260,11 @@ export default function StaffFillForm() {
           </p>
         </div>
 
-        {/* ── Success / Error ── */}
+        {/* ── Success ── */}
         {success && (
           <div className="mb-6 flex items-start gap-3 rounded-xl border border-emerald-100 bg-emerald-50 p-4 text-emerald-700 shadow-sm dark:border-emerald-900/70 dark:bg-emerald-950/40 dark:text-emerald-300">
             <FaCheckCircle className="mt-0.5 shrink-0" />
             <span className="font-semibold">{success}</span>
-          </div>
-        )}
-        {error && (
-          <div className="mb-6 flex items-start gap-3 rounded-xl border border-red-100 bg-red-50 p-4 text-red-700 shadow-sm dark:border-red-900/70 dark:bg-red-950/40 dark:text-red-300">
-            <FaExclamationCircle className="mt-0.5 shrink-0" />
-            <span>{error}</span>
           </div>
         )}
 
@@ -347,11 +397,11 @@ export default function StaffFillForm() {
                 <FaFileInvoiceDollar className="text-sky-500" /> {t('staff.chooseDecision')}
               </h3>
               <div className="space-y-3">
-                <RadioCard name="reinvest" checked={decision === 'reinvest'} onChange={setDecision}
+                <RadioCard name="reinvest" checked={decision === 'reinvest'} onChange={(next) => { setDecision(next); setError(''); }}
                   title={t('staff.reinvestFull')} desc={t('staff.reinvestFullHelp')} />
-                <RadioCard name="fiscalreinvest" checked={decision === 'fiscalreinvest'} onChange={setDecision}
+                <RadioCard name="fiscalreinvest" checked={decision === 'fiscalreinvest'} onChange={(next) => { setDecision(next); setError(''); }}
                   title={t('staff.reinvestYear')} desc={t('staff.reinvestYearHelp')} />
-                <RadioCard name="withdraw" checked={decision === 'withdraw'} onChange={setDecision}
+                <RadioCard name="withdraw" checked={decision === 'withdraw'} onChange={(next) => { setDecision(next); setError(''); }}
                   title={t('staff.withdraw')} desc={t('staff.withdrawHelp')} />
               </div>
             </div>
@@ -364,12 +414,12 @@ export default function StaffFillForm() {
                 </h3>
                 <div className="rounded-lg border border-sky-100 bg-sky-50/40 p-4 dark:border-slate-600 dark:bg-slate-700/60">
                   <label className="mb-1 block text-sm font-medium text-slate-700 dark:text-slate-200">{t('staff.portionToConvert')}</label>
-                  <input type="number" value={amountToConvert} onChange={(e) => setAmountToConvert(e.target.value)} placeholder="Amount in ETB"
+                  <input type="number" value={amountToConvert} onChange={(e) => { setAmountToConvert(e.target.value); if (error) setError(''); }} placeholder="Amount in ETB"
                     className="block w-full rounded-lg border border-sky-100 bg-white px-3 py-2.5 text-slate-800 shadow-sm focus:border-sky-400 focus:outline-none focus:ring-4 focus:ring-sky-500/10 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100" />
                 </div>
                 <div>
                   <label className="mb-1 block text-sm font-semibold text-slate-700 dark:text-slate-200">{t('staff.amountWithdraw')}</label>
-                  <input type="number" value={amountToWithdraw} onChange={(e) => setAmountToWithdraw(e.target.value)} placeholder="Amount in ETB" required
+                  <input type="number" value={amountToWithdraw} onChange={(e) => { setAmountToWithdraw(e.target.value); if (error) setError(''); }} placeholder="Amount in ETB" required
                     className="block w-full rounded-lg border border-sky-100 bg-white px-3 py-2.5 text-slate-800 shadow-sm focus:border-sky-400 focus:outline-none focus:ring-4 focus:ring-sky-500/10 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100" />
                   <p className="mt-1 text-xs text-slate-400">{t('staff.maximum')}: ETB {fmt(selectedSH.total_dividend)}</p>
                 </div>
@@ -393,6 +443,13 @@ export default function StaffFillForm() {
                     <span className="font-medium text-slate-800 dark:text-slate-100">{t('staff.receiveCheck')}</span>
                   </label>
                 </div>
+              </div>
+            )}
+
+            {error && (
+              <div role="alert" className="flex items-start gap-3 rounded-xl border border-red-100 bg-red-50 p-3 text-sm text-red-700 shadow-sm dark:border-red-900/70 dark:bg-red-950/40 dark:text-red-300">
+                <FaExclamationCircle className="mt-0.5 shrink-0" />
+                <span>{error}</span>
               </div>
             )}
 

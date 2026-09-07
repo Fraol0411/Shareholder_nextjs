@@ -49,8 +49,44 @@ export async function POST(request) {
       return NextResponse.json({ message: 'Invalid decision type' }, { status: 400 });
     }
 
-    if (decision_type === 'withdraw' && !amount_to_withdraw) {
-      return NextResponse.json({ message: 'Withdraw amount is required' }, { status: 400 });
+    const dividendBalanceResult = await pool.query(
+      `SELECT total_dividend
+       FROM public.sh_dividend
+       WHERE user_id = $1 AND fiscal_year = $2
+       ORDER BY id DESC
+       LIMIT 1`,
+      [userId, fiscal_year]
+    );
+
+    const availableBalance = Number(dividendBalanceResult.rows[0]?.total_dividend || 0);
+
+    if (availableBalance <= 0 && ['reinvest', 'fiscalreinvest'].includes(decision_type)) {
+      return NextResponse.json(
+        { message: 'There is no available dividend balance to reinvest.' },
+        { status: 400 }
+      );
+    }
+
+    if (decision_type === 'withdraw') {
+      const withdrawAmount = Number(amount_to_withdraw || 0);
+      const convertAmount = Number(amount_to_convert || 0);
+
+      if (!amount_to_withdraw || withdrawAmount <= 0) {
+        return NextResponse.json({ message: 'Withdraw amount is required and must be greater than zero.' }, { status: 400 });
+      }
+
+      if (convertAmount < 0 || withdrawAmount < 0) {
+        return NextResponse.json({ message: 'Reinvested and withdrawn amounts cannot be negative.' }, { status: 400 });
+      }
+
+      if (convertAmount + withdrawAmount > availableBalance + 0.000001) {
+        return NextResponse.json(
+          {
+            message: `The total reinvested and withdrawn amount (${Number(convertAmount + withdrawAmount).toFixed(2)} ETB) exceeds the available balance (${Number(availableBalance).toFixed(2)} ETB).`,
+          },
+          { status: 400 }
+        );
+      }
     }
 
     if (decision_type === 'withdraw' && payment_method === 'bank-transfer') {
@@ -62,10 +98,16 @@ export async function POST(request) {
       }
     }
 
+    if (['reinvest', 'fiscalreinvest'].includes(decision_type)) {
+      const reinvestAmount = availableBalance;
+      body.amount_to_convert = reinvestAmount;
+      body.amount_to_withdraw = null;
+    }
+
     // ── Check for duplicate submission (same user + fiscal year) ──
     const dupCheck = await pool.query(
       `SELECT id FROM public.dividend_decisions
-       WHERE user_id = $1 AND fiscal_year = $2 AND status != 'rejected'`,
+       WHERE user_id = $1 AND fiscal_year = $2`,
       [userId, fiscal_year]
     );
     if (dupCheck.rows.length > 0) {
@@ -76,6 +118,10 @@ export async function POST(request) {
     }
 
     // ── Insert decision ──
+    const submitConvertAmount = ['reinvest', 'fiscalreinvest'].includes(decision_type)
+      ? availableBalance
+      : Number(amount_to_convert || 0);
+
     const result = await pool.query(
       `INSERT INTO public.dividend_decisions (
         file_number, shareholder_name, email, phone,
@@ -85,7 +131,7 @@ export async function POST(request) {
         user_id, sh_dividend_id
       )
       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14)
-      RETURNING id, status, created_at`,
+      RETURNING id, created_at`,
       [
         file_number || null,
         shareholder_name,
@@ -93,8 +139,8 @@ export async function POST(request) {
         phone || null,
         fiscal_year,
         decision_type,
-        amount_to_convert || null,
-        amount_to_withdraw || null,
+        submitConvertAmount || null,
+        decision_type === 'withdraw' ? Number(amount_to_withdraw || 0) : null,
         payment_method || null,
         bank_name || null,
         branch_name || null,
