@@ -170,6 +170,8 @@
   "fill.noDividendRecord": "No dividend record found for fiscal year",
   "fill.dividendSummary": "Your Dividend Summary",
   "fill.optional": "optional",
+  "fill.availableToReinvest": "Available to reinvest",
+  "fill.availableToWithdraw": "Available to withdraw",
   "basket.title": "Form Basket - Dividend Decisions",
   "basket.subtitle": "Select a fiscal year to view and filter forms",
   "basket.filters": "Filter Forms",

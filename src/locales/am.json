@@ -170,6 +170,8 @@
   "fill.noDividendRecord": "ለዚህ የበጀት ዓመት የድርሻ መዝገብ አልተገኘም፦",
   "fill.dividendSummary": "የድርሻዎ ማጠቃለያ",
   "fill.optional": "አማራጭ",
+  "fill.availableToReinvest": "ወደ ካፒታል ለማዞር የሚገኝ",
+  "fill.availableToWithdraw": "ለመውሰድ የሚገኝ",
   "basket.title": "የቅጽ ማዕድ - የድርሻ ውሳኔዎች",
   "basket.subtitle": "ቅጾችን ለማየትና ለማጣራት የበጀት ዓመት ይምረጡ",
   "basket.filters": "ቅጾችን አጣራ",
