@@ -244,7 +244,7 @@
   "staff.reinvestFull": "ሙሉ ድርሻን ወደ ካፒታል ማዞር",
   "staff.reinvestFullHelp": "ያልተወሰደ ድርሻ በሙሉ ወደ ካፒታል ይቀየራል።",
   "staff.reinvestYear": "የዚህን ዓመት ድርሻ ወደ ካፒታል ማዞር",
-  "staff.reinvestYearHelp": "የዚህ ዓመት ድርሻ ብቻ ወደ ካፒታል ይቀየራል።",
+  "staff.reinvestYearHelp": "ከአክሲዮን ድርሻ የሚገኘውን ክፍፍል (dividend) በከፊል ወደ ካፒታል መልሰው ኢንቨስት ማድረግ እና ቀሪውን በጥሬ ገንዘብ ማውጣት ይችላሉ።",
   "staff.withdraw": "ድርሻን መውሰድ",
   "staff.withdrawHelp": "ድርሻውን በጥሬ ገንዘብ ይቀበሉ።",
   "staff.withdrawalDetails": "የመውሰጃ ዝርዝሮች",

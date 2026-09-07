@@ -244,7 +244,7 @@
   "staff.reinvestFull": "Reinvest full dividend in capital",
   "staff.reinvestFullHelp": "All undrawn dividend will be converted to capital.",
   "staff.reinvestYear": "Reinvest this fiscal year dividend in capital",
-  "staff.reinvestYearHelp": "Only this year's dividend will be converted to capital.",
+  "staff.reinvestYearHelp": "You can partially reinvest your dividend to capital and withdraw the rest as cash.",
   "staff.withdraw": "Withdraw dividend",
   "staff.withdrawHelp": "Receive the dividend as a cash payment.",
   "staff.withdrawalDetails": "Withdrawal Details",
