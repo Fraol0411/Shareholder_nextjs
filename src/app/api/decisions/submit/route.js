@@ -128,10 +128,10 @@ export async function POST(request) {
         fiscal_year, decision_type,
         amount_to_convert, amount_to_withdraw,
         payment_method, bank_name, branch_name, account_number,
-        user_id, sh_dividend_id
+        user_id, sh_dividend_id, status, submission_date
       )
-      VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14)
-      RETURNING id, created_at`,
+      VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,'pending', CURRENT_TIMESTAMP)
+      RETURNING id, status, created_at, submission_date`,
       [
         file_number || null,
         shareholder_name,

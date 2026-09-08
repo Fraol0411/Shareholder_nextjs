@@ -15,6 +15,8 @@ import {
   HiOutlineDocumentText, 
   HiOutlineClipboardDocumentList, 
   HiOutlineUserPlus,
+  HiOutlineShieldCheck,
+  HiOutlineLockClosed,
   HiOutlineArrowRightOnRectangle,
   HiChevronDown,
   HiBars3BottomRight,
@@ -69,7 +71,9 @@ export default function NavBar() {
     { href: '/my-decisions', label: 'nav.decisions', icon: HiOutlineClipboardDocumentList, show: !staff },
     { href: '/staff-fillform', label: 'nav.fillform', icon: HiOutlineDocumentText, show: staff },
     { href: '/formbasket', label: 'nav.decisions', icon: HiOutlineClipboardDocumentList, show: staff },
+    { href: '/approvals', label: 'nav.approvals', icon: HiOutlineShieldCheck, show: admin },
     { href: '/register', label: 'nav.register', icon: HiOutlineUserPlus, show: admin },
+    { href: '/roles', label: 'nav.roles', icon: HiOutlineLockClosed, show: admin },
   ].filter((item) => item.show);
 
   const handleLogout = () => {

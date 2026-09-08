@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { Pool } from 'pg';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
+import { resolveRoleIdByName } from '../../../libs/serverAuth';
 
 export const runtime = 'nodejs';
 
@@ -32,10 +33,12 @@ export async function GET(request) {
 
   try {
     const result = await pool.query(
-      `SELECT id, username, role, name, phone
-       FROM public.users
-       WHERE role IN ('staff', 'admin')
-       ORDER BY username ASC`
+      `SELECT u.id, u.username, u.role, u.name, u.phone, u.role_id, r.name AS role_name
+       FROM public.users u
+       LEFT JOIN public.roles r ON r.id = u.role_id
+       WHERE u.role IN ('staff', 'admin')
+          OR r.name IN ('staff', 'admin')
+       ORDER BY u.username ASC`
     );
     return NextResponse.json(result.rows, { status: 200 });
   } catch (error) {
@@ -66,12 +69,13 @@ export async function POST(request) {
       return NextResponse.json({ message: 'Username already exists' }, { status: 409 });
     }
 
+    const roleId = await resolveRoleIdByName(role);
     const passwordHash = await bcrypt.hash(password, 10);
     const inserted = await pool.query(
-      `INSERT INTO public.users (username, password_hash, role)
-       VALUES ($1, $2, $3)
-       RETURNING id, username, role, name, phone`,
-      [username.trim(), passwordHash, role]
+      `INSERT INTO public.users (username, password_hash, role, role_id)
+       VALUES ($1, $2, $3, $4)
+       RETURNING id, username, role, name, phone, role_id`,
+      [username.trim(), passwordHash, role, roleId]
     );
 
     return NextResponse.json({ message: 'User created successfully', user: inserted.rows[0] }, { status: 201 });
@@ -106,16 +110,22 @@ export async function PUT(request) {
       return NextResponse.json({ message: 'Username already exists' }, { status: 409 });
     }
 
+    const roleId = await resolveRoleIdByName(role);
+
     if (password) {
       const passwordHash = await bcrypt.hash(password, 10);
       await pool.query(
-        `UPDATE public.users SET username = $1, role = $2, password_hash = $3 WHERE id = $4`,
-        [username.trim(), role, passwordHash, id]
+        `UPDATE public.users
+         SET username = $1, role = $2, role_id = $3, password_hash = $4, updated_at = CURRENT_TIMESTAMP
+         WHERE id = $5`,
+        [username.trim(), role, roleId, passwordHash, id]
       );
     } else {
       await pool.query(
-        `UPDATE public.users SET username = $1, role = $2 WHERE id = $3`,
-        [username.trim(), role, id]
+        `UPDATE public.users
+         SET username = $1, role = $2, role_id = $3, updated_at = CURRENT_TIMESTAMP
+         WHERE id = $4`,
+        [username.trim(), role, roleId, id]
       );
     }
 
