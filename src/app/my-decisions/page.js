@@ -193,10 +193,8 @@ export default function MyDecisionsPage() {
                   {isExpanded && (
                     <div className="border-t border-sky-100 bg-gradient-to-b from-sky-50/30 to-white p-5 dark:border-slate-700 dark:from-slate-800 dark:to-slate-800">
                       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                        <DetailItem label={t('decisions.fileNumber')} value={d.file_number || '-'} />
                         <DetailItem label={t('decisions.shareholder')} value={d.shareholder_name || '-'} />
                         <DetailItem label={t('decisions.phone')} value={d.phone || '-'} />
-                        <DetailItem label={t('decisions.email')} value={d.email || '-'} />
                         <DetailItem label={t('decisions.decisionType')} value={t(DECISION_LABELS[d.decision_type]) || d.decision_type} />
                         <DetailItem label={t('decisions.fiscalYear')} value={d.fiscal_year} />
 

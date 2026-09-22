@@ -13,8 +13,10 @@ const routeLabels = {
   '/my-decisions': 'nav.decisions',
   '/staff-fillform': 'nav.fillform',
   '/formbasket': 'nav.decisions',
+  '/approvals': 'nav.approvals',
   '/dividendupload': 'upload.title',
   '/register': 'nav.register',
+  '/roles': 'nav.roles',
   '/profile': 'profile.title',
 };
 
@@ -22,6 +24,7 @@ function getRouteLabel(pathname, t) {
   if (routeLabels[pathname]) return t(routeLabels[pathname]);
   if (pathname.startsWith('/manage-shareholders')) return t('breadcrumb.shareholders');
   if (pathname.startsWith('/formbasket/')) return t('breadcrumb.formDetails');
+  if (pathname.startsWith('/approvals/')) return t('approvals.review');
   return pathname
     .split('/')
     .filter(Boolean)

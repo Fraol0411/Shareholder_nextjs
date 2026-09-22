@@ -10,6 +10,7 @@ import AppShell from '../../components/AppShell';
 
 const STATUS_CONFIG = {
   pending:   { icon: FaClock,       color: 'text-amber-600',   bg: 'bg-amber-50',   border: 'border-amber-200',   label: 'Pending' },
+  approved:  { icon: FaCheckCircle, color: 'text-emerald-600', bg: 'bg-emerald-50', border: 'border-emerald-200', label: 'Approved' },
   processed: { icon: FaCheckCircle, color: 'text-emerald-600', bg: 'bg-emerald-50', border: 'border-emerald-200', label: 'Processed' },
   rejected:  { icon: FaTimesCircle, color: 'text-red-600',     bg: 'bg-red-50',     border: 'border-red-200',     label: 'Rejected' },
 };

@@ -12,6 +12,7 @@ import {
   FaUsers,
   FaChevronRight,
   FaShieldAlt,
+  FaLock,
   FaClock,
   FaCheckCircle,
 } from "react-icons/fa";
@@ -259,7 +260,7 @@ export default function HomePortalPage() {
           HERO
       =================================================== */}
 
-      <section className="border-b border-slate-200 py-7 dark:border-slate-700 sm:py-9 lg:py-11">
+      {!staff && <section className="border-b border-slate-200 py-7 dark:border-slate-700 sm:py-9 lg:py-11">
           <div className="flex flex-col gap-7 lg:flex-row lg:items-center lg:justify-between">
             {/* Welcome */}
             <div className="max-w-2xl">
@@ -275,12 +276,12 @@ export default function HomePortalPage() {
 
               <p className="mt-2 max-w-xl text-sm leading-5 text-slate-500 dark:text-slate-400 sm:mt-3 sm:text-base sm:leading-6">
                 {staff
-                  ? t("home.staffSubtitle")
+                  ? null
                   : t("home.shareholderSubtitle")}
               </p>
             </div>
           </div>
-      </section>
+      </section>}
 
       {/* ===================================================
           MAIN CONTENT
@@ -407,10 +408,26 @@ export default function HomePortalPage() {
 
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 <PortalCard
+                  href="/approvals"
+                  icon={FaShieldAlt}
+                  title="home.decisionApprovals"
+                  description="home.decisionApprovalsDescription"
+                  accent="amber"
+                  badge="home.approvals"
+                />
+                <PortalCard
                   href="/register"
                   icon={FaUserPlus}
                   title="home.userManagement"
                   description="home.userManagementDescription"
+                  accent="amber"
+                  badge="home.system"
+                />
+                <PortalCard
+                  href="/roles"
+                  icon={FaLock}
+                  title="home.roleManagement"
+                  description="home.roleManagementDescription"
                   accent="amber"
                   badge="home.system"
                 />
