@@ -1,110 +1,98 @@
-/**
- * API ROUTE: POST /api/auth/verify-otp
- * ──────────────────────────────────────
- * Step 2 of the OTP password-reset flow.
- *
- * REQUEST BODY:
- *   { identifier: string, otp: string }
- *
- * SUCCESS RESPONSE (200):
- *   { resetToken: string }   — a short-lived signed JWT (10-min TTL)
- *                              used to authorise the password-reset step.
- *
- * WHAT NEEDS TO BE IMPLEMENTED:
- *
- * 1. DB TABLE — same otp_requests table created for forgot-password.js.
- *
- * 2. ENV VARIABLES REQUIRED:
- *      JWT_SECRET=...         (already set — used for regular login)
- *      OTP_RESET_SECRET=...   (use a DIFFERENT secret so reset tokens
- *                              cannot be confused with session tokens)
- *
- * 3. OTP VERIFICATION LOGIC:
- *      - Fetch the most recent non-expired, unused OTP for this user.
- *      - Compare the submitted plain OTP to the stored hash with bcrypt.compare().
- *      - On match: mark the row as used=TRUE, issue a signed reset token.
- *      - On failure: increment an attempt counter (max 5 attempts) and
- *        invalidate the OTP after the limit to prevent brute-force.
- *
- * 4. RESET TOKEN PAYLOAD:
- *      { userId: number, purpose: 'password_reset' }
- *      expiresIn: '10m'
- *      Signed with OTP_RESET_SECRET.
- */
+import { connect } from '../../../libs/db';
+import bcrypt from 'bcryptjs';
 
-// import { connect } from '../../../libs/db';  // uncomment when implementing
-// import bcrypt from 'bcryptjs';               // uncomment when implementing
-// import jwt from 'jsonwebtoken';              // uncomment when implementing
+const DEFAULT_PASSWORD = 'shareholder@awash';
+const OTP_MAX_FAILED_ATTEMPTS = 5;
+const OTP_LOCK_MINUTES = 15;
+
+function phoneVariants(input) {
+  const digits = String(input).replace(/\D/g, '');
+  const local = digits.startsWith('251') ? digits.slice(3) : digits.startsWith('0') ? digits.slice(1) : digits;
+  return [local, `0${local}`, `251${local}`];
+}
 
 export default async function handler(req, res) {
-  if (req.method !== 'POST') {
-    return res.status(405).json({ message: 'Method not allowed' });
-  }
+  if (req.method !== 'POST') return res.status(405).json({ message: 'Method not allowed' });
 
-  // ── STUB: remove this block and implement the real logic below ──
-  return res.status(503).json({
-    message: 'OTP verification is not yet configured.',
-  });
+  const { phone, otp, newPassword } = req.body || {};
+  const trimmedPhone = (phone || '').trim();
+  const trimmedOtp = String(otp || '').trim();
 
-  /* ── REAL IMPLEMENTATION (uncomment and complete) ──────────────
-  const { identifier, otp } = req.body;
-
-  if (!identifier || !otp) {
-    return res.status(400).json({ message: 'Identifier and OTP are required.' });
-  }
+  if (!trimmedPhone || !trimmedOtp || !newPassword) return res.status(400).json({ message: 'Phone number, OTP and new password are required' });
+  if (newPassword.length < 6) return res.status(400).json({ message: 'Password must be at least 6 characters long' });
+  if (newPassword === DEFAULT_PASSWORD) return res.status(400).json({ message: 'New password must be different from the default password' });
 
   try {
     const pool = await connect();
-
-    // 1. Look up user
-    const userResult = await pool.query(
-      `SELECT id FROM users
-       WHERE phone = $1 OR username = $1 OR reg_no = $1 OR national_id = $1
-       LIMIT 1`,
-      [identifier]
+    const userRes = await pool.query(
+      `SELECT id, otp, otp_expires_at, otp_failed_attempts, otp_locked_until
+       FROM users WHERE phone = ANY($1) LIMIT 1`,
+      [phoneVariants(trimmedPhone)]
     );
 
-    if (userResult.rows.length === 0) {
-      return res.status(400).json({ message: 'Invalid or expired code.' });
+    if (userRes.rows.length === 0) return res.status(404).json({ message: 'No account found for this phone number.' });
+
+    const user = userRes.rows[0];
+    const now = Date.now();
+
+    if (user.otp_locked_until) {
+      const lockedUntil = new Date(user.otp_locked_until).getTime();
+      if (lockedUntil > now) {
+        const retryAfter = Math.ceil((lockedUntil - now) / 1000);
+        return res.status(423).json({
+          code: 'OTP_LOCKED',
+          message: `Too many incorrect attempts. Verification is locked. Request a new code or wait ${Math.ceil(retryAfter / 60)} minute(s).`,
+          retryAfter,
+          lockedUntil: new Date(lockedUntil).toISOString(),
+        });
+      }
+      await pool.query('UPDATE users SET otp_locked_until = NULL, otp_failed_attempts = 0 WHERE id = $1', [user.id]);
     }
 
-    const userId = userResult.rows[0].id;
+    if (!user.otp) return res.status(400).json({ code: 'OTP_MISSING', message: 'No pending verification. Please request a new code.' });
 
-    // 2. Fetch latest valid OTP
-    const otpResult = await pool.query(
-      `SELECT id, otp_hash FROM otp_requests
-       WHERE user_id = $1 AND used = FALSE AND expires_at > NOW()
-       ORDER BY created_at DESC
-       LIMIT 1`,
-      [userId]
+    if (!user.otp_expires_at || new Date(user.otp_expires_at).getTime() < now) {
+      await pool.query('UPDATE users SET otp = NULL, otp_expires_at = NULL WHERE id = $1', [user.id]);
+      return res.status(400).json({ code: 'OTP_EXPIRED', message: 'OTP expired. Please request a new code.' });
+    }
+
+    if (user.otp !== trimmedOtp) {
+      const attempts = (user.otp_failed_attempts || 0) + 1;
+      const remaining = OTP_MAX_FAILED_ATTEMPTS - attempts;
+
+      if (remaining <= 0) {
+        const lockedUntil = new Date(now + OTP_LOCK_MINUTES * 60 * 1000);
+        await pool.query(
+          `UPDATE users SET otp_failed_attempts = 0, otp_locked_until = $1, otp = NULL, otp_expires_at = NULL, updated_at = CURRENT_TIMESTAMP WHERE id = $2`,
+          [lockedUntil, user.id]
+        );
+        return res.status(423).json({
+          code: 'OTP_LOCKED',
+          message: `Too many incorrect attempts. For your security, verification is locked for ${OTP_LOCK_MINUTES} minutes. Request a new code to unlock.`,
+          retryAfter: OTP_LOCK_MINUTES * 60,
+          lockedUntil: lockedUntil.toISOString(),
+        });
+      }
+
+      await pool.query('UPDATE users SET otp_failed_attempts = $1, updated_at = CURRENT_TIMESTAMP WHERE id = $2', [attempts, user.id]);
+      return res.status(400).json({
+        code: 'OTP_INVALID',
+        message: `Incorrect verification code. ${remaining} attempt(s) remaining.`,
+        attemptsRemaining: remaining,
+      });
+    }
+
+    const salt = await bcrypt.genSalt(10);
+    const passwordHash = await bcrypt.hash(newPassword, salt);
+
+    await pool.query(
+      `UPDATE users SET password_hash = $1, otp = NULL, otp_expires_at = NULL, otp_failed_attempts = 0, otp_locked_until = NULL, updated_at = CURRENT_TIMESTAMP WHERE id = $2`,
+      [passwordHash, user.id]
     );
 
-    if (otpResult.rows.length === 0) {
-      return res.status(400).json({ message: 'Invalid or expired code.' });
-    }
-
-    const { id: otpId, otp_hash } = otpResult.rows[0];
-
-    // 3. Verify OTP
-    const isValid = await bcrypt.compare(otp, otp_hash);
-    if (!isValid) {
-      return res.status(400).json({ message: 'Invalid or expired code.' });
-    }
-
-    // 4. Mark OTP as used
-    await pool.query(`UPDATE otp_requests SET used = TRUE WHERE id = $1`, [otpId]);
-
-    // 5. Issue short-lived reset token
-    const resetToken = jwt.sign(
-      { userId, purpose: 'password_reset' },
-      process.env.OTP_RESET_SECRET || process.env.JWT_SECRET,
-      { expiresIn: '10m' }
-    );
-
-    return res.status(200).json({ resetToken });
+    return res.status(200).json({ message: 'Password set successfully. You can now sign in.' });
   } catch (error) {
-    console.error('verify-otp error:', error);
-    return res.status(500).json({ message: 'Internal server error.' });
+    console.error('Verify OTP error:', error);
+    return res.status(500).json({ message: 'Internal server error' });
   }
-  ────────────────────────────────────────────────────────────── */
 }
