@@ -343,7 +343,7 @@
   "auth.portfolioInsights": "Portfolio Insights",
   "auth.portfolioInsightsDesc": "Track your growth and dividend history.",
   "auth.securityNote": "Your data is protected with enterprise-grade security",
-  "auth.copyright": "© {year} Awash Insurance Shareholder Portal. All rights reserved.",
+  "auth.copyright": "© {year} Awash Insurance. All rights reserved.",
   "auth.copyrightShort": "© {year} Awash Insurance S.C.",
   "auth.welcomeBack": "Welcome Back",
   "auth.signInSubtitle": "Please sign in to access your shareholder account.",
@@ -509,5 +509,10 @@
   "roles.deleteFailed": "Failed to delete role",
   "roles.loadFailed": "Failed to load roles",
   "roles.loadPermissionsFailed": "Failed to load permissions",
-  "roles.nameRequired": "Role name is required."
+  "roles.nameRequired": "Role name is required.",
+  "auth.companyName": "Awash Insurance S.C",
+  "invitation.title": "Accept account invitation",
+  "invitation.description": "You've been invited to join a new account. To complete the\n setup, please click the button below.",
+  "invitation.joinAccount": "Join Account",
+  "invitation.poweredBy": "Powered by"
 }
