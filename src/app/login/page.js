@@ -85,50 +85,50 @@ export default function LoginPage() {
     setShowChangePassword(true);
   };
 
-  const handleSignIn = async (event) => {
-    event.preventDefault();
-    setError('');
+  // const handleSignIn = async (event) => {
+  //   event.preventDefault();
+  //   setError('');
 
-    const trimmedId = identifier.trim();
-    if (!trimmedId) {
-      return setError(t('auth.loginIdRequired'));
-    }
+  //   const trimmedId = identifier.trim();
+  //   if (!trimmedId) {
+  //     return setError(t('auth.loginIdRequired'));
+  //   }
 
-    const normalizedId = normalizePhoneNumber(trimmedId);
+  //   const normalizedId = normalizePhoneNumber(trimmedId);
 
-    setIsLoading(true);
+  //   setIsLoading(true);
 
-    try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/login`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ identifier: normalizedId, password }),
-      });
+  //   try {
+  //     const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/login`, {
+  //       method: 'POST',
+  //       headers: { 'Content-Type': 'application/json' },
+  //       body: JSON.stringify({ identifier: normalizedId, password }),
+  //     });
 
-      const data = await res.json();
+  //     const data = await res.json();
 
-      if (!res.ok) {
-        throw new Error(data.message || t('auth.invalidCredentials'));
-      }
+  //     if (!res.ok) {
+  //       throw new Error(data.message || t('auth.invalidCredentials'));
+  //     }
 
-      if (data.needsPasswordChange) {
-        openEnrollForm(inferEnrollType());
-        setIsLoading(false);
-        return;
-      }
+  //     if (data.needsPasswordChange) {
+  //       openEnrollForm(inferEnrollType());
+  //       setIsLoading(false);
+  //       return;
+  //     }
 
-      localStorage.setItem('token', data.token);
-      localStorage.setItem('user', JSON.stringify(data.user));
-      Object.keys(data.user).forEach((key) => {
-        localStorage.setItem(key, String(data.user[key]));
-      });
+  //     localStorage.setItem('token', data.token);
+  //     localStorage.setItem('user', JSON.stringify(data.user));
+  //     Object.keys(data.user).forEach((key) => {
+  //       localStorage.setItem(key, String(data.user[key]));
+  //     });
 
-      window.location.href = '/shareholder/home';
-    } catch (err) {
-      setError(err.message || t('auth.unexpectedError'));
-      setIsLoading(false);
-    }
-  };
+  //     window.location.href = '/shareholder/home';
+  //   } catch (err) {
+  //     setError(err.message || t('auth.unexpectedError'));
+  //     setIsLoading(false);
+  //   }
+  // };
 
   // const handleSetPassword = async (event) => {
   //   event.preventDefault();
@@ -182,6 +182,51 @@ export default function LoginPage() {
   //     setIsLoading(false);
   //   }
   // };
+
+  const handleSignIn = async (event) => {
+    event.preventDefault();
+    setError('');
+
+    const trimmedId = identifier.trim();
+    if (!trimmedId) {
+      return setError(t('auth.loginIdRequired'));
+    }
+
+    setIsLoading(true);
+
+    try {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ identifier: trimmedId, password }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.message || t('auth.invalidCredentials'));
+      }
+
+      if (data.needsPasswordChange) {
+        openEnrollForm(inferEnrollType());
+        setIsLoading(false);
+        return;
+      }
+
+      localStorage.setItem('token', data.token);
+      localStorage.setItem('user', JSON.stringify(data.user));
+      Object.keys(data.user).forEach((key) => {
+        localStorage.setItem(key, String(data.user[key]));
+      });
+
+      window.location.href = '/shareholder/home';
+    } catch (err) {
+      setError(err.message || t('auth.unexpectedError'));
+      setIsLoading(false);
+    }
+  };
+
+
 
   const handleSetPassword = async (event) => {
     event.preventDefault();

@@ -70,6 +70,7 @@ function OpsSidebarNav({ user, pendingApprovals }) {
     { href: '/formbasket', label: 'nav.decisions', icon: ClipboardList },
     { href: '/manage-shareholders', label: 'home.shareholderRegistry', icon: Building2 },
     { href: '/dividendupload', label: 'home.bulkDataUpload', icon: Upload },
+    { href: '/codegeneration', label:'nav.codegeneration',  icon: Upload}
   ];
 
   const administration = admin
