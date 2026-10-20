@@ -40,6 +40,24 @@ export default function LoginCpPage() {
   const [remainingIn24h, setRemainingIn24h] = useState(null);
   const [attemptsRemaining, setAttemptsRemaining] = useState(null);
 
+
+  const normalizePhoneNumber = (value) => {
+    if (!value) return '';
+    // Remove all non-digit characters
+    let cleaned = value.replace(/\D/g, '');
+
+    // Remove leading 0 (local format: 0964308437 → 964308437)
+    if (cleaned.startsWith('0')) {
+      cleaned = cleaned.substring(1);
+    }
+    // Remove leading 251 (country code: 251964308437 → 964308437)
+    else if (cleaned.startsWith('251')) {
+      cleaned = cleaned.substring(3);
+    }
+
+    return cleaned;
+  };
+
   // Countdown Timers
   useEffect(() => {
     if (cooldown <= 0) return;
@@ -90,6 +108,7 @@ export default function LoginCpPage() {
     setError('');
     if (!identifier.trim()) return setError(t('auth.loginIdRequired') || 'Login ID is required');
 
+    
     setIsLoading(true);
     try {
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/login`, {

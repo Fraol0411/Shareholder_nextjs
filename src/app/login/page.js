@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 'use client';
 
 import { useState } from 'react';
@@ -47,6 +48,25 @@ export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
 
+  const [verificationCode, setVerificationCode] = useState('');
+
+  const normalizePhoneNumber = (value) => {
+    if (!value) return '';
+    // Remove all non-digit characters
+    let cleaned = value.replace(/\D/g, '');
+
+    // Remove leading 0 (local format: 0964308437 → 964308437)
+    if (cleaned.startsWith('0')) {
+      cleaned = cleaned.substring(1);
+    }
+    // Remove leading 251 (country code: 251964308437 → 964308437)
+    else if (cleaned.startsWith('251')) {
+      cleaned = cleaned.substring(3);
+    }
+
+    return cleaned;
+  };
+
   const handleEnrollTypeChange = (type) => {
     setEnrollType(type);
     setEnrollIdentifier('');
@@ -74,13 +94,15 @@ export default function LoginPage() {
       return setError(t('auth.loginIdRequired'));
     }
 
+    const normalizedId = normalizePhoneNumber(trimmedId);
+
     setIsLoading(true);
 
     try {
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ identifier: trimmedId, password }),
+        body: JSON.stringify({ identifier: normalizedId, password }),
       });
 
       const data = await res.json();
@@ -108,28 +130,86 @@ export default function LoginPage() {
     }
   };
 
+  // const handleSetPassword = async (event) => {
+  //   event.preventDefault();
+  //   setError('');
+
+  //   const trimmedId = enrollIdentifier.trim();
+  //   const isEnrollIndividual = enrollType === LOGIN_TYPES.INDIVIDUAL;
+
+  //   if (!trimmedId) {
+  //     return setError(isEnrollIndividual ? t('auth.nationalIdRequired') : t('auth.tinRequired'));
+  //   }
+  //   if (!/^\d+$/.test(trimmedId)) {
+  //     return setError(t('auth.digitsOnly'));
+  //   }
+  //   if (newPassword.length < 8) {
+  //     return setError(t('password.minLength'));
+  //   }
+  //   if (newPassword !== confirmPassword) {
+  //     return setError(t('password.mismatch'));
+  //   }
+
+  //   setIsLoading(true);
+
+  //   try {
+  //     const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/set-password`, {
+  //       method: 'POST',
+  //       headers: { 'Content-Type': 'application/json' },
+  //       body: JSON.stringify({
+  //         identifier: trimmedId,
+  //         userType: enrollType,
+  //         newPassword,
+  //       }),
+  //     });
+
+  //     const data = await res.json();
+
+  //     if (!res.ok) {
+  //       throw new Error(data.message || t('auth.setPasswordFailed'));
+  //     }
+
+  //     setShowChangePassword(false);
+  //     setPasswordSetSuccess(true);
+  //     setIdentifier('');
+  //     setPassword('');
+  //     setEnrollIdentifier('');
+  //     setNewPassword('');
+  //     setConfirmPassword('');
+  //   } catch (err) {
+  //     setError(err.message || t('auth.unexpectedError'));
+  //   } finally {
+  //     setIsLoading(false);
+  //   }
+  // };
+
   const handleSetPassword = async (event) => {
     event.preventDefault();
     setError('');
-
+  
     const trimmedId = enrollIdentifier.trim();
     const isEnrollIndividual = enrollType === LOGIN_TYPES.INDIVIDUAL;
-
+  
+    console.log("vr",verificationCode)
     if (!trimmedId) {
       return setError(isEnrollIndividual ? t('auth.nationalIdRequired') : t('auth.tinRequired'));
     }
     if (!/^\d+$/.test(trimmedId)) {
       return setError(t('auth.digitsOnly'));
     }
-    if (newPassword.length < 6) {
+    if (!verificationCode || verificationCode.length !== 4) {
+      return setError(t('auth.verificationCodeRequired') || 'Please enter the 6-digit verification code');
+    }
+    if (newPassword.length < 8) {
       return setError(t('password.minLength'));
     }
     if (newPassword !== confirmPassword) {
       return setError(t('password.mismatch'));
     }
-
+  
+    console.log("id",trimmedId)
     setIsLoading(true);
-
+  
     try {
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/set-password`, {
         method: 'POST',
@@ -138,15 +218,16 @@ export default function LoginPage() {
           identifier: trimmedId,
           userType: enrollType,
           newPassword,
+          otp: verificationCode, // ✅ Include verification code
         }),
       });
-
+  
       const data = await res.json();
-
+  
       if (!res.ok) {
         throw new Error(data.message || t('auth.setPasswordFailed'));
       }
-
+  
       setShowChangePassword(false);
       setPasswordSetSuccess(true);
       setIdentifier('');
@@ -154,6 +235,7 @@ export default function LoginPage() {
       setEnrollIdentifier('');
       setNewPassword('');
       setConfirmPassword('');
+      setVerificationCode(''); // ✅ Clear verification code
     } catch (err) {
       setError(err.message || t('auth.unexpectedError'));
     } finally {
@@ -174,6 +256,9 @@ export default function LoginPage() {
   const inputClsWithToggle =
     'w-full rounded-xl border border-slate-200 bg-white py-3.5 pl-11 pr-12 text-base text-slate-900 shadow-sm outline-none transition-all placeholder:text-slate-400 focus:border-brand-secondary focus:ring-4 focus:ring-brand-secondary/10 dark:border-slate-600/50 dark:bg-[#111827] dark:text-white dark:shadow-none dark:placeholder:text-slate-500 dark:focus:border-brand-secondary dark:focus:ring-brand-secondary/15 [&::-ms-reveal]:hidden [&::-ms-clear]:hidden';
 
+    const phoneInputCls =
+    'w-full rounded-xl border border-slate-200 bg-white py-3.5 pl-[4.5rem] pr-4 text-base text-slate-900 shadow-sm outline-none transition-all placeholder:text-slate-400 focus:border-brand-secondary focus:ring-4 focus:ring-brand-secondary/10 dark:border-slate-600/50 dark:bg-[#111827] dark:text-white dark:shadow-none dark:placeholder:text-slate-500 dark:focus:border-brand-secondary dark:focus:ring-brand-secondary/15';
+    
   const selectorActiveCls =
     'border-brand-secondary bg-brand-secondary-soft shadow-sm dark:border-brand-secondary dark:bg-[#0f1f35] dark:shadow-[inset_0_0_24px_rgba(69,199,232,0.06)]';
   const selectorInactiveCls =
@@ -579,7 +664,31 @@ export default function LoginPage() {
                         </button>
                       </div>
                     </div>
-
+                    <div className="space-y-2">
+                      <label className="ml-1 text-sm font-semibold text-slate-700 dark:text-white">
+                        {t('auth.verificationCode') || 'Verification Code'}
+                      </label>
+                      <div className="group relative">
+                        <div className="absolute inset-y-0 left-0 flex items-center pl-4 text-slate-400 transition-colors group-focus-within:text-brand-secondary dark:text-slate-500">
+                          <HiOutlineKey className="h-[18px] w-[18px]" strokeWidth={1.75} />
+                        </div>
+                        <input
+                          type="text"
+                          inputMode="numeric"
+                          pattern="[0-9]*"
+                          value={verificationCode}
+                          onChange={(event) => setVerificationCode(event.target.value.replace(/\D/g, ''))}
+                          placeholder={t('auth.enterVerificationCode') || 'Enter 6-digit code'}
+                          autoComplete="one-time-code"
+                          className={inputCls}
+                          maxLength={6}
+                          required
+                        />
+                      </div>
+                      <p className="ml-1 text-xs text-slate-400 dark:text-slate-500">
+                        {t('auth.verificationCodeHint') || 'Enter the code sent to your phone'}
+                      </p>
+                    </div>
                     <button
                       type="submit"
                       disabled={isLoading}
