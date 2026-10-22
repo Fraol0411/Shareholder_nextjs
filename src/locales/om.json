@@ -379,6 +379,7 @@
   "auth.enterVerificationCode":"lakkoofsa Iccitii galchi",
   "auth.reEnterPassword": "Jecha iccitii keessan irra deebi'ii galchaa",
   "auth.continue": "Itti fufi",
+  "nav.codegeneration":"codii uumi",
   "auth.loginIdRequired": "ID seensaa barbaachisa.",
   "auth.nationalIdRequired": "National ID barbaachisa.",
   "auth.tinRequired": "TIN barbaachisa.",

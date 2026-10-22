@@ -168,12 +168,12 @@ export default function DividendDetail() {
           <div className="space-y-3 sm:space-y-4">
             <DividendSummaryCard record={record} t={t} />
 
-            <DecisionImpactCard
+            {/* <DecisionImpactCard
               decision={yearDecision}
               totalDividend={record.total_dividend}
               t={t}
               onFillDecision={() => router.push('/fillform')}
-            />
+            /> */}
 
             <ProfileCard record={record} />
           </div>

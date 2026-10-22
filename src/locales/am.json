@@ -379,6 +379,7 @@
   "auth.enterVerificationCode":"የማረጋገጫ ቁጥር ያስገቡ",
   "auth.reEnterPassword": "የይለፍ ቃልዎን እንደገና ያስገቡ",
   "auth.continue": "ቀጥል",
+  "nav.codegeneration":"ኮድ መፍጥሪያ",
   "auth.loginIdRequired": "የመግቢያ መለያ ያስፈልጋል።",
   "auth.nationalIdRequired": "National ID ያስፈልጋል።",
   "auth.tinRequired": "TIN ያስፈልጋል።",
