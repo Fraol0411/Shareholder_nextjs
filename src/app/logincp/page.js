@@ -5,7 +5,8 @@ import { useRouter } from 'next/navigation';
 import {
   HiOutlineLockClosed, HiOutlineEye, HiOutlineEyeSlash, HiOutlineArrowRightOnRectangle,
   HiOutlineShieldCheck, HiOutlineChartBar, HiOutlineKey, HiOutlineArrowLeft,
-  HiOutlineCheckCircle, HiOutlineIdentification, HiOutlineExclamationTriangle
+  HiOutlineCheckCircle, HiOutlineIdentification, HiOutlineExclamationTriangle,
+  HiOutlineInformationCircle
 } from 'react-icons/hi2';
 import { FaExclamationCircle } from 'react-icons/fa';
 import ThemeToggle from '../../components/ThemeToggle';
@@ -33,6 +34,31 @@ export default function LoginCpPage() {
   const [passwordSetSuccess, setPasswordSetSuccess] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
+
+  // Activation campaign window (public info banner)
+  const [campaignStatus, setCampaignStatus] = useState(null);
+  useEffect(() => {
+    fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/activation/status`)
+      .then((res) => res.json())
+      .then((data) => setCampaignStatus(data))
+      .catch(() => {});
+  }, []);
+
+  // Transient notice shown right after a shareholder finishes activation
+  const [activatedNotice, setActivatedNotice] = useState(false);
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('activated') !== '1') return;
+    setActivatedNotice(true);
+    window.history.replaceState({}, '', window.location.pathname);
+    const timer = setTimeout(() => setActivatedNotice(false), 9000);
+    return () => clearTimeout(timer);
+  }, []);
+
+  const campaignBanner = !campaignStatus?.exists ? null
+    : campaignStatus.beforeStart ? `Account activation opens on ${new Date(campaignStatus.startsAt).toLocaleString()}. Watch for your SMS invitation with your personal activation link.`
+    : campaignStatus.active ? `Account activation is open until ${new Date(campaignStatus.endsAt).toLocaleString()}. Not activated yet? Use the personal link sent to your phone.`
+    : null;
 
   // Rate Limiting & Lock States
   const [cooldown, setCooldown] = useState(0);
@@ -118,7 +144,11 @@ export default function LoginCpPage() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || 'Invalid credentials');
 
-      if (data.needsPasswordChange) { openEnrollForm(); setIsLoading(false); return; }
+      if (data.needsPasswordChange) {
+        setError('This account has not been activated yet. Please use the personal activation link sent to your phone by SMS, or contact your nearest Awash Insurance branch.');
+        setIsLoading(false);
+        return;
+      }
 
       localStorage.setItem('token', data.token);
       localStorage.setItem('user', JSON.stringify(data.user));
@@ -280,6 +310,18 @@ export default function LoginCpPage() {
 
         <div className="flex flex-1 items-center justify-center px-4 pb-[max(1.5rem,env(safe-area-inset-bottom))] pt-6 sm:px-8 lg:p-12">
           <div className="relative z-10 w-full max-w-[460px] animate-content">
+            {activatedNotice && (
+              <div className="mb-5 flex items-start gap-3 rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-800 shadow-sm dark:border-emerald-900/70 dark:bg-emerald-950/40 dark:text-emerald-300">
+                <HiOutlineCheckCircle className="mt-0.5 h-5 w-5 shrink-0" strokeWidth={1.75} />
+                <p className="font-medium">{t('auth.accountActivated') || 'Account activated successfully. Please sign in with your new password.'}</p>
+              </div>
+            )}
+            {campaignBanner && (
+              <div className="mb-5 flex items-start gap-3 rounded-xl border border-blue-100 bg-blue-50 p-4 text-sm text-blue-700 shadow-sm dark:border-blue-900/70 dark:bg-blue-950/40 dark:text-blue-300">
+                <HiOutlineInformationCircle className="mt-0.5 h-5 w-5 shrink-0" strokeWidth={1.75} />
+                <p className="font-medium">{campaignBanner}</p>
+              </div>
+            )}
             <div className="rounded-2xl border border-slate-200/80 bg-white/90 p-5 shadow-sm dark:border-slate-700/50 dark:bg-[#111827]/60 sm:p-8 lg:border-0 lg:bg-transparent lg:p-0 lg:shadow-none dark:lg:border-0 dark:lg:bg-transparent">
               
               {showChangePassword && (
@@ -309,7 +351,6 @@ export default function LoginCpPage() {
                     <div className="space-y-2">
                       <div className="ml-1 flex items-center justify-between">
                         <label className="text-sm font-semibold text-slate-700 dark:text-white">{t('auth.password') || 'Password'}</label>
-                        <button type="button" onClick={() => router.push('/forgot-password')} className="text-xs font-bold text-brand-primary transition-colors hover:text-brand-primary-hover dark:text-brand-secondary">{t('auth.forgotPassword') || 'Forgot?'}</button>
                       </div>
                       <div className="group relative">
                         <div className="absolute inset-y-0 left-0 flex items-center pl-4 text-slate-400 transition-colors group-focus-within:text-brand-secondary dark:text-slate-500"><HiOutlineLockClosed className="h-[18px] w-[18px]" strokeWidth={1.75} /></div>
@@ -325,9 +366,8 @@ export default function LoginCpPage() {
                   </form>
 
                   <div className="mt-6 text-center">
-                    <p className="text-sm text-slate-500 dark:text-slate-400">
-                      {t('auth.notEnrolled') || 'First time logging in?'}{' '}
-                      <button type="button" onClick={openEnrollForm} className="font-bold text-brand-primary transition-colors hover:text-brand-primary-hover dark:text-brand-secondary">{t('auth.enrollNow') || 'Activate Account'}</button>
+                    <p className="text-xs text-slate-400 dark:text-slate-500">
+                      First account? Activation is done only through the personal link sent to you by SMS.
                     </p>
                   </div>
                 </>

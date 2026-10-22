@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { FaFileInvoiceDollar, FaUserCircle, FaMoneyBillWave, FaBank, FaPiggyBank } from 'react-icons/fa';
 import AppShell from '../../../components/AppShell';
+import { LoadingState } from '../../../components/ui/loading';
 import { useTranslation } from '../../../components/LanguageProvider';
 
 export default function FormDetail() {
@@ -53,9 +54,7 @@ export default function FormDetail() {
   if (loading) {
     return (
       <AppShell>
-        <div className="flex min-h-[50vh] items-center justify-center">
-          <p className="text-gray-600 dark:text-gray-300">{t('detail.loading')}</p>
-        </div>
+        <LoadingState label={t('detail.loading')} className="min-h-[50vh]" />
       </AppShell>
     );
   }

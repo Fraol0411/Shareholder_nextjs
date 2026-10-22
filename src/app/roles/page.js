@@ -14,6 +14,7 @@ import {
   FaLock,
 } from 'react-icons/fa';
 import AppShell from '../../components/AppShell';
+import { Spinner } from '../../components/ui/loading';
 import { useTranslation } from '../../components/LanguageProvider';
 import { getStoredUser, getToken, isAdminRole } from '../../libs/auth';
 
@@ -29,7 +30,7 @@ export default function RolesManagementPage() {
   const [authorized, setAuthorized] = useState(false);
   const [roles, setRoles] = useState([]);
   const [permissionGroups, setPermissionGroups] = useState({});
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true); // the list is fetched on mount
   const [searchTerm, setSearchTerm] = useState('');
   const [formData, setFormData] = useState(EMPTY_FORM);
   const [isSaving, setIsSaving] = useState(false);
@@ -415,7 +416,10 @@ export default function RolesManagementPage() {
                 {isLoading ? (
                   <tr>
                     <td colSpan={5} className="px-4 py-10 text-center text-sm text-slate-500">
-                      {t('roles.loading')}
+                      <span className="inline-flex items-center gap-3">
+                        <Spinner className="h-5 w-5 border-2" />
+                        {t('roles.loading')}
+                      </span>
                     </td>
                   </tr>
                 ) : paginatedRoles.length === 0 ? (

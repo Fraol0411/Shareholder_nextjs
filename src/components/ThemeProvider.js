@@ -5,9 +5,10 @@ import { createContext, useContext, useEffect, useState } from 'react';
 const ThemeContext = createContext(null);
 
 function getStoredTheme() {
-  const savedTheme = window.localStorage.getItem('theme');
-  if (savedTheme === 'dark' || savedTheme === 'light') return savedTheme;
-  return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  // Light is the house style, so the operating system's colour scheme is
+  // deliberately not consulted. Only the theme toggle (or a value it stored on an
+  // earlier visit) can put the portal in dark mode.
+  return window.localStorage.getItem('theme') === 'dark' ? 'dark' : 'light';
 }
 
 function applyTheme(nextTheme) {
@@ -18,26 +19,14 @@ function applyTheme(nextTheme) {
 
 export function ThemeProvider({ children }) {
   // Always start as light so the server HTML and the first client render match.
-  // The real preference is applied after mount (the boot script already set the
-  // document class so the page does not flash).
+  // The stored preference is applied right after mount (the boot script already set
+  // the document class, so a dark-mode user does not see a light frame).
   const [theme, setThemeState] = useState('light');
 
   useEffect(() => {
     const initial = getStoredTheme();
     setThemeState(initial);
     applyTheme(initial);
-
-    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-    const handleSystemThemeChange = (event) => {
-      if (!window.localStorage.getItem('theme')) {
-        const nextTheme = event.matches ? 'dark' : 'light';
-        setThemeState(nextTheme);
-        applyTheme(nextTheme);
-      }
-    };
-
-    mediaQuery.addEventListener?.('change', handleSystemThemeChange);
-    return () => mediaQuery.removeEventListener?.('change', handleSystemThemeChange);
   }, []);
 
   const setTheme = (nextTheme) => {

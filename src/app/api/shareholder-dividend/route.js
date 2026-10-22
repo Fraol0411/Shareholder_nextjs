@@ -1,31 +1,27 @@
 import { NextResponse } from 'next/server';
-import { Pool } from 'pg';
-import jwt from 'jsonwebtoken';
+import { getPool, requireDividendDataAccess } from '../../../libs/serverAuth';
 
 export const runtime = 'nodejs';
-const pool = new Pool({ connectionString: process.env.DATABASE_URL });
-const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-here';
 
+/**
+ * GET /api/shareholder-dividend?fiscal_year=
+ *
+ * Feeds the decision form (fiscal years + the balance being decided on), so it is
+ * dividend data just like the statement page and sits behind the same data-viewing
+ * switch. Rows are looked up by the account id carried by the token, so no
+ * registration number is needed here.
+ */
 export async function GET(request) {
+  const auth = await requireDividendDataAccess(request, { requireRegNo: false });
+  if (auth.error) return auth.error;
+
   try {
-    // ── Authenticate user from Bearer token ──
-    const authHeader = request.headers.get('authorization');
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
-    }
-
-    let decoded;
-    try {
-      decoded = jwt.verify(authHeader.split(' ')[1], JWT_SECRET);
-    } catch {
-      return NextResponse.json({ message: 'Invalid token' }, { status: 401 });
-    }
-
-    const userId = decoded.id;
+    const userId = auth.viewer.userId;
     const { searchParams } = new URL(request.url);
     const fiscalYear = searchParams.get('fiscal_year');
 
     // ── 1. Fetch all fiscal years that have dividend data for this user ──
+    const pool = getPool();
     const yearsRes = await pool.query(
       `SELECT DISTINCT d.fiscal_year
        FROM public.sh_dividend d

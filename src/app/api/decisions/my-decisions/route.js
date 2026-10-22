@@ -1,29 +1,23 @@
 import { NextResponse } from 'next/server';
-import { Pool } from 'pg';
-import jwt from 'jsonwebtoken';
+import { getPool, requireDividendDataAccess } from '../../../../libs/serverAuth';
 
 export const runtime = 'nodejs';
-const pool = new Pool({ connectionString: process.env.DATABASE_URL });
-const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-here';
 
+/**
+ * GET /api/decisions/my-decisions
+ *
+ * Submitted decisions quote the dividend amounts they were made about, so this
+ * list is dividend data too and honours the shareholder data-viewing switch.
+ * Scoped to the account behind the token, so no registration number is required.
+ */
 export async function GET(request) {
+  const auth = await requireDividendDataAccess(request, { requireRegNo: false });
+  if (auth.error) return auth.error;
+
   try {
-    // ── Authenticate ──
-    const authHeader = request.headers.get('authorization');
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
-    }
+    const userId = auth.viewer.userId;
 
-    let decoded;
-    try {
-      decoded = jwt.verify(authHeader.split(' ')[1], JWT_SECRET);
-    } catch {
-      return NextResponse.json({ message: 'Invalid token' }, { status: 401 });
-    }
-
-    const userId = decoded.id;
-
-    const result = await pool.query(
+    const result = await getPool().query(
       `SELECT
          id, file_number, shareholder_name, email, phone,
          submission_date, fiscal_year, decision_type,

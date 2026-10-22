@@ -1,6 +1,17 @@
 import { connect } from '../../../libs/db'; // Adjust path if your libs folder is elsewhere
 
+// Disabled: this endpoint required no authentication and exported plaintext
+// OTPs for every user in the database. Use the admin-gated activation campaign
+// instead: POST /api/activation/campaign (unique hashed link + code per user).
 export async function POST() {
+  return Response.json(
+    { message: 'This endpoint has been replaced by /api/activation/campaign (admin only).' },
+    { status: 410 }
+  );
+}
+
+// eslint-disable-next-line no-unused-vars
+async function _legacyGenerateOtpCsv() {
   try {
     const pool = await connect();
     const client = await pool.connect();

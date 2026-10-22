@@ -1,7 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import {
   HiOutlineUser,
@@ -16,6 +16,7 @@ import {
   HiOutlineKey,
   HiOutlineArrowLeft,
   HiOutlineCheckCircle,
+  HiOutlineInformationCircle,
 } from 'react-icons/hi2';
 import { FaExclamationCircle } from 'react-icons/fa';
 import ThemeToggle from '../../components/ThemeToggle';
@@ -50,6 +51,31 @@ export default function LoginPage() {
 
   const [verificationCode, setVerificationCode] = useState('');
 
+  // Activation campaign window (public info banner)
+  const [campaignStatus, setCampaignStatus] = useState(null);
+  useEffect(() => {
+    fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/activation/status`)
+      .then((res) => res.json())
+      .then((data) => setCampaignStatus(data))
+      .catch(() => {});
+  }, []);
+
+  const campaignBanner = !campaignStatus?.exists ? null
+    : campaignStatus.beforeStart ? `Account activation opens on ${new Date(campaignStatus.startsAt).toLocaleString()}. Watch for your SMS invitation with your personal activation link.`
+    : campaignStatus.active ? `Account activation is open until ${new Date(campaignStatus.endsAt).toLocaleString()}. Not activated yet? Use the personal link sent to your phone.`
+    : null;
+
+  // Transient notice shown right after a shareholder finishes activation
+  const [activatedNotice, setActivatedNotice] = useState(false);
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('activated') !== '1') return;
+    setActivatedNotice(true);
+    window.history.replaceState({}, '', window.location.pathname);
+    const timer = setTimeout(() => setActivatedNotice(false), 9000);
+    return () => clearTimeout(timer);
+  }, []);
+
   const normalizePhoneNumber = (value) => {
     if (!value) return '';
     // Remove all non-digit characters
@@ -66,6 +92,17 @@ export default function LoginPage() {
 
     return cleaned;
   };
+
+  // Shareholders type their phone in several shapes (0964308437, +251 96 43 08 437,
+  // 964308437) while the accounts store the local 9-digit form. Only identifiers that
+  // are unmistakably an Ethiopian mobile get rewritten, so National IDs (which can be
+  // 9-10 digits, some with leading zeros or a 251 prefix), registration numbers such
+  // as 1201-001, and usernames are always sent exactly as typed.
+  const looksLikeEthiopianMobile = (value) =>
+    /^(\+?251|0)?9\d{8}$/.test(String(value).replace(/[\s()\-.]/g, ''));
+
+  const loginIdentifier = (value) =>
+    looksLikeEthiopianMobile(value) ? normalizePhoneNumber(value) : value.trim();
 
   const handleEnrollTypeChange = (type) => {
     setEnrollType(type);
@@ -198,7 +235,7 @@ export default function LoginPage() {
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ identifier: trimmedId, password }),
+        body: JSON.stringify({ identifier: loginIdentifier(trimmedId), password }),
       });
 
       const data = await res.json();
@@ -208,7 +245,7 @@ export default function LoginPage() {
       }
 
       if (data.needsPasswordChange) {
-        openEnrollForm(inferEnrollType());
+        setError('This account has not been activated yet. Please use the personal activation link sent to your phone by SMS, or contact your nearest Awash Insurance branch.');
         setIsLoading(false);
         return;
       }
@@ -235,7 +272,6 @@ export default function LoginPage() {
     const trimmedId = enrollIdentifier.trim();
     const isEnrollIndividual = enrollType === LOGIN_TYPES.INDIVIDUAL;
   
-    console.log("vr",verificationCode)
     if (!trimmedId) {
       return setError(isEnrollIndividual ? t('auth.nationalIdRequired') : t('auth.tinRequired'));
     }
@@ -252,7 +288,6 @@ export default function LoginPage() {
       return setError(t('password.mismatch'));
     }
   
-    console.log("id",trimmedId)
     setIsLoading(true);
   
     try {
@@ -428,6 +463,18 @@ export default function LoginPage() {
 
         <div className="flex flex-1 items-center justify-center px-4 pb-[max(1.5rem,env(safe-area-inset-bottom))] pt-6 sm:px-8 lg:p-12">
           <div className="relative z-10 w-full max-w-[460px] animate-content">
+            {activatedNotice && (
+              <div className="mb-5 flex items-start gap-3 rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-800 shadow-sm dark:border-emerald-900/70 dark:bg-emerald-950/40 dark:text-emerald-300">
+                <HiOutlineCheckCircle className="mt-0.5 h-5 w-5 shrink-0" strokeWidth={1.75} />
+                <p className="font-medium">{t('auth.accountActivated') || 'Account activated successfully. Please sign in with your new password.'}</p>
+              </div>
+            )}
+            {campaignBanner && (
+              <div className="mb-5 flex items-start gap-3 rounded-xl border border-blue-100 bg-blue-50 p-4 text-sm text-blue-700 shadow-sm dark:border-blue-900/70 dark:bg-blue-950/40 dark:text-blue-300">
+                <HiOutlineInformationCircle className="mt-0.5 h-5 w-5 shrink-0" strokeWidth={1.75} />
+                <p className="font-medium">{campaignBanner}</p>
+              </div>
+            )}
             <div className="rounded-2xl border border-slate-200/80 bg-white/90 p-5 shadow-sm dark:border-slate-700/50 dark:bg-[#111827]/60 sm:p-8 lg:border-0 lg:bg-transparent lg:p-0 lg:shadow-none dark:lg:border-0 dark:lg:bg-transparent">
 
               {showChangePassword && (
@@ -489,13 +536,6 @@ export default function LoginPage() {
                     <div className="space-y-2">
                       <div className="ml-1 flex items-center justify-between">
                         <label className="text-sm font-semibold text-slate-700 dark:text-white">{t('auth.password')}</label>
-                        <button
-                          type="button"
-                          onClick={() => router.push('/forgot-password')}
-                          className="text-xs font-bold text-brand-primary transition-colors hover:text-brand-primary-hover dark:text-brand-secondary"
-                        >
-                          {t('auth.forgotPassword')}
-                        </button>
                       </div>
                       <div className="group relative">
                         <div className="absolute inset-y-0 left-0 flex items-center pl-4 text-slate-400 transition-colors group-focus-within:text-brand-secondary dark:text-slate-500">
@@ -543,15 +583,8 @@ export default function LoginPage() {
                   </form>
 
                   <div className="mt-6 text-center">
-                    <p className="text-sm text-slate-500 dark:text-slate-400">
-                      {t('auth.notEnrolled')}{' '}
-                      <button
-                        type="button"
-                        onClick={() => openEnrollForm()}
-                        className="font-bold text-brand-primary transition-colors hover:text-brand-primary-hover dark:text-brand-secondary"
-                      >
-                        {t('auth.enrollNow')}
-                      </button>
+                    <p className="text-xs text-slate-400 dark:text-slate-500">
+                      First account? Activation is done only through the personal link sent to you by SMS.
                     </p>
                   </div>
                 </>

@@ -33,7 +33,10 @@ export default function RootLayout({ children }) {
         <link rel="icon" href={metadata.icon} />
         <script
           dangerouslySetInnerHTML={{
-            __html: `(() => { try { const theme = localStorage.getItem('theme') || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'); document.documentElement.classList.toggle('dark', theme === 'dark'); document.documentElement.style.colorScheme = theme; } catch (error) {} })()`,
+            // Light is the house style. The operating system's preference is not asked
+            // for: only a deliberate choice in the theme toggle changes it, and that
+            // choice is remembered. Runs before paint so nothing flashes.
+            __html: `(() => { try { const theme = localStorage.getItem('theme') === 'dark' ? 'dark' : 'light'; document.documentElement.classList.toggle('dark', theme === 'dark'); document.documentElement.style.colorScheme = theme; } catch (error) {} })()`,
           }}
         />
       </head>

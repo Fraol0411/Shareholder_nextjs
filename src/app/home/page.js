@@ -18,6 +18,7 @@ import {
 } from "react-icons/fa";
 
 import AppShell from "../../components/AppShell";
+import { Spinner } from "../../components/ui/loading";
 import { useTranslation } from "../../components/LanguageProvider";
 import {
   getStoredUser,
@@ -238,16 +239,17 @@ export default function HomePortalPage() {
   ======================================================= */
 
   if (!user) {
+    // Inside AppShell on purpose: the header and the sidebar stay put while the
+    // profile is read, so waiting never looks like the whole portal reloaded.
     return (
-      <div className="flex min-h-screen items-center justify-center bg-slate-50 px-4 dark:bg-slate-950">
-        <div className="flex flex-col items-center">
-          <div className="h-9 w-9 animate-spin rounded-full border-[3px] border-slate-200 border-t-blue-600 dark:border-slate-700 dark:border-t-blue-400" />
-
+      <AppShell>
+        <div className="flex min-h-[50vh] flex-col items-center justify-center">
+          <Spinner />
           <p className="mt-4 text-xs font-semibold text-slate-400">
             {t("home.loading")}
           </p>
         </div>
-      </div>
+      </AppShell>
     );
   }
 
@@ -406,15 +408,7 @@ export default function HomePortalPage() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                <PortalCard
-                  href="/approvals"
-                  icon={FaShieldAlt}
-                  title="home.decisionApprovals"
-                  description="home.decisionApprovalsDescription"
-                  accent="amber"
-                  badge="home.approvals"
-                />
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <PortalCard
                   href="/register"
                   icon={FaUserPlus}

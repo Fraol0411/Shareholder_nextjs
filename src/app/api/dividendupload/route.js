@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { Pool } from 'pg';
 import * as XLSX from 'xlsx';
 import bcrypt from 'bcryptjs';
+import { requireOperator } from '../../../libs/serverAuth';
 
 export const runtime = 'nodejs';
 
@@ -29,7 +30,11 @@ const parseIntSafe = (val) => {
   return isNaN(num) ? 0 : Math.round(num);
 };
 
+// Bulk dividend import writes money for every shareholder at once — staff/admin only.
 export async function POST(request) {
+  const auth = await requireOperator(request);
+  if (auth.error) return auth.error;
+
   try {
     const formData = await request.formData();
     const file = formData.get('file');

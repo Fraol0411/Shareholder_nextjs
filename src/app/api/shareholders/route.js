@@ -1,15 +1,22 @@
 import { NextResponse } from 'next/server';
-import { Pool } from 'pg';
 import bcrypt from 'bcryptjs';
+import { getPool, requireOperator } from '../../../libs/serverAuth';
 
 export const runtime = 'nodejs';
-const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 
 const DEFAULT_PASSWORD = 'shareholder@awash';
 
+/* The registry holds every shareholder's identity and money. It used to answer
+   without a token at all — including the POST below, which created logins. All
+   five verbs now require a staff or admin session. */
+
 // POST: Create a new shareholder (user + dividend record)
 export async function POST(request) {
+  const auth = await requireOperator(request);
+  if (auth.error) return auth.error;
+
   try {
+    const pool = getPool();
     const data = await request.json();
     const {
       sh_name, reg_no, sif_no, phone, national_id,
@@ -127,7 +134,11 @@ export async function POST(request) {
 
 // GET: Fetch shareholders ONLY for the selected fiscal year
 export async function GET(request) {
+  const auth = await requireOperator(request);
+  if (auth.error) return auth.error;
+
   try {
+    const pool = getPool();
     const { searchParams } = new URL(request.url);
     const fiscalYear = searchParams.get('fiscal_year');
 
@@ -155,7 +166,11 @@ export async function GET(request) {
 
 // PUT: Update a shareholder record (updates both sh_dividend and users)
 export async function PUT(request) {
+  const auth = await requireOperator(request);
+  if (auth.error) return auth.error;
+
   try {
+    const pool = getPool();
     const data = await request.json();
     const { id, user_id } = data; // id is sh_dividend.id, user_id is users.id
 
@@ -192,7 +207,11 @@ export async function PUT(request) {
 
 // PATCH: Reset a user's password to the default password
 export async function PATCH(request) {
+  const auth = await requireOperator(request);
+  if (auth.error) return auth.error;
+
   try {
+    const pool = getPool();
     const { user_id } = await request.json();
 
     if (!user_id) {
@@ -219,7 +238,11 @@ export async function PATCH(request) {
 
 // DELETE: Delete a shareholder dividend record
 export async function DELETE(request) {
+  const auth = await requireOperator(request);
+  if (auth.error) return auth.error;
+
   try {
+    const pool = getPool();
     const { id } = await request.json(); // id is sh_dividend.id
 
     // Only delete the dividend record for that specific fiscal year.

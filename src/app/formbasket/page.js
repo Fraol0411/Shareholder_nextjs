@@ -7,6 +7,8 @@ import {
   FaClock, FaCheckCircle, FaTimesCircle, FaUser, FaUserTie,
 } from 'react-icons/fa';
 import AppShell from '../../components/AppShell';
+import { LoadingState, SkeletonRows } from '../../components/ui/loading';
+import { getToken } from '../../libs/auth';
 
 const STATUS_CONFIG = {
   pending:   { icon: FaClock,       color: 'text-amber-600',   bg: 'bg-amber-50',   border: 'border-amber-200',   label: 'Pending' },
@@ -32,6 +34,9 @@ export default function FormBasket() {
 
   // ── Dynamic fiscal years ──
   const [fiscalYears, setFiscalYears] = useState([]);
+  // The year list arrives from the server, so "no year selected" and "the list is
+  // still loading" are different states that must not share one message.
+  const [loadingYears, setLoadingYears] = useState(true);
 
   // ── Filters ──
   const [fiscalYear, setFiscalYear] = useState('');
@@ -44,10 +49,14 @@ export default function FormBasket() {
 
   // ── Load fiscal years ──
   useEffect(() => {
-    fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/fiscal-years`)
+    // The endpoints behind this page are staff-only now, so the token must be sent.
+    fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/fiscal-years`, {
+      headers: { Authorization: `Bearer ${getToken()}` },
+    })
       .then((r) => r.json())
       .then((data) => setFiscalYears(data || []))
-      .catch(() => {});
+      .catch(() => {})
+      .finally(() => setLoadingYears(false));
   }, []);
 
   // ── Fetch forms when fiscal year changes ──
@@ -131,9 +140,9 @@ export default function FormBasket() {
             {/* Fiscal Year */}
             <div>
               <label className="mb-1 block text-xs font-semibold uppercase tracking-wider text-slate-500">Fiscal Year *</label>
-              <select value={fiscalYear} onChange={(e) => setFiscalYear(e.target.value)}
-                className="w-full rounded-lg border border-sky-100 bg-white px-3 py-2.5 text-sm text-slate-800 shadow-sm focus:border-sky-400 focus:outline-none focus:ring-4 focus:ring-sky-500/10">
-                <option value="">Select Year</option>
+              <select value={fiscalYear} onChange={(e) => setFiscalYear(e.target.value)} disabled={loadingYears}
+                className="w-full rounded-lg border border-sky-100 bg-white px-3 py-2.5 text-sm text-slate-800 shadow-sm focus:border-sky-400 focus:outline-none focus:ring-4 focus:ring-sky-500/10 disabled:bg-slate-50 disabled:opacity-60">
+                <option value="">{loadingYears ? 'Loading years…' : 'Select Year'}</option>
                 {fiscalYears.map((fy) => <option key={fy} value={fy}>{fy}</option>)}
               </select>
             </div>
@@ -200,14 +209,22 @@ export default function FormBasket() {
         </div>
 
         {/* ── Loading ── */}
-        {loading && fiscalYear && (
-          <div className="flex items-center justify-center py-16">
-            <div className="h-8 w-8 animate-spin rounded-full border-4 border-sky-200 border-t-sky-600" />
+        {loading && (
+          <div className="space-y-3">
+            <p className="text-sm font-medium text-slate-500">
+              Loading dividend decisions for FY {fiscalYear}...
+            </p>
+            <SkeletonRows rows={5} />
           </div>
         )}
 
+        {/* ── Fiscal years still arriving ── */}
+        {!loading && loadingYears && (
+          <LoadingState label="Loading fiscal years..." description="The year list comes from the dividend records on file." />
+        )}
+
         {/* ── No Fiscal Year ── */}
-        {!fiscalYear && !loading && (
+        {!fiscalYear && !loading && !loadingYears && (
           <div className="flex flex-col items-center justify-center rounded-xl border border-sky-100 bg-white py-20 shadow-sm">
             <FaCalendarAlt className="mb-4 text-5xl text-slate-200" />
             <h3 className="text-lg font-bold text-slate-800">Select a Fiscal Year</h3>

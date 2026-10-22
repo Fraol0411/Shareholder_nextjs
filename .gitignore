@@ -49,3 +49,7 @@ docker-compose.yaml
 .dockerignore
 next.config.mjs.qoder/
 .qoder/
+scripts/activation_campaign_management.sql
+scripts/activation_migration.sql
+scripts/approvals_migration.sql
+scripts/data_access_settings_migration.sql

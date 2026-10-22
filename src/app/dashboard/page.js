@@ -3,7 +3,7 @@
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { FaUserCircle, FaSignOutAlt, FaMoneyBillWave, FaChartLine, FaBank, FaFileInvoiceDollar } from 'react-icons/fa';
-import AppShell from 'src/components/AppShell';
+import AppShell from '../../components/AppShell';
 import { useTranslation } from '../../components/LanguageProvider';
 
 

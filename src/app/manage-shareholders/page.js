@@ -7,6 +7,10 @@ import {
   FaCalendarAlt, FaSpinner, FaUserTie, FaPlus, FaUserPlus, FaKey
 } from 'react-icons/fa';
 import AppShell from '../../components/AppShell'; // Update path if needed
+import { getToken } from '../../libs/auth';
+
+// The registry endpoints are staff-only now, so every call carries the session token.
+const authHeaders = (extra = {}) => ({ ...extra, Authorization: `Bearer ${getToken()}` });
 
 export default function ManageShareholders() {
   /* ------------------------------ State ------------------------------ */
@@ -55,7 +59,7 @@ export default function ManageShareholders() {
 
   const fetchFiscalYears = async () => {
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/fiscal-years`);
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/fiscal-years`, { headers: authHeaders() });
       if (res.ok) setFiscalYears(await res.json());
     } catch {
       showNotification('error', 'Failed to load fiscal years.');
@@ -65,7 +69,7 @@ export default function ManageShareholders() {
   const fetchData = async (year) => {
     setIsLoading(true);
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/shareholders?fiscal_year=${encodeURIComponent(year)}`);
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/shareholders?fiscal_year=${encodeURIComponent(year)}`, { headers: authHeaders() });
       if (!res.ok) throw new Error('Failed to fetch');
       setShareholders(await res.json());
     } catch {
@@ -111,7 +115,7 @@ export default function ManageShareholders() {
     try {
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/shareholders`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: authHeaders({ 'Content-Type': 'application/json' }),
         body: JSON.stringify({
           ...addForm,
           sn: parseInt(addForm.sn) || 0,
@@ -211,7 +215,7 @@ export default function ManageShareholders() {
     try {
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/shareholders`, {
         method: 'DELETE',
-        headers: { 'Content-Type': 'application/json' },
+        headers: authHeaders({ 'Content-Type': 'application/json' }),
         // Only pass the dividend record ID. The user account will be preserved.
         body: JSON.stringify({ id: deleteTarget.id }), 
       });
@@ -231,7 +235,7 @@ export default function ManageShareholders() {
     try {
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/shareholders`, {
         method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
+        headers: authHeaders({ 'Content-Type': 'application/json' }),
         body: JSON.stringify({ user_id: resetTarget.user_id }),
       });
       const data = await res.json();
@@ -251,7 +255,7 @@ export default function ManageShareholders() {
     try {
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/shareholders`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+        headers: authHeaders({ 'Content-Type': 'application/json' }),
         body: JSON.stringify(editingItem), // Contains both user_id and sh_dividend id
       });
       if (!res.ok) throw new Error('Update failed');
