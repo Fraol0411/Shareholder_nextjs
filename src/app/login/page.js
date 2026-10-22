@@ -377,7 +377,7 @@ export default function LoginPage() {
               <span className="text-brand-secondary underline decoration-brand-secondary/30 underline-offset-8">
                 {t('auth.heroHighlight')}
               </span>{' '}
-              {t('auth.heroTitleEnd')}
+              {/* {t('auth.heroTitleEnd')} */}
             </h2>
             <p className="max-w-md text-lg leading-relaxed text-white/70">
               {t('auth.heroDescription')}

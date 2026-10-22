@@ -153,12 +153,12 @@ export default function DividendDetail() {
           <div className="space-y-3 sm:space-y-4">
             <DividendSummaryCard record={record} t={t} />
 
-            <DecisionImpactCard
+            {/* <DecisionImpactCard
               decision={yearDecision}
               totalDividend={record.total_dividend}
               t={t}
               onFillDecision={() => router.push('/fillform')}
-            />
+            /> */}
 
             <ProfileCard record={record} />
           </div>
@@ -364,35 +364,38 @@ function ImpactStat({ label, value, color, dot }) {
 
 function DividendSummaryCard({ record, t }) {
   return (
-    <section className="overflow-hidden rounded-xl border border-brand-secondary/20 bg-white shadow-sm dark:border-slate-700 dark:bg-slate-800">
-      <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 bg-gradient-to-r from-brand-primary/[0.06] via-white to-brand-secondary/[0.08] px-3.5 py-3 dark:border-slate-700 dark:from-brand-primary/20 dark:via-slate-800 dark:to-brand-secondary/10 sm:px-4">
-        <div className="flex min-w-0 items-center gap-2.5">
-          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-brand-primary text-white shadow-sm shadow-brand-primary/30 sm:h-9 sm:w-9 sm:rounded-xl">
-            <FaMoneyBillWave className="text-sm" />
-          </div>
+    <section className="space-y-3">
+      {/* ── Hero Card: Total Dividend (Brand Blue) ── */}
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-brand-primary to-brand-primary-hover p-5 text-white shadow-lg shadow-brand-primary/20 sm:p-6 dark:shadow-brand-primary/30">
+        {/* Subtle decorative glow */}
+        <div className="pointer-events-none absolute -right-10 -top-10 h-40 w-40 rounded-full bg-brand-secondary/20 blur-3xl" />
+        <div className="pointer-events-none absolute -bottom-12 -left-8 h-32 w-32 rounded-full bg-white/5 blur-2xl" />
+
+        <div className="relative flex items-start justify-between gap-4">
           <div className="min-w-0">
-            <h3 className="truncate text-sm font-bold text-slate-900 dark:text-white">
-              {t('detail.summaryTitle')}
-            </h3>
-            <p className="text-[11px] text-slate-500 dark:text-slate-400">
-              {t('detail.fiscalYearBadge').replace('{year}', record.fiscal_year)}
-              {' · '}
+            <div className="mb-1 flex items-center gap-2 text-[13px] font-semibold uppercase tracking-[0.14em] text-brand-secondary">
+              <FaMoneyBillWave className="text-sm" />
+              <span>{t('detail.summaryTitle')}</span>
+            </div>
+            <p className="text-xs text-white sm:text-sm">
               {t('detail.declaredForward')}
             </p>
           </div>
+          <div className="rounded-full bg-white/15 px-3 py-1 text-[11px] font-semibold text-white backdrop-blur-sm">
+            {t('detail.total')}
+          </div>
         </div>
-        <div className="rounded-full bg-brand-secondary/15 px-3 py-1 text-xs font-semibold text-brand-primary dark:text-brand-secondary">
-          {t('detail.total')}: {fmt(record.total_dividend)} ETB
+
+        <div className="relative mt-4">
+          <p className="text-3xl font-extrabold leading-tight tracking-tight tabular-nums sm:text-4xl">
+            {fmt(record.total_dividend)}
+            <span className="ml-2 text-base font-semibold text-white/70 sm:text-lg">ETB</span>
+          </p>
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-px bg-slate-100 dark:bg-slate-700 sm:grid-cols-4">
-        <SummaryMetric
-          icon={FaMoneyBillWave}
-          label={t('detail.total')}
-          value={fmt(record.total_dividend)}
-          highlight
-        />
+      {/* ── Condensed Metrics Row (stacked on mobile, 3-col on desktop) ── */}
+      <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-3 sm:gap-3">
         <SummaryMetric
           icon={FaWallet}
           label={t('detail.paidCapital')}
@@ -413,26 +416,18 @@ function DividendSummaryCard({ record, t }) {
   );
 }
 
-function SummaryMetric({ icon: Icon, label, value, highlight = false }) {
+function SummaryMetric({ icon: Icon, label, value }) {
   return (
-    <div
-      className={`bg-white p-3 sm:p-3.5 dark:bg-slate-800 ${
-        highlight
-          ? 'bg-gradient-to-br from-brand-secondary-soft to-white dark:from-brand-secondary/10 dark:to-slate-800'
-          : ''
-      }`}
-    >
-      <div className="flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-        <Icon className={`h-3 w-3 shrink-0 ${highlight ? 'text-brand-secondary' : 'text-brand-primary/70'}`} />
-        <span className="truncate">{label}</span>
+    <div className="rounded-xl border border-slate-100 bg-white px-4 py-3.5 dark:border-slate-700 dark:bg-slate-800">
+      <div className="mb-1.5 flex items-center gap-2">
+        <Icon className="h-4 w-4 shrink-0 text-brand-primary/70 dark:text-slate-400" />
+        <span className="truncate text-[11px] font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+          {label}
+        </span>
       </div>
-      <p
-        className={`mt-1 text-sm font-bold tabular-nums sm:text-base ${
-          highlight ? 'text-brand-primary dark:text-brand-secondary' : 'text-slate-900 dark:text-white'
-        }`}
-      >
+      <p className="truncate text-base font-bold tabular-nums text-slate-900 dark:text-white sm:text-lg">
         {value}
-        <span className="ml-1 text-[10px] font-medium text-slate-400">ETB</span>
+        <span className="ml-1 text-xs font-medium text-slate-400">ETB</span>
       </p>
     </div>
   );
