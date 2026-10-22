@@ -1,18 +1,35 @@
 import { NextResponse } from 'next/server';
-import { Pool } from 'pg';
+import { getPool, requireDividendDataAccess } from '../../../libs/serverAuth';
 
 export const runtime = 'nodejs';
-const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 
+/**
+ * GET /api/dividend-detail?reg_no=&fiscal_year=
+ *
+ * A shareholder is always shown their OWN record: the registration number is
+ * taken from the account behind the Bearer token, and any reg_no in the query
+ * string is ignored. Staff and admins may look any shareholder up, because they
+ * work on behalf of people who cannot access the portal.
+ *
+ * The whole endpoint also sits behind the shareholder data-viewing switch
+ * (requireDividendDataAccess), so an admin can close self-service in one click.
+ */
 export async function GET(request) {
-  try {
-    const { searchParams } = new URL(request.url);
-    const reg_no = searchParams.get('reg_no');
-    const fiscal_year = searchParams.get('fiscal_year');
+  const auth = await requireDividendDataAccess(request);
+  if (auth.error) return auth.error;
 
-    if (!reg_no) {
-      return NextResponse.json({ message: 'reg_no is required' }, { status: 400 });
-    }
+  const { searchParams } = new URL(request.url);
+  const requestedRegNo = (searchParams.get('reg_no') || '').trim();
+  const fiscal_year = searchParams.get('fiscal_year');
+
+  // Operators must say whose record they want; shareholders get their own.
+  const reg_no = auth.viewer.isOperator ? requestedRegNo : auth.viewer.regNo;
+  if (!reg_no) {
+    return NextResponse.json({ message: 'reg_no is required' }, { status: 400 });
+  }
+
+  try {
+    const pool = getPool();
 
     // 1. Fetch all available fiscal years for this specific shareholder
     // We JOIN the users table because reg_no is now stored there, linked by user_id

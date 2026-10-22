@@ -46,6 +46,22 @@ export function isStaffRole(role) {
   return role === 'staff' || role === 'admin'; // admins see staff tools too
 }
 
+/**
+ * Turn a failed API response into what a page needs in order to explain it.
+ *
+ * A 403 that carries a reason code (DATA_VIEWING_CLOSED, ACCOUNT_DISABLED,
+ * ACCOUNT_LOCKED) is a deliberate decision by the bank rather than a fault, so the
+ * pages word it as an amber notice using the admin's own message. Everything else is
+ * a genuine failure and stays red.
+ */
+export async function readApiError(res, fallback = 'Please try again.') {
+  const payload = await res.json().catch(() => ({}));
+  return {
+    tone: res.status === 403 && payload.code ? 'notice' : 'error',
+    message: payload.message || fallback,
+  };
+}
+
 export function isAdminRole(role) {
   return role === 'admin';
 }

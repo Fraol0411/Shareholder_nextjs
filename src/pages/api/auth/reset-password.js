@@ -4,6 +4,17 @@ import bcrypt from 'bcryptjs';
 const DEFAULT_PASSWORD = 'shareholder@awash';
 
 export default async function handler(req, res) {
+  // Disabled: password recovery now runs exclusively through the activation
+  // campaign (/api/activation/*), which verifies a unique link + national ID +
+  // one-time code before a password can be set. This endpoint accepted a bare
+  // national ID with no proof of identity (account-takeover risk).
+  return res.status(410).json({
+    message: 'Password reset is no longer available. Please use the personal activation link sent to your phone, or contact your branch.',
+  });
+}
+
+// eslint-disable-next-line no-unused-vars
+async function _legacyResetPassword(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ message: 'Method not allowed' });
   }

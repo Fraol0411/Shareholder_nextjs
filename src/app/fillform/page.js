@@ -5,25 +5,24 @@ import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import {
   HiOutlineCalendarDays,
-  HiOutlineChartBar,
   HiOutlineCheckCircle,
   HiOutlineChevronDown,
   HiOutlineCreditCard,
   HiOutlineEnvelope,
   HiOutlineExclamationCircle,
-  HiOutlineBanknotes,
   HiOutlinePhone,
   HiOutlineUser,
-  HiOutlineWallet,
   HiOutlineXMark,
-  HiOutlineArrowPath,
   HiOutlineDocumentText,
   HiOutlineBuildingLibrary,
   HiOutlineArrowLeft,
 } from 'react-icons/hi2';
 import { FaCheck } from 'react-icons/fa';
 import AppShell from '../../components/AppShell';
-import { getToken, getStoredUser } from '../../libs/auth';
+import { DividendSummaryCard } from '../../components/DividendSummaryCard';
+import { StatusNotice } from '../../components/ui/status-notice';
+import { LoadingState, Spinner } from '../../components/ui/loading';
+import { getToken, getStoredUser, readApiError } from '../../libs/auth';
 import { useTranslation } from '../../components/LanguageProvider';
 
 const fmt = (v) =>
@@ -65,9 +64,15 @@ export default function ShareholderFillForm() {
   const [token, setToken] = useState(null);
 
   const [fiscalYears, setFiscalYears] = useState([]);
+  // Years have not arrived yet as opposed to genuinely being none. Without this the
+  // panel reads "no fiscal years available" while the request is still in flight.
+  const [loadingYears, setLoadingYears] = useState(true);
   const [selectedYear, setSelectedYear] = useState('');
   const [dividendData, setDividendData] = useState(null);
   const [loadingDividend, setLoadingDividend] = useState(false);
+  // Why the form cannot be shown: the data-viewing switch closed by the bank (notice)
+  // or a request that failed (error). Nothing is rendered while it is set.
+  const [blocked, setBlocked] = useState(null);
 
   const [shareholderName, setShareholderName] = useState('');
   const [email, setEmail] = useState('');
@@ -113,23 +118,39 @@ export default function ShareholderFillForm() {
 
   useEffect(() => {
     if (!token) return;
-    fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/shareholder-dividend`, {
-      headers: { Authorization: `Bearer ${token}` },
-    })
-      .then((r) => r.json())
-      .then((data) => setFiscalYears(data.fiscalYears || []))
-      .catch(() => {});
+
+    // The fiscal years and the balance come from the dividend endpoints, which honour
+    // the data-viewing switch. Read the reason out when they refuse: a form that
+    // quietly shows no years looks broken, and the admin's message explains it.
+    (async () => {
+      try {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/shareholder-dividend`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (!res.ok) {
+          setBlocked(await readApiError(res, 'Could not load your dividend data.'));
+          return;
+        }
+        const data = await res.json();
+        setBlocked(null);
+        setFiscalYears(data.fiscalYears || []);
+      } catch {
+        setBlocked({ tone: 'error', message: 'Could not reach the server. Please try again.' });
+      } finally {
+        setLoadingYears(false);
+      }
+    })();
 
     fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/decisions/my-decisions`, {
       headers: { Authorization: `Bearer ${token}` },
     })
-      .then((r) => r.json())
+      .then((r) => (r.ok ? r.json() : { decisions: [] }))
       .then((data) => setMyDecisions(data.decisions || []))
       .catch(() => setMyDecisions([]));
   }, [token]);
 
   useEffect(() => {
-    if (!token || !selectedYear) return;
+    if (!token || !selectedYear || blocked) return;
     setLoadingDividend(true);
     setDividendData(null);
     setFormOpen(false);
@@ -150,7 +171,7 @@ export default function ShareholderFillForm() {
       })
       .catch(() => setDividendData(null))
       .finally(() => setLoadingDividend(false));
-  }, [token, selectedYear]);
+  }, [token, selectedYear, blocked]);
 
   useEffect(() => {
     if (!formOpen) return undefined;
@@ -311,26 +332,40 @@ export default function ShareholderFillForm() {
             </p>
           </div>
 
-          <div className="w-full shrink-0 sm:w-56 lg:w-64">
-            <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
-              {t('staff.selectFiscalYear')}
-            </label>
-            {fiscalYears.length === 0 ? (
-              <p className="rounded-xl border border-dashed border-slate-200 px-3.5 py-2.5 text-sm text-slate-400 dark:border-slate-700">
-                {t('fill.noFiscalYears')}
-              </p>
-            ) : (
-              <FiscalYearDropdown
-                years={fiscalYears}
-                selected={selectedYear}
-                onSelect={setSelectedYear}
-              />
-            )}
-          </div>
+          {!blocked && (
+            <div className="w-full shrink-0 sm:w-56 lg:w-64">
+              <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
+                {t('staff.selectFiscalYear')}
+              </label>
+              {loadingYears && fiscalYears.length === 0 ? (
+                <p className="flex items-center gap-2.5 rounded-xl border border-dashed border-slate-200 px-3.5 py-2.5 text-sm text-slate-400 dark:border-slate-700">
+                  <Spinner className="h-4 w-4 border-2" />
+                  {t('common.loading')}
+                </p>
+              ) : fiscalYears.length === 0 ? (
+                <p className="rounded-xl border border-dashed border-slate-200 px-3.5 py-2.5 text-sm text-slate-400 dark:border-slate-700">
+                  {t('fill.noFiscalYears')}
+                </p>
+              ) : (
+                <FiscalYearDropdown
+                  years={fiscalYears}
+                  selected={selectedYear}
+                  onSelect={setSelectedYear}
+                />
+              )}
+            </div>
+          )}
         </div>
 
+        {/* Closed or failing data: say why instead of showing an empty form */}
+        {blocked && <StatusNotice tone={blocked.tone} message={blocked.message} />}
+
         {/* Empty / loading / missing states */}
-        {!selectedYear && (
+        {!blocked && loadingYears && (
+          <LoadingState label={t('common.loading')} description={t('fill.subtitle')} />
+        )}
+
+        {!blocked && !loadingYears && !selectedYear && (
           <EmptyState
             icon={HiOutlineCalendarDays}
             title={t('fill.selectYearFirst')}
@@ -338,7 +373,7 @@ export default function ShareholderFillForm() {
           />
         )}
 
-        {selectedYear && loadingDividend && (
+        {!blocked && selectedYear && loadingDividend && (
           <div className="flex min-h-[220px] items-center justify-center rounded-2xl border border-brand-secondary/20 bg-white/80 dark:border-slate-700 dark:bg-slate-800/60">
             <div className="flex flex-col items-center gap-3 text-sm text-slate-500 dark:text-slate-400">
               <div className="h-9 w-9 animate-spin rounded-full border-[3px] border-brand-secondary/25 border-t-brand-secondary" />
@@ -347,7 +382,7 @@ export default function ShareholderFillForm() {
           </div>
         )}
 
-        {selectedYear && !loadingDividend && !dividendData && (
+        {!blocked && selectedYear && !loadingDividend && !dividendData && (
           <div className="flex items-start gap-3 rounded-2xl border border-amber-200/80 bg-amber-50 px-4 py-4 text-amber-800 dark:border-amber-800/60 dark:bg-amber-950/40 dark:text-amber-200">
             <HiOutlineExclamationCircle className="mt-0.5 h-5 w-5 shrink-0" />
             <p className="text-sm font-medium">
@@ -357,55 +392,9 @@ export default function ShareholderFillForm() {
         )}
 
         {/* Compact summary + CTA */}
-        {dividendData && !loadingDividend && (
+        {!blocked && dividendData && !loadingDividend && (
           <>
-            <section className="overflow-hidden rounded-2xl border border-brand-secondary/20 bg-white shadow-sm dark:border-slate-700 dark:bg-slate-800/80">
-              <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 bg-gradient-to-r from-brand-primary/[0.06] via-white to-brand-secondary/[0.08] px-4 py-3 dark:border-slate-700 dark:from-brand-primary/20 dark:via-slate-800 dark:to-brand-secondary/10 sm:px-5">
-                <div className="flex min-w-0 items-center gap-2.5">
-                  <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-brand-primary text-white shadow-sm shadow-brand-primary/30">
-                    <HiOutlineChartBar className="h-5 w-5" />
-                  </div>
-                  <div className="min-w-0">
-                    <h2 className="truncate text-sm font-bold text-slate-900 dark:text-white sm:text-base">
-                      {t('fill.dividendSummary')}
-                    </h2>
-                    <p className="text-xs text-slate-500 dark:text-slate-400">
-                      FY {dividendData.fiscal_year}
-                      {dividendData.file_number
-                        ? ` · ${t('fill.fileNumber')} ${dividendData.file_number}`
-                        : ''}
-                    </p>
-                  </div>
-                </div>
-                <div className="rounded-full bg-brand-secondary/15 px-3 py-1 text-xs font-semibold text-brand-primary dark:text-brand-secondary">
-                  {t('fill.balanceLabel')}: {fmt(dividendData.total_dividend)} ETB
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-px bg-slate-100 dark:bg-slate-700 lg:grid-cols-4">
-                <Metric
-                  icon={HiOutlineWallet}
-                  label={t('dashboard.paidCapital')}
-                  value={fmt(dividendData.paidup_capital)}
-                />
-                <Metric
-                  icon={HiOutlineChartBar}
-                  label={t('dashboard.grossDividend')}
-                  value={fmt(dividendData.dividend_declared)}
-                />
-                <Metric
-                  icon={HiOutlineArrowPath}
-                  label={t('dashboard.broughtForward')}
-                  value={fmt(dividendData.dividend_bf)}
-                />
-                <Metric
-                  icon={HiOutlineBanknotes}
-                  label={t('dashboard.totalDividend')}
-                  value={fmt(dividendData.total_dividend)}
-                  highlight
-                />
-              </div>
-            </section>
+            <DividendSummaryCard record={dividendData} t={t} />
 
             <section
               className={`flex flex-col gap-3 rounded-2xl border p-4 shadow-lg sm:flex-row sm:items-center sm:justify-between sm:p-5 ${
@@ -943,29 +932,6 @@ function DecisionModal({
           </div>
         </form>
       </div>
-    </div>
-  );
-}
-
-function Metric({ icon: Icon, label, value, highlight = false }) {
-  return (
-    <div
-      className={`bg-white p-3.5 sm:p-4 dark:bg-slate-800 ${
-        highlight ? 'bg-gradient-to-br from-brand-secondary-soft to-white dark:from-brand-secondary/10 dark:to-slate-800' : ''
-      }`}
-    >
-      <div className="flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 sm:text-[11px]">
-        <Icon className={`h-3.5 w-3.5 ${highlight ? 'text-brand-secondary' : 'text-brand-primary/70'}`} />
-        <span className="truncate">{label}</span>
-      </div>
-      <p
-        className={`mt-1.5 text-base font-bold tabular-nums sm:text-lg ${
-          highlight ? 'text-brand-primary dark:text-brand-secondary' : 'text-slate-900 dark:text-white'
-        }`}
-      >
-        {value}
-        <span className="ml-1 text-[10px] font-medium text-slate-400 sm:text-xs">ETB</span>
-      </p>
     </div>
   );
 }

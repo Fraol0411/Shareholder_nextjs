@@ -100,6 +100,12 @@ export function Sidebar({ className, children, ...props }) {
         data-collapsed={collapsed ? 'true' : 'false'}
         data-mobile-open={mobileOpen ? 'true' : 'false'}
         className={cn(
+          // The operations rail is permanently dark, whatever the page beside it is
+          // using. globals.css declares the variant as `&:where(.dark, .dark *)`, so
+          // naming the class here turns on every dark: utility in this subtree — the
+          // sidebar renders exactly the colours it had in dark mode, with no second
+          // copy of those decisions to keep in sync.
+          'dark',
           'fixed inset-y-0 left-0 z-50 flex h-svh flex-col border-r border-slate-200/80 bg-white text-slate-900 transition-[width,transform] duration-200 ease-out dark:border-slate-800 dark:bg-slate-950 dark:text-slate-100',
           'w-[var(--sidebar-width)]',
           collapsed && 'md:w-[var(--sidebar-width-icon)]',

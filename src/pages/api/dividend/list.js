@@ -1,5 +1,9 @@
 // pages/api/dividend/list.js
 import { connect } from '../../../libs/db';
+import jwt from 'jsonwebtoken';
+
+const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-here';
+const OPERATOR_ROLES = ['admin', 'staff'];
 
 export default async function handler(req, res) {
   if (req.method !== 'GET') {
@@ -9,6 +13,20 @@ export default async function handler(req, res) {
   const authHeader = req.headers.authorization;
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
     return res.status(401).json({ message: 'Unauthorized' });
+  }
+
+  // The header used to be checked for existence only, so any string
+  // ("Bearer x") unlocked every shareholder's submission. Verify and require an
+  // operator role: this list is the staff form basket, not a self-service view.
+  let decoded;
+  try {
+    decoded = jwt.verify(authHeader.split(' ')[1], JWT_SECRET);
+  } catch {
+    return res.status(401).json({ message: 'Invalid or expired token' });
+  }
+
+  if (!OPERATOR_ROLES.includes(decoded.role)) {
+    return res.status(403).json({ message: 'Forbidden: staff access required' });
   }
 
   try {

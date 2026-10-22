@@ -6,7 +6,6 @@ import {
   FaClipboardList,
   FaCalendarAlt,
   FaMoneyBillWave,
-  FaExclamationCircle,
   FaCheckCircle,
   FaClock,
   FaTimesCircle,
@@ -16,7 +15,8 @@ import {
   FaChevronUp,
 } from 'react-icons/fa';
 import AppShell from '../../components/AppShell';
-import { getToken, getStoredUser } from '../../libs/auth';
+import { StatusNotice } from '../../components/ui/status-notice';
+import { getToken, getStoredUser, readApiError } from '../../libs/auth';
 import { useTranslation } from '../../components/LanguageProvider';
 
 const fmt = (v) =>
@@ -40,6 +40,8 @@ export default function MyDecisionsPage() {
   const [decisions, setDecisions] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
+  // A 403 with a reason code is the bank closing dividend data on purpose, not a fault.
+  const [errorIsNotice, setErrorIsNotice] = useState(false);
   const [expandedId, setExpandedId] = useState(null);
 
   useEffect(() => {
@@ -55,18 +57,21 @@ export default function MyDecisionsPage() {
   const fetchDecisions = async (token) => {
     setIsLoading(true);
     setError('');
+    setErrorIsNotice(false);
     try {
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/decisions/my-decisions`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      const data = await res.json();
-      // check if response has rows
-      if (!data || !data.decisions || data.decisions.length === 0) {
-        setDecisions([]);
-        setIsLoading(false);
+      // The status has to be read before the row count: a closed data-viewing switch
+      // answers 403 with no decisions, and that must read as "not available right now"
+      // rather than as an empty list.
+      if (!res.ok) {
+        const failure = await readApiError(res, 'Failed to load decisions');
+        setError(failure.message);
+        setErrorIsNotice(failure.tone === 'notice');
         return;
       }
-      if (!res.ok) throw new Error(data.message || 'Failed to load decisions');
+      const data = await res.json();
       setDecisions(data.decisions || []);
     } catch (err) {
       setError(err.message);
@@ -92,12 +97,13 @@ export default function MyDecisionsPage() {
           </p>
         </div>
 
-        {/* ── Error ── */}
+        {/* ── Error / closed data ── */}
         {error && (
-          <div className="mb-6 flex items-start gap-3 rounded-xl border border-red-100 bg-red-50 p-4 text-red-700 shadow-sm dark:border-red-900/70 dark:bg-red-950/40 dark:text-red-300">
-            <FaExclamationCircle className="mt-0.5 shrink-0" />
-            <span>{error}</span>
-          </div>
+          <StatusNotice
+            tone={errorIsNotice ? 'notice' : 'error'}
+            message={error}
+            className="mb-6"
+          />
         )}
 
         {/* ── Loading ── */}
@@ -119,7 +125,7 @@ export default function MyDecisionsPage() {
         )}
 
         {/* ── Empty State ── */}
-        {!isLoading && decisions.length === 0 && (
+        {!isLoading && !error && decisions.length === 0 && (
           <div className="flex flex-col items-center justify-center rounded-xl border border-sky-100 bg-white py-20 shadow-sm dark:border-slate-700 dark:bg-slate-800">
             <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-sky-50 dark:bg-slate-700">
               <FaFileInvoiceDollar className="text-3xl text-sky-300" />

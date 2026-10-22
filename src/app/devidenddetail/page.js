@@ -3,11 +3,14 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import {
-  FaCalendarAlt, FaWallet, FaChartLine, FaHistory, FaMoneyBillWave,
-  FaUser, FaIdCard, FaPhone, FaExclamationTriangle, FaBuilding,
+  FaCalendarAlt, FaHistory,
+  FaUser, FaIdCard, FaPhone,
+  FaBuilding,
   FaHashtag, FaPrint, FaCheck, FaUniversity, FaFileInvoiceDollar
 } from 'react-icons/fa';
 import AppShell from '../../components/AppShell';
+import { DividendSummaryCard } from '../../components/DividendSummaryCard';
+import { StatusNotice } from '../../components/ui/status-notice';
 import { useTranslation } from '../../components/LanguageProvider';
 import { getToken } from '../../libs/auth';
 
@@ -26,6 +29,10 @@ const DECISION_LABELS = {
   withdraw: 'decisions.withdraw',
 };
 
+// The summary card (balance hero, "as of" statement date) and the fiscal-year closing
+// logic behind it live in components/DividendSummaryCard, because /fillform shows the
+// same figures about the same record.
+
 export default function DividendDetail() {
   const { t } = useTranslation();
   const router = useRouter();
@@ -35,6 +42,9 @@ export default function DividendDetail() {
   const [record, setRecord] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
+  // A 403 with a reason code is a deliberate decision by the bank, not a failure —
+  // it is worded and coloured differently so it does not look like a broken portal.
+  const [errorIsNotice, setErrorIsNotice] = useState(false);
   const [myDecisions, setMyDecisions] = useState([]);
 
   useEffect(() => {
@@ -60,13 +70,25 @@ export default function DividendDetail() {
   const fetchDetails = async (currentRegNo, year) => {
     setIsLoading(true);
     setError('');
+    setErrorIsNotice(false);
     try {
       const url = year
         ? `${process.env.NEXT_PUBLIC_API_BASE_URL}/dividend-detail?reg_no=${encodeURIComponent(currentRegNo)}&fiscal_year=${encodeURIComponent(year)}`
         : `${process.env.NEXT_PUBLIC_API_BASE_URL}/dividend-detail?reg_no=${encodeURIComponent(currentRegNo)}`;
 
-      const res = await fetch(url);
-      if (!res.ok) throw new Error('Failed to fetch details');
+      const res = await fetch(url, {
+        // The server reads the registration number from this token rather than from
+        // the query string, so nobody can be shown another shareholder's record.
+        headers: { Authorization: `Bearer ${getToken()}` },
+      });
+      if (!res.ok) {
+        // 401/403 carry a reason worth reading out (closed for the fiscal season,
+        // account disabled...), so surface it instead of a generic failure.
+        const payload = await res.json().catch(() => ({}));
+        const failure = new Error(payload.message || 'Failed to fetch details');
+        failure.isNotice = res.status === 403 && Boolean(payload.code);
+        throw failure;
+      }
       const data = await res.json();
 
       setFiscalYears(data.fiscalYears || []);
@@ -85,6 +107,7 @@ export default function DividendDetail() {
       }
     } catch (err) {
       setError(err.message);
+      setErrorIsNotice(!!err.isNotice);
     } finally {
       setIsLoading(false);
     }
@@ -138,27 +161,19 @@ export default function DividendDetail() {
         {isLoading ? (
           <SkeletonLayout />
         ) : error ? (
-          <div className="flex items-start gap-3 rounded-xl border border-red-200 bg-red-50 p-4 text-red-700 dark:border-red-900/70 dark:bg-red-950/40 dark:text-red-300 sm:p-5">
-            <div className="shrink-0 rounded-lg bg-red-100 p-1.5 dark:bg-red-900/60">
-              <FaExclamationTriangle className="text-sm" />
-            </div>
-            <div>
-              <p className="text-sm font-semibold text-red-800 dark:text-red-200">Something went wrong</p>
-              <p className="mt-0.5 text-xs text-red-600 dark:text-red-300">{error}</p>
-            </div>
-          </div>
+          <StatusNotice tone={errorIsNotice ? 'notice' : 'error'} message={error} />
         ) : !record ? (
           <EmptyState />
         ) : (
           <div className="space-y-3 sm:space-y-4">
             <DividendSummaryCard record={record} t={t} />
 
-            <DecisionImpactCard
+            {/* <DecisionImpactCard
               decision={yearDecision}
               totalDividend={record.total_dividend}
               t={t}
               onFillDecision={() => router.push('/fillform')}
-            />
+            /> */}
 
             <ProfileCard record={record} />
           </div>
@@ -169,6 +184,11 @@ export default function DividendDetail() {
         @media print {
           header, footer, button, select, [role="listbox"] { display: none !important; }
           body { background: white !important; }
+          /* White hero text is unreadable if the gradient is dropped by the printer */
+          .balance-hero {
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+          }
         }
       `}</style>
     </AppShell>
@@ -362,82 +382,6 @@ function ImpactStat({ label, value, color, dot }) {
   );
 }
 
-function DividendSummaryCard({ record, t }) {
-  return (
-    <section className="overflow-hidden rounded-xl border border-brand-secondary/20 bg-white shadow-sm dark:border-slate-700 dark:bg-slate-800">
-      <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 bg-gradient-to-r from-brand-primary/[0.06] via-white to-brand-secondary/[0.08] px-3.5 py-3 dark:border-slate-700 dark:from-brand-primary/20 dark:via-slate-800 dark:to-brand-secondary/10 sm:px-4">
-        <div className="flex min-w-0 items-center gap-2.5">
-          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-brand-primary text-white shadow-sm shadow-brand-primary/30 sm:h-9 sm:w-9 sm:rounded-xl">
-            <FaMoneyBillWave className="text-sm" />
-          </div>
-          <div className="min-w-0">
-            <h3 className="truncate text-sm font-bold text-slate-900 dark:text-white">
-              {t('detail.summaryTitle')}
-            </h3>
-            <p className="text-[11px] text-slate-500 dark:text-slate-400">
-              {t('detail.fiscalYearBadge').replace('{year}', record.fiscal_year)}
-              {' · '}
-              {t('detail.declaredForward')}
-            </p>
-          </div>
-        </div>
-        <div className="rounded-full bg-brand-secondary/15 px-3 py-1 text-xs font-semibold text-brand-primary dark:text-brand-secondary">
-          {t('detail.total')}: {fmt(record.total_dividend)} ETB
-        </div>
-      </div>
-
-      <div className="grid grid-cols-2 gap-px bg-slate-100 dark:bg-slate-700 sm:grid-cols-4">
-        <SummaryMetric
-          icon={FaMoneyBillWave}
-          label={t('detail.total')}
-          value={fmt(record.total_dividend)}
-          highlight
-        />
-        <SummaryMetric
-          icon={FaWallet}
-          label={t('detail.paidCapital')}
-          value={fmt(record.paidup_capital)}
-        />
-        <SummaryMetric
-          icon={FaChartLine}
-          label={t('detail.declared')}
-          value={fmt(record.dividend_declared)}
-        />
-        <SummaryMetric
-          icon={FaHistory}
-          label={t('detail.broughtForward')}
-          value={fmt(record.dividend_bf)}
-        />
-      </div>
-    </section>
-  );
-}
-
-function SummaryMetric({ icon: Icon, label, value, highlight = false }) {
-  return (
-    <div
-      className={`bg-white p-3 sm:p-3.5 dark:bg-slate-800 ${
-        highlight
-          ? 'bg-gradient-to-br from-brand-secondary-soft to-white dark:from-brand-secondary/10 dark:to-slate-800'
-          : ''
-      }`}
-    >
-      <div className="flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-        <Icon className={`h-3 w-3 shrink-0 ${highlight ? 'text-brand-secondary' : 'text-brand-primary/70'}`} />
-        <span className="truncate">{label}</span>
-      </div>
-      <p
-        className={`mt-1 text-sm font-bold tabular-nums sm:text-base ${
-          highlight ? 'text-brand-primary dark:text-brand-secondary' : 'text-slate-900 dark:text-white'
-        }`}
-      >
-        {value}
-        <span className="ml-1 text-[10px] font-medium text-slate-400">ETB</span>
-      </p>
-    </div>
-  );
-}
-
 function FiscalYearDropdown({ years, selected, onSelect }) {
   const [open, setOpen] = useState(false);
   const { t } = useTranslation();
@@ -579,8 +523,13 @@ function SkeletonLayout() {
     <div className="animate-pulse space-y-3">
       <div className="overflow-hidden rounded-xl border border-slate-200 dark:border-slate-700">
         <div className="h-14 bg-slate-100 dark:bg-slate-700/60" />
-        <div className="grid grid-cols-2 gap-px bg-slate-100 dark:bg-slate-700 sm:grid-cols-4">
-          {[0, 1, 2, 3].map((i) => (
+        <div className="space-y-2.5 bg-slate-100 p-4 dark:bg-slate-700/60">
+          <div className="h-3 w-40 rounded bg-white/60 dark:bg-slate-800" />
+          <div className="h-10 w-64 rounded bg-white/60 dark:bg-slate-800" />
+          <div className="h-6 w-44 rounded-full bg-white/60 dark:bg-slate-800" />
+        </div>
+        <div className="grid grid-cols-1 gap-px bg-slate-100 dark:bg-slate-700 sm:grid-cols-3">
+          {[0, 1, 2].map((i) => (
             <div key={i} className="space-y-2 bg-white p-3 dark:bg-slate-800">
               <div className="h-2.5 w-16 rounded bg-slate-100 dark:bg-slate-700" />
               <div className="h-4 w-24 rounded bg-slate-100 dark:bg-slate-700" />

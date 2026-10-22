@@ -39,10 +39,17 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
-.qoder/plans/Theme_and_i18n_a18e7734.md
+
+# editor/agent workspace (plans, MCP config, screenshots and diffs produced while working)
+.qoder/
 
 Dockerfile
 docker-compose.yaml
 .env.local
 .dockerignore
-next.config.mjs
+next.config.mjs.qoder/
+.qoder/
+scripts/activation_campaign_management.sql
+scripts/activation_migration.sql
+scripts/approvals_migration.sql
+scripts/data_access_settings_migration.sql

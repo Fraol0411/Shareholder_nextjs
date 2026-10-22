@@ -3,6 +3,7 @@ import { connect } from '../../../libs/db';
 import jwt from 'jsonwebtoken';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-here';
+const OPERATOR_ROLES = ['admin', 'staff'];
 
 export default async function handler(req, res) {
   const { id } = req.query;
@@ -16,10 +17,19 @@ export default async function handler(req, res) {
     return res.status(401).json({ message: 'Unauthorized' });
   }
 
+  // This is one record of the staff form basket, and it used to accept any valid
+  // token with the id left to the caller - a shareholder could walk the ids and read
+  // everyone else's bank details. Verify the token and require an operator role, the
+  // same rule /dividend/list applies. Shareholders use /decisions/my-decisions.
+  let decoded;
   try {
-    jwt.verify(authHeader.split(' ')[1], JWT_SECRET);
-  } catch (err) {
+    decoded = jwt.verify(authHeader.split(' ')[1], JWT_SECRET);
+  } catch {
     return res.status(401).json({ message: 'Invalid or expired token' });
+  }
+
+  if (!OPERATOR_ROLES.includes(decoded.role)) {
+    return res.status(403).json({ message: 'Forbidden: staff access required' });
   }
 
   try {

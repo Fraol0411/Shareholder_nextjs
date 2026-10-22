@@ -65,7 +65,10 @@ export default function StaffFillForm() {
 
   // ── Load fiscal years ──
   useEffect(() => {
-    fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/fiscal-years`)
+    // Both endpoints are staff-only now, so the session token has to travel with them.
+    fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/fiscal-years`, {
+      headers: { Authorization: `Bearer ${getToken()}` },
+    })
       .then((r) => r.json())
       .then((data) => setFiscalYears(data || []))
       .catch(() => {});
@@ -81,7 +84,9 @@ export default function StaffFillForm() {
     setSelectedSH(null);
     resetForm();
 
-    fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/shareholders?fiscal_year=${encodeURIComponent(selectedYear)}`)
+    fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/shareholders?fiscal_year=${encodeURIComponent(selectedYear)}`, {
+      headers: { Authorization: `Bearer ${getToken()}` },
+    })
       .then((r) => r.json())
       .then((data) => setShareholders(data || []))
       .catch(() => setShareholders([]))

@@ -14,6 +14,7 @@ import {
   FaExclamationTriangle,
 } from 'react-icons/fa';
 import AppShell from '../../components/AppShell';
+import { Spinner } from '../../components/ui/loading';
 import { useTranslation } from '../../components/LanguageProvider';
 import { getStoredUser, getToken, isAdminRole, getRoleLabel } from '../../libs/auth';
 
@@ -30,7 +31,7 @@ export default function UserManagementPage() {
   const [authorized, setAuthorized] = useState(false);
   const [currentUser, setCurrentUser] = useState(null);
   const [users, setUsers] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true); // the list is fetched on mount
   const [searchTerm, setSearchTerm] = useState('');
   const [formData, setFormData] = useState(EMPTY_FORM);
   const [isSaving, setIsSaving] = useState(false);
@@ -346,7 +347,12 @@ export default function UserManagementPage() {
               <tbody className="divide-y divide-slate-100 dark:divide-slate-700">
                 {isLoading ? (
                   <tr>
-                    <td colSpan={4} className="px-4 py-10 text-center text-sm text-slate-500">{t('admin.loadingUsers')}</td>
+                    <td colSpan={4} className="px-4 py-10 text-center text-sm text-slate-500">
+                      <span className="inline-flex items-center gap-3">
+                        <Spinner className="h-5 w-5 border-2" />
+                        {t('admin.loadingUsers')}
+                      </span>
+                    </td>
                   </tr>
                 ) : paginatedUsers.length === 0 ? ( // Changed from filteredUsers to paginatedUsers
                   <tr>

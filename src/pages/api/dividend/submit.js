@@ -3,6 +3,7 @@ import { connect } from '../../../libs/db';
 import jwt from 'jsonwebtoken';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-here';
+const OPERATOR_ROLES = ['admin', 'staff'];
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -20,6 +21,13 @@ export default async function handler(req, res) {
     decoded = jwt.verify(token, JWT_SECRET);
   } catch (err) {
     return res.status(401).json({ message: 'Unauthorized: Invalid or expired token' });
+  }
+
+  // Every row this writes is entered on behalf of somebody else (entered_by), which
+  // is staff work: a shareholder filing their own decision goes through
+  // /api/decisions/submit, where the data-viewing switch applies.
+  if (!OPERATOR_ROLES.includes(decoded.role)) {
+    return res.status(403).json({ message: 'Forbidden: staff access required' });
   }
 
   const {

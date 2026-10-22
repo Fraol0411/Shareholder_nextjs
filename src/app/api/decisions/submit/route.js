@@ -1,27 +1,24 @@
 import { NextResponse } from 'next/server';
-import { Pool } from 'pg';
-import jwt from 'jsonwebtoken';
+import { getPool, requireDividendDataAccess } from '../../../../libs/serverAuth';
 
 export const runtime = 'nodejs';
-const pool = new Pool({ connectionString: process.env.DATABASE_URL });
-const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-here';
 
+/**
+ * POST /api/decisions/submit
+ *
+ * A shareholder's own dividend decision. It reads the balance being decided on and
+ * quotes it back in its validation messages, so it sits behind the same
+ * data-viewing switch as the read endpoints: closing access has to close the form
+ * as well as the statement, and a decision made while the book is shut cannot be
+ * honoured.
+ */
 export async function POST(request) {
+  const auth = await requireDividendDataAccess(request, { requireRegNo: false });
+  if (auth.error) return auth.error;
+
   try {
-    // ── Authenticate ──
-    const authHeader = request.headers.get('authorization');
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
-    }
-
-    let decoded;
-    try {
-      decoded = jwt.verify(authHeader.split(' ')[1], JWT_SECRET);
-    } catch {
-      return NextResponse.json({ message: 'Invalid token' }, { status: 401 });
-    }
-
-    const userId = decoded.id;
+    const pool = getPool();
+    const userId = auth.viewer.userId;
     const body = await request.json();
 
     const {

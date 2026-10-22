@@ -7,12 +7,12 @@ import {
   Home,
   FileText,
   ClipboardList,
-  ShieldCheck,
   Users,
   Lock,
   Upload,
   UserCircle,
   KeyRound,
+  Eye,
   LogOut,
   Building2,
   ChevronDown,
@@ -27,7 +27,6 @@ import {
   SidebarHeader,
   SidebarInset,
   SidebarMenu,
-  SidebarMenuBadge,
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarProvider,
@@ -36,14 +35,12 @@ import {
   useSidebar,
 } from './ui/sidebar';
 import { Separator } from './ui/separator';
-import { Badge } from './ui/badge';
 import ThemeToggle from './ThemeToggle';
 import LanguageSelector from './LanguageSelector';
 import ChangePasswordModal from './ChangePasswordModal';
 import Breadcrumbs from './Breadcrumbs';
 import Container from './Container';
 import { useTranslation } from './LanguageProvider';
-import { useApprovalsBadge } from '../hooks/useApprovalsBadge';
 import {
   getStoredUser,
   logout,
@@ -52,13 +49,7 @@ import {
 } from '../libs/auth';
 import { cn } from '../libs/utils';
 
-function formatBadgeCount(n) {
-  if (!n || n <= 0) return null;
-  if (n > 99) return '99+';
-  return String(n);
-}
-
-function OpsSidebarNav({ user, pendingApprovals }) {
+function OpsSidebarNav({ user }) {
   const pathname = usePathname();
   const { t } = useTranslation();
   const { setMobileOpen, collapsed } = useSidebar();
@@ -70,27 +61,27 @@ function OpsSidebarNav({ user, pendingApprovals }) {
     { href: '/formbasket', label: 'nav.decisions', icon: ClipboardList },
     { href: '/manage-shareholders', label: 'home.shareholderRegistry', icon: Building2 },
     { href: '/dividendupload', label: 'home.bulkDataUpload', icon: Upload },
-    { href: '/codegeneration', label:'nav.codegeneration',  icon: Upload}
   ];
 
   const administration = admin
     ? [
-        {
-          href: '/approvals',
-          label: 'nav.approvals',
-          icon: ShieldCheck,
-          badge: formatBadgeCount(pendingApprovals),
-          badgeTone: 'warning',
-        },
         { href: '/register', label: 'nav.register', icon: Users },
         { href: '/roles', label: 'nav.roles', icon: Lock },
+        // Campaign console (/codegeneration) is entered from here, not from the nav
+        { href: '/activation-dashboard', label: 'nav.activationDashboard', icon: KeyRound },
+        { href: '/data-access', label: 'nav.dataAccess', icon: Eye },
       ]
     : [];
 
-  const isActive = (href) => pathname === href || pathname.startsWith(`${href}/`);
+  // The campaign console is a sub-page of the activation dashboard, so the
+  // dashboard entry stays highlighted while it is open.
+  const isActive = (href) =>
+    pathname === href ||
+    pathname.startsWith(`${href}/`) ||
+    (href === '/activation-dashboard' && pathname.startsWith('/codegeneration'));
 
   const renderItems = (items) =>
-    items.map(({ href, label, icon: Icon, badge, badgeTone }) => {
+    items.map(({ href, label, icon: Icon }) => {
       const active = isActive(href);
       return (
         <SidebarMenuItem key={href}>
@@ -98,19 +89,6 @@ function OpsSidebarNav({ user, pendingApprovals }) {
             <Link href={href} onClick={() => setMobileOpen(false)}>
               <Icon className="h-4 w-4 shrink-0" />
               <span className={cn('truncate', collapsed && 'md:hidden')}>{t(label)}</span>
-              {badge && (
-                <SidebarMenuBadge
-                  className={cn(
-                    active
-                      ? 'bg-white/20 text-white'
-                      : badgeTone === 'warning'
-                        ? 'bg-amber-500 text-white shadow-sm shadow-amber-500/30'
-                        : 'bg-brand-secondary text-white'
-                  )}
-                >
-                  {badge}
-                </SidebarMenuBadge>
-              )}
             </Link>
           </SidebarMenuButton>
         </SidebarMenuItem>
@@ -261,10 +239,9 @@ function OpsSidebarUser({ user, onChangePassword, onLogout }) {
   );
 }
 
-function OpsTopBar({ pendingApprovals, isAdmin }) {
+function OpsTopBar() {
   const { t } = useTranslation();
   const pathname = usePathname();
-  const badge = formatBadgeCount(pendingApprovals);
 
   return (
     <header className="sticky top-0 z-30 flex h-14 items-center gap-2 border-b border-slate-200/80 bg-white/85 px-3 backdrop-blur-md dark:border-slate-800 dark:bg-slate-950/85 sm:px-4">
@@ -272,43 +249,21 @@ function OpsTopBar({ pendingApprovals, isAdmin }) {
       <Separator orientation="vertical" className="mx-1 hidden h-5 sm:block" />
       <div className="min-w-0 flex-1">
         <p className="truncate text-sm font-semibold text-slate-800 dark:text-slate-100">
-          {pathname.startsWith('/approvals')
-            ? t('nav.approvals')
-            : pathname.startsWith('/roles')
-              ? t('nav.roles')
-              : pathname.startsWith('/register')
-                ? t('nav.register')
-                : t('home.operationsCenter')}
+          {pathname.startsWith('/roles')
+            ? t('nav.roles')
+            : pathname.startsWith('/register')
+              ? t('nav.register')
+              : pathname.startsWith('/activation-dashboard')
+                ? t('nav.activationDashboard')
+                : pathname.startsWith('/codegeneration')
+                  ? t('nav.campaignConsole')
+                  : pathname.startsWith('/data-access')
+                    ? t('nav.dataAccess')
+                    : t('home.operationsCenter')}
         </p>
       </div>
 
       <div className="flex items-center gap-1.5">
-        {isAdmin && (
-          <Link
-            href="/approvals?status=pending"
-            className={cn(
-              'relative inline-flex h-9 items-center gap-2 rounded-full border px-2.5 text-xs font-semibold transition',
-              badge
-                ? 'border-amber-200 bg-amber-50 text-amber-800 hover:bg-amber-100 dark:border-amber-800 dark:bg-amber-950/40 dark:text-amber-200'
-                : 'border-slate-200 bg-white text-slate-600 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300'
-            )}
-            title={t('nav.approvals')}
-          >
-            <ShieldCheck className="h-4 w-4" />
-            <span className="hidden sm:inline">{t('nav.approvals')}</span>
-            {badge && (
-              <Badge variant="warning" className="animate-pulse">
-                {badge}
-              </Badge>
-            )}
-            {badge && (
-              <span className="absolute -right-0.5 -top-0.5 flex h-2.5 w-2.5 sm:hidden">
-                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-amber-400 opacity-75" />
-                <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-amber-500" />
-              </span>
-            )}
-          </Link>
-        )}
         <LanguageSelector />
         <ThemeToggle />
       </div>
@@ -318,43 +273,25 @@ function OpsTopBar({ pendingApprovals, isAdmin }) {
 
 export default function OpsShell({ children, className = '' }) {
   const router = useRouter();
-  const [user, setUser] = useState(null);
-  const [mounted, setMounted] = useState(false);
+  // The profile is read while rendering, not in an effect. This shell owns the
+  // sidebar and the header, and those must survive a page change untouched — a
+  // "loading" state here would blank the whole application chrome, so AppShell only
+  // reaches this component once the browser (and therefore localStorage) is available.
+  const [user, setUser] = useState(() => getStoredUser());
   const [changePasswordOpen, setChangePasswordOpen] = useState(false);
 
+  // Picks up a profile changed on another page (role or name edit) without ever
+  // hiding the rail while it does.
   useEffect(() => {
-    setMounted(true);
     setUser(getStoredUser());
   }, []);
 
-  const isAdmin = isAdminRole(user?.role);
-  const { pending, refresh } = useApprovalsBadge({
-    enabled: mounted && isAdmin,
-    intervalMs: 40000,
-  });
-
-  // Refresh badge when landing on approvals pages after actions
-  useEffect(() => {
-    if (!mounted || !isAdmin) return undefined;
-    const onFocus = () => refresh();
-    window.addEventListener('ops-approvals-changed', onFocus);
-    return () => window.removeEventListener('ops-approvals-changed', onFocus);
-  }, [mounted, isAdmin, refresh]);
-
   const shellUser = useMemo(() => user, [user]);
-
-  if (!mounted) {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-slate-50 dark:bg-slate-950">
-        <div className="h-10 w-10 animate-spin rounded-full border-4 border-brand-secondary/30 border-t-brand-secondary" />
-      </div>
-    );
-  }
 
   return (
     <SidebarProvider>
       <Sidebar>
-        <OpsSidebarNav user={shellUser} pendingApprovals={pending} />
+        <OpsSidebarNav user={shellUser} />
         <OpsSidebarUser
           user={shellUser}
           onChangePassword={() => setChangePasswordOpen(true)}
@@ -364,7 +301,7 @@ export default function OpsShell({ children, className = '' }) {
       </Sidebar>
 
       <SidebarInset className={className}>
-        <OpsTopBar pendingApprovals={pending} isAdmin={isAdmin} />
+        <OpsTopBar />
         <main className="w-full min-w-0 flex-1">
           <Container className="py-2 sm:py-3">
             <Breadcrumbs />
