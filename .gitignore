@@ -48,3 +48,4 @@ docker-compose.yaml
 .env.local
 .dockerignore
 next.config.mjs.qoder/
+.qoder/
