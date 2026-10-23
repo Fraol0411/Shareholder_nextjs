@@ -60,9 +60,46 @@ export function useCampaignActions() {
   );
 
   const reissueCampaign = useCallback(
-    (campaignId) => runCsvAction('PATCH', { campaignId, action: 'reissue' }, `activation_campaign_${campaignId}_reissued.csv`),
+    (campaignId, { deliverCsv = true } = {}) => {
+      if (deliverCsv) {
+        return runCsvAction(
+          'PATCH',
+          { campaignId, action: 'reissue', deliverCsv: true },
+          `activation_campaign_${campaignId}_reissued.csv`
+        );
+      }
+      return (async () => {
+        const res = await fetch('/api/activation/campaign', {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${getToken()}`,
+          },
+          body: JSON.stringify({ campaignId, action: 'reissue', deliverCsv: false }),
+        });
+        if (!res.ok) await readError(res, 'Failed to re-issue campaign');
+        return res.json();
+      })();
+    },
     [runCsvAction]
   );
+
+  const downloadCampaignCsv = useCallback(async (campaignId) => {
+    const res = await fetch('/api/activation/campaign', {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${getToken()}`,
+      },
+      body: JSON.stringify({ campaignId, action: 'download' }),
+    });
+    if (!res.ok) await readError(res, 'Failed to download CSV');
+    await saveCsv(res, `activation_campaign_${campaignId}.csv`);
+    return {
+      campaignId,
+      count: Number(res.headers.get('X-Invitation-Count')) || 0,
+    };
+  }, []);
 
   const disableCampaign = useCallback(async (campaignId) => {
     const res = await fetch('/api/activation/campaign', {
@@ -118,6 +155,7 @@ export function useCampaignActions() {
     act,
     createCampaign,
     reissueCampaign,
+    downloadCampaignCsv,
     disableCampaign,
     enableCampaign,
     deleteCampaign,

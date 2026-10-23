@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import {
   FaRocket, FaSyncAlt, FaInfoCircle, FaPauseCircle, FaPlayCircle,
-  FaTrashAlt, FaUndoAlt, FaTachometerAlt,
+  FaTrashAlt, FaUndoAlt, FaTachometerAlt, FaDownload,
 } from 'react-icons/fa';
 import AppShell from '../../components/AppShell';
 import ConfirmDialog from '../../components/ConfirmDialog';
@@ -90,11 +90,24 @@ function CampaignPanel({ campaign, isActing, onAction }) {
         <Button
           variant="secondary"
           disabled={isActing || !live}
-          title={live ? undefined : 'Enable the campaign first'}
+          title={live ? 'Replace all outstanding links with new ones' : 'Enable the campaign first'}
           onClick={() => onAction({ type: 'reissue', campaignId: campaign.id })}
         >
           <FaUndoAlt />
-          Re-issue links &amp; download CSV
+          Re-issue links
+        </Button>
+        <Button
+          variant="outline"
+          disabled={isActing || !campaign.invitations}
+          title={
+            campaign.invitations
+              ? 'Download SMS CSV from stored invitation messages'
+              : 'No invitations in this campaign yet'
+          }
+          onClick={() => onAction({ type: 'download', campaignId: campaign.id })}
+        >
+          <FaDownload />
+          Download CSV
         </Button>
         <Button
           variant="destructive"
@@ -125,7 +138,7 @@ export default function ActivationCampaignConsolePage() {
   const [confirm, setConfirm] = useState(null);
   const [confirmOpen, setConfirmOpen] = useState(false);
 
-  const { isActing, act, createCampaign, reissueCampaign, disableCampaign, enableCampaign, deleteCampaign } =
+  const { isActing, act, createCampaign, reissueCampaign, downloadCampaignCsv, disableCampaign, enableCampaign, deleteCampaign } =
     useCampaignActions();
 
   const defaultStart = new Date();
@@ -184,9 +197,14 @@ export default function ActivationCampaignConsolePage() {
           description: `${result.count} personalized invitations generated — the CSV download has started. Upload it to your SMS server.`,
         });
       } else if (confirm.type === 'reissue') {
-        const result = await act(() => reissueCampaign(confirm.campaignId));
+        const result = await act(() => reissueCampaign(confirm.campaignId, { deliverCsv: false }));
         toast.success(`Re-issued ${result.count} invitation(s)`, {
-          description: 'Links and codes sent so far for this campaign no longer work. The new CSV has been downloaded.',
+          description: 'Outstanding links and codes no longer work. Download CSV anytime to export messages.',
+        });
+      } else if (confirm.type === 'download') {
+        const result = await act(() => downloadCampaignCsv(confirm.campaignId));
+        toast.success('SMS CSV downloaded', {
+          description: `${result.count} message(s) exported from stored invitation data.`,
         });
       } else if (confirm.type === 'disable') {
         const data = await act(() => disableCampaign(confirm.campaignId));
@@ -234,9 +252,18 @@ export default function ActivationCampaignConsolePage() {
       bullets: [
         'Every link and code already sent for this campaign stops working immediately.',
         'Shareholders who have already activated are not invited again.',
-        'A new CSV is downloaded — hand it to the SMS server right away.',
+        'This does not download a file — use Download CSV to export messages already on file.',
       ],
-      confirmLabel: 'Re-issue & download CSV',
+      confirmLabel: 'Re-issue invitations',
+    }),
+    download: () => ({
+      title: `Download SMS CSV for campaign #${confirm.campaignId}?`,
+      description: 'Exports phone numbers and personalized messages from invitations already stored for this campaign.',
+      bullets: [
+        'Re-issue is not required — this uses the SMS text saved when links were issued.',
+        'Only shareholders who have not finished activation are included.',
+      ],
+      confirmLabel: 'Download CSV',
     }),
     disable: () => ({
       title: `Disable campaign #${confirm.campaignId}?`,
@@ -374,7 +401,7 @@ export default function ActivationCampaignConsolePage() {
                   <li className="flex gap-2.5"><span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-brand-secondary" />Covers shareholders whose phone number <b>and</b> National ID/TIN are on file — <b>{inviteable}</b> invitable right now.</li>
                   <li className="flex gap-2.5"><span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-brand-secondary" />Only <b>hashes</b> of the link token and code are stored — never the values themselves.</li>
                   <li className="flex gap-2.5"><span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-brand-secondary" />Links are single-use and expire after 72 hours or at campaign close, whichever is first.</li>
-                  <li className="flex gap-2.5"><span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-brand-secondary" />The downloaded CSV is the only copy of the links and codes; it can only be replaced by re-issuing new ones.</li>
+                  <li className="flex gap-2.5"><span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-brand-secondary" />SMS message text is stored with each invitation so you can download the CSV again without re-issuing.</li>
                 </ul>
 
                 <Button

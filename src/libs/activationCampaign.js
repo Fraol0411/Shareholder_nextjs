@@ -100,7 +100,7 @@ export async function generateInvitations(client, { campaignId, endsAt, baseUrl 
     // can never end up on another shareholder's message.
     const reference = maskNationalIdTail(user.national_id);
     const message =
-      `Awash Insurance: Activate your shareholder account: ${link} ` +
+      `Awash Insurance: Activate your shareholder account via this link: ${link} ` +
       `Verification code: ${code}. Valid until ${expiresAt.toLocaleDateString('en-GB')}. ` +
       `${reference ? `Reference ${reference}. ` : ''}Do not share this code.`;
     csvRows.push({ phone: toInternationalPhone(user.phone), message });

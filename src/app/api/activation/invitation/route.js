@@ -123,6 +123,7 @@ export async function POST(request) {
     const code = generateActivationCode();
     const tokenHash = sha256Hex(token);
     const codeHash = hashActivationCode(tokenHash, code);
+    const link = `${baseUrl}/accept-invitation?token=${token}`;
 
     const client = await pool.connect();
     try {
@@ -148,7 +149,7 @@ export async function POST(request) {
         message: 'New invitation created. Share the link and code with the shareholder now — they are not recoverable later.',
         activationId: inserted.rows[0].id,
         campaignId: campaign.id,
-        link: `${baseUrl}/accept-invitation?token=${token}`,
+        link,
         token,
         code,
         expiresAt,

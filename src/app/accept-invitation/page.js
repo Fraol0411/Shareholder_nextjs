@@ -142,7 +142,7 @@ export default function AcceptInvitationPage() {
   const handleSetPassword = async (event) => {
     event.preventDefault();
     setError('');
-    if (newPassword.length < 6) return setError('Password must be at least 6 characters long.');
+    if (newPassword.length < 8) return setError('Password must be at least 8 characters long.');
     if (newPassword !== confirmPassword) return setError('Passwords do not match.');
 
     setIsLoading(true);
@@ -272,7 +272,7 @@ export default function AcceptInvitationPage() {
             <label className="ml-1 text-sm font-semibold text-slate-700 dark:text-white">New Password</label>
             <div className="group relative">
               <div className="absolute inset-y-0 left-0 flex items-center pl-4 text-slate-400"><HiOutlineLockClosed className="h-[18px] w-[18px]" strokeWidth={1.75} /></div>
-              <input type={showNewPwd ? 'text' : 'password'} value={newPassword} onChange={(e) => setNewPassword(e.target.value)} placeholder="Create a password (min 6 characters)" autoComplete="new-password" className={inputClsWithToggle} minLength={6} required />
+              <input type={showNewPwd ? 'text' : 'password'} value={newPassword} onChange={(e) => setNewPassword(e.target.value)} placeholder="Create a password (min 8 characters)" autoComplete="new-password" className={inputClsWithToggle} minLength={8} required />
               <button type="button" onClick={() => setShowNewPwd((v) => !v)} className="absolute inset-y-0 right-0 flex items-center pr-4 text-slate-400 hover:text-slate-600 dark:text-slate-500 dark:hover:text-slate-300">
                 {showNewPwd ? <HiOutlineEyeSlash className="h-[18px] w-[18px]" strokeWidth={1.75} /> : <HiOutlineEye className="h-[18px] w-[18px]" strokeWidth={1.75} />}
               </button>
@@ -282,7 +282,7 @@ export default function AcceptInvitationPage() {
             <label className="ml-1 text-sm font-semibold text-slate-700 dark:text-white">Confirm Password</label>
             <div className="group relative">
               <div className="absolute inset-y-0 left-0 flex items-center pl-4 text-slate-400"><HiOutlineKey className="h-[18px] w-[18px]" strokeWidth={1.75} /></div>
-              <input type={showConfirmPwd ? 'text' : 'password'} value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} placeholder="Re-enter your password" autoComplete="new-password" className={inputClsWithToggle} minLength={6} required />
+              <input type={showConfirmPwd ? 'text' : 'password'} value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} placeholder="Re-enter your password" autoComplete="new-password" className={inputClsWithToggle} minLength={8} required />
               <button type="button" onClick={() => setShowConfirmPwd((v) => !v)} className="absolute inset-y-0 right-0 flex items-center pr-4 text-slate-400 hover:text-slate-600 dark:text-slate-500 dark:hover:text-slate-300">
                 {showConfirmPwd ? <HiOutlineEyeSlash className="h-[18px] w-[18px]" strokeWidth={1.75} /> : <HiOutlineEye className="h-[18px] w-[18px]" strokeWidth={1.75} />}
               </button>

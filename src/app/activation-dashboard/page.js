@@ -6,7 +6,7 @@ import { toast } from 'sonner';
 import {
   FaRocket, FaSyncAlt, FaSearch, FaKey, FaUserSlash, FaCopy,
   FaExclamationTriangle, FaCheckCircle, FaClipboardList, FaShieldAlt,
-  FaPauseCircle, FaPlayCircle, FaUndoAlt, FaTrashAlt,
+  FaPauseCircle, FaPlayCircle, FaUndoAlt, FaTrashAlt, FaDownload,
 } from 'react-icons/fa';
 import AppShell from '../../components/AppShell';
 import ConfirmDialog from '../../components/ConfirmDialog';
@@ -56,7 +56,7 @@ export default function ActivationDashboardPage() {
   const [confirm, setConfirm] = useState(null); // { kind, ...context }
   const [confirmOpen, setConfirmOpen] = useState(false);
 
-  const { isActing, act, reissueCampaign, disableCampaign, enableCampaign, deleteCampaign } =
+  const { isActing, act, reissueCampaign, downloadCampaignCsv, disableCampaign, enableCampaign, deleteCampaign } =
     useCampaignActions();
   const [isInvitationActing, setIsInvitationActing] = useState(false);
   const busy = isActing || isInvitationActing;
@@ -152,9 +152,14 @@ export default function ActivationDashboardPage() {
     const { action, campaign } = confirm;
     try {
       if (action === 'reissue') {
-        const result = await act(() => reissueCampaign(campaign.id));
+        const result = await act(() => reissueCampaign(campaign.id, { deliverCsv: false }));
         toast.success(`Re-issued ${result.count} invitation(s)`, {
-          description: 'Links and codes sent so far for this campaign no longer work. The new CSV has been downloaded.',
+          description: 'Outstanding links and codes for this campaign no longer work. Download CSV anytime to get the SMS file.',
+        });
+      } else if (action === 'download') {
+        const result = await act(() => downloadCampaignCsv(campaign.id));
+        toast.success('SMS CSV downloaded', {
+          description: `${result.count} message(s) exported from stored invitation data. Upload the file to your SMS server.`,
         });
       } else if (action === 'disable') {
         const payload = await act(() => disableCampaign(campaign.id));
@@ -261,9 +266,20 @@ export default function ActivationDashboardPage() {
               bullets: [
                 'Every link and code already sent for this campaign stops working immediately.',
                 'Shareholders who have already activated are not invited again.',
-                'A new CSV is downloaded for the SMS server — it is the only copy of the new links.',
+                'This does not download a file — use Download CSV to export messages already on file.',
               ],
-              confirmLabel: 'Re-issue & download CSV',
+              confirmLabel: 'Re-issue invitations',
+            };
+          }
+          if (confirm.action === 'download') {
+            return {
+              title: `Download SMS CSV for campaign #${c.id}?`,
+              description: 'Exports phone numbers and personalized messages from invitations already stored for this campaign.',
+              bullets: [
+                'Re-issue is not required — this uses the SMS text saved when links were issued.',
+                'Only shareholders who have not finished activation are included.',
+              ],
+              confirmLabel: 'Download CSV',
             };
           }
           return {
@@ -427,10 +443,22 @@ export default function ActivationDashboardPage() {
                         <button
                           onClick={() => openConfirmation({ scope: 'campaign', action: 'reissue', campaign: row })}
                           disabled={busy || row.status !== 'live'}
-                          title={row.status === 'live' ? 'Replace all outstanding links with new ones and download a fresh CSV' : 'Only the live campaign can be re-issued'}
+                          title={row.status === 'live' ? 'Replace all outstanding links with new ones' : 'Only the live campaign can be re-issued'}
                           className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 px-2.5 py-1.5 text-xs font-semibold text-slate-700 transition-colors hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-600 dark:text-slate-200 dark:hover:bg-slate-700"
                         >
                           <FaUndoAlt /> Re-issue
+                        </button>
+                        <button
+                          onClick={() => openConfirmation({ scope: 'campaign', action: 'download', campaign: row })}
+                          disabled={busy || !row.invitations}
+                          title={
+                            row.invitations
+                              ? 'Download SMS CSV from stored invitation messages'
+                              : 'No invitations in this campaign yet'
+                          }
+                          className="inline-flex items-center gap-1.5 rounded-lg border border-sky-200 px-2.5 py-1.5 text-xs font-semibold text-sky-700 transition-colors hover:bg-sky-50 disabled:cursor-not-allowed disabled:opacity-50 dark:border-sky-900/70 dark:text-sky-300 dark:hover:bg-sky-950/40"
+                        >
+                          <FaDownload /> Download CSV
                         </button>
                         <button
                           onClick={() => openConfirmation({ scope: 'campaign', action: 'delete', campaign: row })}

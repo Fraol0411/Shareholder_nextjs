@@ -3,6 +3,7 @@ import { getPool, requireAdmin } from '../../../../libs/serverAuth';
 import {
   generateInvitations, countInvitableUsers, csvResponse,
 } from '../../../../libs/activationCampaign';
+import { saveCampaignCsv, loadCampaignCsv, deleteCampaignCsv } from '../../../../libs/campaignCsvStore';
 
 const CAMPAIGN_SELECT = `
   SELECT c.id, c.starts_at, c.ends_at, c.status, c.disabled_at,
@@ -142,6 +143,9 @@ export async function POST(request) {
       }
 
       await client.query('COMMIT');
+      // Cache the file server-side so it can be re-downloaded later without a
+      // fresh re-issue. Raw links/codes never go into PostgreSQL.
+      await saveCampaignCsv(campaignId, csv);
       return csvResponse(csv, campaignId, {
         'X-Campaign-Id': String(campaignId),
         'X-Invitation-Count': String(count),
@@ -164,25 +168,28 @@ export async function POST(request) {
 
 /**
  * PATCH /api/activation/campaign  (admin only)
- * Body: { campaignId, action: 'disable' | 'enable' | 'reissue' }
+ * Body: { campaignId, action: 'disable' | 'enable' | 'reissue' | 'download' }
  *
  * - disable: pause the campaign — every link/code of the campaign stops working
  *   immediately, without deleting anything. Reversible with 'enable'.
  * - enable: make a disabled campaign live again (fails if another campaign is
  *   already live — only one at a time).
- * - reissue: replace this campaign's outstanding invitations with brand-new
- *   links/codes and return a fresh CSV. Already-activated shareholders are left
- *   alone. Response is text/csv.
+ * - reissue: replace outstanding invitations with brand-new links/codes and save the
+ *   generated CSV server-side. With deliverCsv: true (default) the response is text/csv;
+ *   with deliverCsv: false the response is JSON (the file stays available to download).
+ * - download: stream the SMS CSV saved on disk when this campaign was last issued —
+ *   independent of re-issue and requiring no schema change.
  */
 export async function PATCH(request) {
   const auth = requireAdmin(request);
   if (auth.error) return auth.error;
 
-  let campaignId, action;
+  let campaignId, action, deliverCsv;
   try {
     const body = await request.json();
     campaignId = Number(body.campaignId);
     action = body.action;
+    deliverCsv = body.deliverCsv !== false;
   } catch {
     return jsonError('Invalid request body');
   }
@@ -190,8 +197,8 @@ export async function PATCH(request) {
   if (!Number.isInteger(campaignId) || campaignId <= 0) {
     return jsonError('A valid campaignId is required');
   }
-  if (!['disable', 'enable', 'reissue'].includes(action)) {
-    return jsonError('action must be disable, enable or reissue');
+  if (!['disable', 'enable', 'reissue', 'download'].includes(action)) {
+    return jsonError('action must be disable, enable, reissue or download');
   }
 
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || new URL(request.url).origin;
@@ -244,6 +251,24 @@ export async function PATCH(request) {
       return NextResponse.json({ message: `Campaign #${campaignId} is live again.${note ? ` ${note}` : ''}`, campaign: reloaded });
     }
 
+    if (action === 'download') {
+      // Serve the CSV cached on disk when this campaign's links were last issued.
+      // Schema-free: raw links/codes never live in PostgreSQL, so the generated
+      // file is kept server-side for re-download without a fresh re-issue.
+      const stored = await loadCampaignCsv(campaignId);
+      if (!stored || stored.count === 0) {
+        return jsonError(
+          'No saved SMS CSV for this campaign yet. Create or re-issue invitations once to generate the file, then download it anytime.',
+          404
+        );
+      }
+
+      return csvResponse(stored.csv, campaignId, {
+        'X-Campaign-Id': String(campaignId),
+        'X-Invitation-Count': String(stored.count),
+      });
+    }
+
     // ---------- reissue ----------
     if (target.status !== 'live') {
       return jsonError('Only the live campaign can be re-issued. Enable it first.');
@@ -258,9 +283,22 @@ export async function PATCH(request) {
       await client.query('COMMIT');
 
       if (count === 0) return jsonError('No shareholder is invitable in this campaign right now.');
-      return csvResponse(csv, campaignId, {
-        'X-Campaign-Id': String(campaignId),
-        'X-Invitation-Count': String(count),
+
+      // Keep the freshly generated file on disk so Download CSV works without
+      // re-running the issuance.
+      await saveCampaignCsv(campaignId, csv);
+
+      if (deliverCsv) {
+        return csvResponse(csv, campaignId, {
+          'X-Campaign-Id': String(campaignId),
+          'X-Invitation-Count': String(count),
+        });
+      }
+
+      return NextResponse.json({
+        message: `Re-issued ${count} invitation(s). Links and codes sent so far for this campaign no longer work.`,
+        campaignId,
+        count,
       });
     } catch (error) {
       await client.query('ROLLBACK');
@@ -313,6 +351,8 @@ export async function DELETE(request) {
       [campaignId]
     );
     if (deleted.rows.length === 0) return jsonError('Campaign was already deleted — refresh the list', 409);
+
+    await deleteCampaignCsv(campaignId);
 
     return NextResponse.json({
       message: `Campaign #${campaignId} deleted with its ${target.invitations} invitation record(s). Activated shareholder accounts were not affected.`,

@@ -5,15 +5,6 @@ import { getPool, getJwtSecret } from '../../../../libs/serverAuth';
 
 const DEFAULT_PASSWORD = 'shareholder@awash';
 
-/**
- * POST /api/activation/set-password
- * Body: { setupToken, newPassword }
- *
- * Accepts ONLY the short-lived purpose-restricted setup token issued by
- * /api/activation/verify — identity verification cannot be bypassed by
- * calling this endpoint directly. Hashes the new password, activates the
- * account and marks the invitation as completed.
- */
 export async function POST(request) {
   let setupToken, newPassword;
   try {
@@ -27,8 +18,8 @@ export async function POST(request) {
   if (!setupToken) {
     return NextResponse.json({ message: 'Your setup session is missing. Please restart activation.' }, { status: 401 });
   }
-  if (newPassword.length < 6) {
-    return NextResponse.json({ message: 'Password must be at least 6 characters long' }, { status: 400 });
+  if (newPassword.length < 8) {
+    return NextResponse.json({ message: 'Password must be at least 8 characters long' }, { status: 400 });
   }
   if (newPassword === DEFAULT_PASSWORD) {
     return NextResponse.json({ message: 'New password must be different from the default password' }, { status: 400 });

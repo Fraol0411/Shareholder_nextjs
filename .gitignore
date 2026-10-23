@@ -43,6 +43,9 @@ next-env.d.ts
 # editor/agent workspace (plans, MCP config, screenshots and diffs produced while working)
 .qoder/
 
+# server-side campaign SMS CSV cache (contains raw activation links/codes)
+/.data/
+
 Dockerfile
 docker-compose.yaml
 .env.local

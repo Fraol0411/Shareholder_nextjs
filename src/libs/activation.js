@@ -40,7 +40,8 @@ export function timingSafeHexEqual(a, b) {
 
 /** Random 64-char (256-bit) activation link token. */
 export function generateActivationToken() {
-  return crypto.randomBytes(32).toString('hex');
+  //return crypto.randomBytes(32).toString('hex');
+    return crypto.randomBytes(12).toString('base64url');
 }
 
 /**
