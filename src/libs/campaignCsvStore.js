@@ -1,8 +1,14 @@
 import fs from 'fs/promises';
 import path from 'path';
 
-/** Server-side copy of each campaign SMS CSV (links/codes are not stored in PostgreSQL). */
-const ROOT = path.join(process.cwd(), '.data', 'campaign-csv');
+/**
+ * Server-side copy of each campaign SMS CSV (links/codes are not stored in PostgreSQL).
+ * Defaults to <cwd>/.data/campaign-csv (works for local dev). In containerized
+ * deployments point CAMPAIGN_CSV_DIR at a writable, persisted volume path.
+ */
+const ROOT = process.env.CAMPAIGN_CSV_DIR
+  ? path.resolve(process.env.CAMPAIGN_CSV_DIR)
+  : path.join(process.cwd(), '.data', 'campaign-csv');
 
 function filePath(campaignId) {
   return path.join(ROOT, `${campaignId}.csv`);
