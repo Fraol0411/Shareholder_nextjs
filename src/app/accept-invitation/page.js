@@ -14,7 +14,7 @@ import LanguageSelector from '../../components/LanguageSelector';
 import { useTranslation } from '../../components/LanguageProvider';
 import { ArrowRight, ArrowRightFromLine } from 'lucide-react';
 
-const API = process.env.NEXT_PUBLIC_API_BASE_URL || '/api';
+const API = process.env.NEXT_PUBLIC_API_BASE_URL || '';
 
 export default function AcceptInvitationPage() {
   const router = useRouter();

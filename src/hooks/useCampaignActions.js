@@ -29,14 +29,14 @@ async function readError(response, fallback) {
  * Client-side actions for the single activation campaign:
  * create (CSV download), re-issue (fresh CSV), disable, enable, delete.
  * Shared by the Campaign Console and the Activation Dashboard so both surfaces
- * talk to /api/activation/campaign the same way.
+ * talk to /activation/campaign the same way.
  */
 export function useCampaignActions() {
   const [isActing, setIsActing] = useState(false);
 
   /** POST/PATCH that answer with a CSV — returns { campaignId, count }. */
   const runCsvAction = useCallback(async (method, body, fallbackName) => {
-    const res = await fetch('/api/activation/campaign', {
+    const res = await fetch('/activation/campaign', {
       method,
       headers: {
         'Content-Type': 'application/json',
@@ -69,7 +69,7 @@ export function useCampaignActions() {
         );
       }
       return (async () => {
-        const res = await fetch('/api/activation/campaign', {
+        const res = await fetch('/activation/campaign', {
           method: 'PATCH',
           headers: {
             'Content-Type': 'application/json',
@@ -85,7 +85,7 @@ export function useCampaignActions() {
   );
 
   const downloadCampaignCsv = useCallback(async (campaignId) => {
-    const res = await fetch('/api/activation/campaign', {
+    const res = await fetch('/activation/campaign', {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',
@@ -102,7 +102,7 @@ export function useCampaignActions() {
   }, []);
 
   const disableCampaign = useCallback(async (campaignId) => {
-    const res = await fetch('/api/activation/campaign', {
+    const res = await fetch('/activation/campaign', {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',
@@ -115,7 +115,7 @@ export function useCampaignActions() {
   }, []);
 
   const enableCampaign = useCallback(async (campaignId) => {
-    const res = await fetch('/api/activation/campaign', {
+    const res = await fetch('/activation/campaign', {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',
@@ -128,7 +128,7 @@ export function useCampaignActions() {
   }, []);
 
   const deleteCampaign = useCallback(async (campaignId, confirm) => {
-    const res = await fetch('/api/activation/campaign', {
+    const res = await fetch('/activation/campaign', {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json',

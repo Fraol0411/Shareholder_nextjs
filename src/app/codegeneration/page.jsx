@@ -160,7 +160,7 @@ export default function ActivationCampaignConsolePage() {
     setIsLoading(true);
     setLoadError(null);
     try {
-      const res = await fetch('/api/activation/campaign', {
+      const res = await fetch('/activation/campaign', {
         headers: { Authorization: `Bearer ${getToken()}` },
       });
       const data = await res.json();

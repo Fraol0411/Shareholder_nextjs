@@ -79,7 +79,7 @@ export default function ActivationDashboardPage() {
       if (status) params.set('status', status);
       if (q.trim()) params.set('q', q.trim());
 
-      const res = await fetch(`/api/activation/dashboard?${params.toString()}`, {
+      const res = await fetch(`/activation/dashboard?${params.toString()}`, {
         headers: { Authorization: `Bearer ${getToken()}` },
       });
       const payload = await res.json();
@@ -117,7 +117,7 @@ export default function ActivationDashboardPage() {
     const { row, action } = confirm;
     setIsInvitationActing(true);
     try {
-      const res = await fetch('/api/activation/invitation', {
+      const res = await fetch('/activation/invitation', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${getToken()}` },
         // Shareholders of a disabled campaign get their new link in the live campaign
