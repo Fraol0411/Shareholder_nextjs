@@ -91,7 +91,7 @@ export async function generateInvitations(client, { campaignId, endsAt, baseUrl 
     // each other and to exactly one shareholder.
     codeHashes.push(hashActivationCode(tokenHash, code));
 
-    const link = `${baseUrl}/accept-invitation?token=${token}`;
+    const link = `${baseUrl}/shareholder/accept-invitation?token=${token}`;
     // Every invitation carries the reference, not just the ones whose phone number
     // happens to be shared — one consistent sentence for all 1,500-odd messages
     // means staff and shareholders learn one thing, and a phone that gains a
