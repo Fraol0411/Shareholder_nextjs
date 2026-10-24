@@ -52,7 +52,7 @@ export default function AcceptInvitationPage() {
     setToken(t0);
 
     // Check the campaign window, and this link's own state, before showing the form
-    fetch(`${API}/activation/status?token=${encodeURIComponent(t0)}`)
+    fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/activation/status?token=${encodeURIComponent(t0)}`)
       .then((res) => res.json())
       .then((data) => {
         setCampaign(data);
@@ -110,7 +110,7 @@ export default function AcceptInvitationPage() {
 
     setIsLoading(true);
     try {
-      const res = await fetch(`${API}/activation/verify`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/activation/verify`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ token, nationalId: nationalId.trim(), code: code.trim() }),
@@ -147,7 +147,7 @@ export default function AcceptInvitationPage() {
 
     setIsLoading(true);
     try {
-      const res = await fetch(`${API}/activation/set-password`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/activation/set-password`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ setupToken, newPassword }),

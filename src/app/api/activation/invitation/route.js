@@ -123,7 +123,7 @@ export async function POST(request) {
     const code = generateActivationCode();
     const tokenHash = sha256Hex(token);
     const codeHash = hashActivationCode(tokenHash, code);
-    const link = `${baseUrl}/accept-invitation?token=${token}`;
+    const link = `${baseUrl}/shareholder/accept-invitation?token=${token}`;
 
     const client = await pool.connect();
     try {
