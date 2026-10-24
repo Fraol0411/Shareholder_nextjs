@@ -177,7 +177,7 @@ export default function DataAccessPage() {
       if (!silent) setIsLoading(true);
       try {
         const params = query.trim() ? `?q=${encodeURIComponent(query.trim())}` : '';
-        const res = await fetch(`/admin/data-access${params}`, {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/admin/data-access${params}`, {
           headers: { Authorization: `Bearer ${getToken()}` },
         });
         if (res.status === 401) {
@@ -241,7 +241,7 @@ export default function DataAccessPage() {
     setState((prev) => (prev ? { ...prev, enabled } : prev));
     setIsSavingGlobal(true);
     try {
-      const res = await fetch('/admin/data-access', {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/admin/data-access`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${getToken()}` },
         body: JSON.stringify({ enabled }),
@@ -265,7 +265,7 @@ export default function DataAccessPage() {
   const saveNote = async () => {
     setIsSavingNote(true);
     try {
-      const res = await fetch('/admin/data-access', {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/admin/data-access`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${getToken()}` },
         body: JSON.stringify({ enabled: !!state?.enabled, note: noteDraft }),
@@ -303,7 +303,7 @@ export default function DataAccessPage() {
     patch(blocked, blocked ? 'disabled' : 'active', blocked ? 1 : -1);
     setSavingUserId(row.userId);
     try {
-      const res = await fetch('/admin/data-access', {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/admin/data-access`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${getToken()}` },
         body: JSON.stringify({ userId: row.userId, action: blocked ? 'disable' : 'enable' }),
