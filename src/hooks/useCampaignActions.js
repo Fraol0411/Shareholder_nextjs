@@ -36,7 +36,7 @@ export function useCampaignActions() {
 
   /** POST/PATCH that answer with a CSV — returns { campaignId, count }. */
   const runCsvAction = useCallback(async (method, body, fallbackName) => {
-    const res = await fetch('/activation/campaign', {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/activation/campaign`, {
       method,
       headers: {
         'Content-Type': 'application/json',
@@ -69,7 +69,7 @@ export function useCampaignActions() {
         );
       }
       return (async () => {
-        const res = await fetch('/activation/campaign', {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/activation/campaign`, {
           method: 'PATCH',
           headers: {
             'Content-Type': 'application/json',
@@ -85,7 +85,7 @@ export function useCampaignActions() {
   );
 
   const downloadCampaignCsv = useCallback(async (campaignId) => {
-    const res = await fetch('/activation/campaign', {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/activation/campaign`, {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',
@@ -102,7 +102,7 @@ export function useCampaignActions() {
   }, []);
 
   const disableCampaign = useCallback(async (campaignId) => {
-    const res = await fetch('/activation/campaign', {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/activation/campaign`, {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',
@@ -115,7 +115,7 @@ export function useCampaignActions() {
   }, []);
 
   const enableCampaign = useCallback(async (campaignId) => {
-    const res = await fetch('/activation/campaign', {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/activation/campaign`, {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',
@@ -128,7 +128,7 @@ export function useCampaignActions() {
   }, []);
 
   const deleteCampaign = useCallback(async (campaignId, confirm) => {
-    const res = await fetch('/activation/campaign', {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/activation/campaign`, {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json',
