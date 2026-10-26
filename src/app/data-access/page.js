@@ -251,7 +251,7 @@ export default function DataAccessPage() {
       // One careless flip must never leave the whole portal shut by accident.
       toast.success(payload.message, {
         duration: 8000,
-        action: { label: 'Undo', onClick: () => setGlobalEnabled(previous) },
+        action: {  onClick: () => setGlobalEnabled(previous) },
       });
       await load({ silent: true });
     } catch (err) {
@@ -312,7 +312,7 @@ export default function DataAccessPage() {
       if (!res.ok) throw new Error(payload.message || 'We could not update that shareholder. Please try again.');
 
       toast.success(blocked ? `${row.name} can no longer view dividend data.` : `${row.name} can view dividend data again.`, {
-        action: { label: 'Undo', onClick: () => setRowBlocked(row, !blocked) },
+        action: {  onClick: () => setRowBlocked(row, !blocked) },
       });
       // Re-read the list so a restored shareholder leaves the “Blocked” view.
       await load({ silent: true });
