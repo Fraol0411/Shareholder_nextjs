@@ -112,9 +112,14 @@ export async function generateInvitations(client, { campaignId, endsAt, baseUrl 
     [campaignId, userIds, tokenHashes, codeHashes, expiresAt]
   );
 
+  // Exported as "CSV UTF-8 (Comma delimited)" — the file type the SMS gateway
+  // expects: UTF-8 BOM + CRLF line endings. The phone is written as raw digits
+  // exactly as stored (251 + 964308437 = 251964308437). Excel's scientific
+  // notation is only a cell-display artifact; the file bytes the gateway reads
+  // keep the full, unprefixed number.
   const csv =
-    'phone_number,message\n' +
-    csvRows.map((row) => `${row.phone},"${row.message.replace(/"/g, '""')}"`).join('\n');
+    '\uFEFFphone_number,message\r\n' +
+    csvRows.map((row) => `${row.phone},"${row.message.replace(/"/g, '""')}"`).join('\r\n');
 
   return { count: csvRows.length, csv, expiresAt };
 }
@@ -124,7 +129,7 @@ export function csvResponse(csv, campaignId, headers = {}) {
   return new Response(csv, {
     status: 200,
     headers: {
-      'Content-Type': 'text/csv',
+      'Content-Type': 'text/csv; charset=utf-8',
       'Content-Disposition': `attachment; filename="activation_campaign_${campaignId}.csv"`,
       ...headers,
     },
