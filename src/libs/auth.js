@@ -59,6 +59,10 @@ export async function readApiError(res, fallback = 'Please try again.') {
   return {
     tone: res.status === 403 && payload.code ? 'notice' : 'error',
     message: payload.message || fallback,
+    // The reason code and, for a deliberate closure, the full structured notice,
+    // so a page can render the rich shareholder card instead of a one-liner.
+    code: payload.code || null,
+    notice: payload.notice || null,
   };
 }
 

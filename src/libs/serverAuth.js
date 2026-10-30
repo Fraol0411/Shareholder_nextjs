@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { Pool } from 'pg';
 import jwt from 'jsonwebtoken';
+import { parseNotice, noticeSummaryText } from './shareholderNotice';
 
 const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-here';
@@ -145,8 +146,15 @@ export async function setSystemSetting(key, value, updatedBy = null) {
 
 export async function getDataViewingState() {
   const value = await getSystemSetting(DATA_VIEWING_KEY, 'on');
-  const note = await getSystemSetting(DATA_VIEWING_NOTE_KEY, '');
-  return { enabled: value !== 'off', note: (note || '').trim() };
+  const raw = await getSystemSetting(DATA_VIEWING_NOTE_KEY, '');
+  const { notice, legacyText } = parseNotice(raw);
+  // `note` stays a plain string for anything that only reads text; `notice` carries
+  // the structured document for screens that render the full card.
+  return {
+    enabled: value !== 'off',
+    notice,
+    note: notice ? noticeSummaryText(notice) : legacyText,
+  };
 }
 
 /**
@@ -203,13 +211,16 @@ export async function requireDividendDataAccess(request, { requireRegNo = true }
       };
     }
 
-    const { enabled, note } = await getDataViewingState();
+    const { enabled, note, notice } = await getDataViewingState();
     if (!enabled) {
       return {
         error: NextResponse.json(
           {
             code: 'DATA_VIEWING_CLOSED',
-            message: note || 'Dividend data viewing is temporarily closed. Please check back later.',
+            message: notice
+              ? noticeSummaryText(notice)
+              : note || 'Dividend data viewing is temporarily closed. Please check back later.',
+            notice,
           },
           { status: 403 }
         ),

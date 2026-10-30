@@ -11,6 +11,7 @@ import {
 import AppShell from '../../components/AppShell';
 import { DividendSummaryCard } from '../../components/DividendSummaryCard';
 import { StatusNotice } from '../../components/ui/status-notice';
+import ShareholderNoticeCard from '../../components/ShareholderNoticeCard';
 import { useTranslation } from '../../components/LanguageProvider';
 import { getToken } from '../../libs/auth';
 
@@ -45,6 +46,8 @@ export default function DividendDetail() {
   // A 403 with a reason code is a deliberate decision by the bank, not a failure —
   // it is worded and coloured differently so it does not look like a broken portal.
   const [errorIsNotice, setErrorIsNotice] = useState(false);
+  // The structured notice behind a deliberate closure, when the server sends one.
+  const [closedNotice, setClosedNotice] = useState(null);
   const [myDecisions, setMyDecisions] = useState([]);
 
   useEffect(() => {
@@ -71,6 +74,7 @@ export default function DividendDetail() {
     setIsLoading(true);
     setError('');
     setErrorIsNotice(false);
+    setClosedNotice(null);
     try {
       const url = year
         ? `${process.env.NEXT_PUBLIC_API_BASE_URL}/dividend-detail?reg_no=${encodeURIComponent(currentRegNo)}&fiscal_year=${encodeURIComponent(year)}`
@@ -87,6 +91,8 @@ export default function DividendDetail() {
         const payload = await res.json().catch(() => ({}));
         const failure = new Error(payload.message || 'Failed to fetch details');
         failure.isNotice = res.status === 403 && Boolean(payload.code);
+        failure.code = payload.code || null;
+        failure.notice = payload.notice || null;
         throw failure;
       }
       const data = await res.json();
@@ -108,6 +114,7 @@ export default function DividendDetail() {
     } catch (err) {
       setError(err.message);
       setErrorIsNotice(!!err.isNotice);
+      setClosedNotice(err.code === 'DATA_VIEWING_CLOSED' ? err.notice : null);
     } finally {
       setIsLoading(false);
     }
@@ -161,7 +168,11 @@ export default function DividendDetail() {
         {isLoading ? (
           <SkeletonLayout />
         ) : error ? (
-          <StatusNotice tone={errorIsNotice ? 'notice' : 'error'} message={error} />
+          errorIsNotice && closedNotice ? (
+            <ShareholderNoticeCard notice={closedNotice} />
+          ) : (
+            <StatusNotice tone={errorIsNotice ? 'notice' : 'error'} message={error} />
+          )
         ) : !record ? (
           <EmptyState />
         ) : (

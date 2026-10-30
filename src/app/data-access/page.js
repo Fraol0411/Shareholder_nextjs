@@ -5,7 +5,6 @@ import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import {
   FaComments,
-  FaExclamationTriangle,
   FaEye,
   FaEyeSlash,
   FaSearch,
@@ -14,16 +13,14 @@ import {
 } from 'react-icons/fa';
 import AppShell from '../../components/AppShell';
 import { StatusNotice } from '../../components/ui/status-notice';
+import ShareholderNoticeCard from '../../components/ShareholderNoticeCard';
 import { Button } from '../../components/ui/button';
 import { Toggle, ToggleState } from '../../components/ui/toggle';
 import { getStoredUser, getToken, isAdminRole } from '../../libs/auth';
+import { cn } from '../../libs/utils';
+import { DEFAULT_NOTICE, normalizeNotice } from '../../libs/shareholderNotice';
 
-const MAX_NOTE_LENGTH = 300;
 const SEARCH_DEBOUNCE_MS = 350;
-
-// Shown to a shareholder when no custom message is saved — mirrors
-// requireDividendDataAccess() in libs/serverAuth.js so the preview is truthful.
-const DEFAULT_NOTE = 'Dividend data viewing is temporarily closed. Please check back later.';
 
 const fmtDateTime = (value) => (value ? new Date(value).toLocaleString() : '—');
 
@@ -60,6 +57,41 @@ function accountState(status) {
   if (!status || status === 'active') return null;
   if (ACCOUNT_STATE[status] !== undefined) return ACCOUNT_STATE[status];
   return String(status).replace(/_/g, ' ');
+}
+
+const inputClass =
+  'w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm outline-none transition-colors focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 disabled:opacity-60 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-100';
+
+/** A labelled text input or textarea, used across the notice editor. */
+function Field({ id, label, value, onChange, textarea = false, rows = 2, placeholder }) {
+  return (
+    <div>
+      <label
+        htmlFor={id}
+        className="mb-1 block text-[11px] font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400"
+      >
+        {label}
+      </label>
+      {textarea ? (
+        <textarea
+          id={id}
+          value={value}
+          rows={rows}
+          placeholder={placeholder}
+          onChange={(e) => onChange(e.target.value)}
+          className={cn(inputClass, 'resize-none leading-relaxed')}
+        />
+      ) : (
+        <input
+          id={id}
+          value={value}
+          placeholder={placeholder}
+          onChange={(e) => onChange(e.target.value)}
+          className={inputClass}
+        />
+      )}
+    </div>
+  );
 }
 
 /**
@@ -148,10 +180,10 @@ export default function DataAccessPage() {
   const [isListFetching, setIsListFetching] = useState(false);
 
   const [query, setQuery] = useState('');
-  const [noteDraft, setNoteDraft] = useState('');
-  // The message as it is on the server, so a background refresh never overwrites
-  // a message the admin is still typing.
-  const noteOnServer = useRef('');
+  const [noticeDraft, setNoticeDraft] = useState(() => ({ ...DEFAULT_NOTICE }));
+  // The notice as it is on the server (serialized), so a background refresh never
+  // overwrites edits the admin is still making.
+  const noticeOnServer = useRef('');
   // Only the newest search response may paint, otherwise fast typing can show
   // results of an older term.
   const requestId = useRef(0);
@@ -191,9 +223,14 @@ export default function DataAccessPage() {
         if (!res.ok) throw new Error(humanizeStatus(res.status, payload.message));
         if (mine !== requestId.current) return;
 
-        const previousNote = noteOnServer.current;
-        noteOnServer.current = payload.note || '';
-        setNoteDraft((draft) => (draft === previousNote ? payload.note || '' : draft));
+        const serverNotice = payload.notice ? normalizeNotice(payload.notice) : { ...DEFAULT_NOTICE };
+        const serverSerialized = JSON.stringify(serverNotice);
+        const previousServer = noticeOnServer.current;
+        noticeOnServer.current = serverSerialized;
+        // Only repaint the editor when it currently mirrors the server (no unsaved edits).
+        setNoticeDraft((draft) =>
+          JSON.stringify(normalizeNotice(draft)) === previousServer ? serverNotice : draft
+        );
 
         setState((prev) => (prev && silent ? { ...prev, ...payload } : payload));
         setError('');
@@ -268,11 +305,11 @@ export default function DataAccessPage() {
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/admin/data-access`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${getToken()}` },
-        body: JSON.stringify({ enabled: !!state?.enabled, note: noteDraft }),
+        body: JSON.stringify({ enabled: !!state?.enabled, notice: normalizeNotice(noticeDraft) }),
       });
       const payload = await res.json();
-      if (!res.ok) throw new Error(payload.message || 'We could not save the message. Please try again.');
-      toast.success('Message saved — shareholders see it right away.');
+      if (!res.ok) throw new Error(payload.message || 'We could not save the notice. Please try again.');
+      toast.success('Notice saved — shareholders see it right away.');
       await load({ silent: true });
     } catch (err) {
       toast.error(err.message);
@@ -341,8 +378,10 @@ export default function DataAccessPage() {
   const rowTotal = state?.shareholders?.total ?? 0;
   const rowLimit = state?.shareholders?.limit ?? 25;
   const searching = query.trim().length > 0;
-  const shownNote = noteDraft.trim() || DEFAULT_NOTE;
-  const noteDirty = noteDraft !== (state?.note ?? '');
+  const noticeDirty = JSON.stringify(normalizeNotice(noticeDraft)) !== noticeOnServer.current;
+  const setField = (key) => (value) => setNoticeDraft((d) => ({ ...d, [key]: value }));
+  const setAgenda = (text) =>
+    setNoticeDraft((d) => ({ ...d, agenda: text.split('\n').map((s) => s.trim()).filter(Boolean) }));
 
   return (
     <AppShell>
@@ -432,71 +471,90 @@ export default function DataAccessPage() {
           />
         </section>
 
-        {/* ── Message shareholders see ── */}
+        {/* ── Notice shareholders see when closed ── */}
         <section className="mb-6 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm dark:border-slate-700 dark:bg-slate-800">
           <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 p-5 dark:border-slate-700">
             <div>
               <h2 className="flex items-center gap-2 text-sm font-semibold text-slate-700 dark:text-slate-200">
                 <FaComments className="text-sky-600" />
-                Message shareholders see
+                Notice shareholders see when closed
               </h2>
               <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
                 {enabled
                   ? 'Kept ready for the next closure — shareholders cannot see it while access is open.'
-                  : 'This is what shareholders are reading instead of their statement right now.'}
+                  : 'This is the notice shareholders are reading instead of their statement right now.'}
               </p>
             </div>
             <div className="flex items-center gap-2">
-              {noteDirty && !isSavingNote && (
+              {noticeDirty && !isSavingNote && (
                 <span className="text-[11px] font-semibold text-amber-600 dark:text-amber-400">Not saved yet</span>
               )}
-              <Button variant="secondary" size="sm" disabled={!noteDirty || !state || busy} onClick={saveNote}>
-                {isSavingNote ? 'Saving…' : 'Save message'}
+              <Button variant="secondary" size="sm" disabled={!noticeDirty || !state || busy} onClick={saveNote}>
+                {isSavingNote ? 'Saving…' : 'Save notice'}
               </Button>
             </div>
           </div>
 
-          <div className="grid gap-5 p-5 lg:grid-cols-2">
-            <div>
-              <label
-                htmlFor="access-note"
-                className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400"
-              >
-                Your message
-              </label>
-              <textarea
-                id="access-note"
-                value={noteDraft}
-                rows={4}
-                disabled={!state}
-                onChange={(e) => setNoteDraft(e.target.value.slice(0, MAX_NOTE_LENGTH))}
-                placeholder="e.g. Statements reopen once the General Meeting resolves the dividend payout."
-                className="w-full resize-none rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm leading-relaxed outline-none transition-colors focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 disabled:opacity-60 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-100"
-              />
-              <p className="mt-1.5 flex items-center justify-between text-[11px] text-slate-400 dark:text-slate-500">
-                <span>Leave it empty and shareholders are shown a neutral “temporarily closed” line.</span>
-                <span className="tabular-nums">
-                  {noteDraft.length}/{MAX_NOTE_LENGTH}
-                </span>
-              </p>
+          <div className="grid gap-6 p-5 lg:grid-cols-2">
+            {/* Editor */}
+            <div className="space-y-4">
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                <Field id="n-org" label="Organization" value={noticeDraft.orgName} onChange={setField('orgName')} />
+                <Field id="n-title" label="Meeting title" value={noticeDraft.meetingTitle} onChange={setField('meetingTitle')} />
+              </div>
+              <Field id="n-badge" label="Notice badge" value={noticeDraft.badge} onChange={setField('badge')} />
+              <Field id="n-greeting" label="Greeting" value={noticeDraft.greeting} onChange={setField('greeting')} />
+              <Field id="n-intro" label="Introduction" value={noticeDraft.intro} onChange={setField('intro')} textarea rows={3} />
+
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+                <Field id="n-date" label="Meeting date" value={noticeDraft.meetingDate} onChange={setField('meetingDate')} placeholder="14 November 2026" />
+                <Field id="n-time" label="Meeting time" value={noticeDraft.meetingTime} onChange={setField('meetingTime')} placeholder="2:30 AM" />
+                <Field id="n-venue" label="Venue" value={noticeDraft.venue} onChange={setField('venue')} placeholder="Hilton Addis Ababa" />
+              </div>
+
+              <Field id="n-agenda-heading" label="Agenda heading" value={noticeDraft.agendaHeading} onChange={setField('agendaHeading')} />
+              <div>
+                <label
+                  htmlFor="n-agenda"
+                  className="mb-1 block text-[11px] font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400"
+                >
+                  Agenda items (one per line)
+                </label>
+                <textarea
+                  id="n-agenda"
+                  value={noticeDraft.agenda.join('\n')}
+                  rows={6}
+                  onChange={(e) => setAgenda(e.target.value)}
+                  className={cn(inputClass, 'resize-none leading-relaxed')}
+                />
+              </div>
+              <Field id="n-attendance" label="Attendance note" value={noticeDraft.attendanceNote} onChange={setField('attendanceNote')} textarea rows={2} />
+
+              <div className="rounded-xl border border-amber-200 bg-amber-50/60 p-3 dark:border-amber-900/60 dark:bg-amber-950/20">
+                <p className="mb-2 text-[11px] font-bold uppercase tracking-wide text-amber-700 dark:text-amber-400">
+                  Information access panel
+                </p>
+                <div className="space-y-3">
+                  <Field id="n-access-heading" label="Heading" value={noticeDraft.accessHeading} onChange={setField('accessHeading')} />
+                  <Field id="n-access-message" label="Message" value={noticeDraft.accessMessage} onChange={setField('accessMessage')} textarea rows={2} />
+                  <Field id="n-access-date" label="Access enabled on" value={noticeDraft.accessEnabledOn} onChange={setField('accessEnabledOn')} placeholder="DD/MM/YYYY" />
+                  <Field id="n-access-footnote" label="Footnote" value={noticeDraft.accessFootnote} onChange={setField('accessFootnote')} textarea rows={2} />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                <Field id="n-closing" label="Closing line" value={noticeDraft.closing} onChange={setField('closing')} />
+                <Field id="n-signoff" label="Sign-off" value={noticeDraft.signoff} onChange={setField('signoff')} />
+              </div>
             </div>
 
+            {/* Live preview */}
             <div>
-              <p className="mb-1.5 text-[11px] font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
+              <p className="mb-2 text-[11px] font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
                 {enabled ? 'Preview' : 'Exactly what they see right now'}
               </p>
-              <div className="rounded-xl border border-amber-200 bg-amber-50 p-4 text-amber-800 dark:border-amber-900/70 dark:bg-amber-950/40 dark:text-amber-300">
-                <div className="flex items-start gap-3">
-                  <div className="shrink-0 rounded-lg bg-amber-100 p-1.5 dark:bg-amber-900/60">
-                    <FaExclamationTriangle className="text-sm" />
-                  </div>
-                  <div className="min-w-0">
-                    <p className="text-sm font-semibold text-amber-900 dark:text-amber-200">
-                      Not available right now
-                    </p>
-                    <p className="mt-0.5 break-words text-xs text-amber-700 dark:text-amber-300">{shownNote}</p>
-                  </div>
-                </div>
+              <div className="rounded-xl bg-slate-100/70 p-4 dark:bg-slate-900/40 sm:p-6">
+                <ShareholderNoticeCard notice={normalizeNotice(noticeDraft)} />
               </div>
             </div>
           </div>

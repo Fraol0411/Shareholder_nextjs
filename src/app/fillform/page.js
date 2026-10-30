@@ -21,6 +21,7 @@ import { FaCheck } from 'react-icons/fa';
 import AppShell from '../../components/AppShell';
 import { DividendSummaryCard } from '../../components/DividendSummaryCard';
 import { StatusNotice } from '../../components/ui/status-notice';
+import ShareholderNoticeCard from '../../components/ShareholderNoticeCard';
 import { LoadingState, Spinner } from '../../components/ui/loading';
 import { getToken, getStoredUser, readApiError } from '../../libs/auth';
 import { useTranslation } from '../../components/LanguageProvider';
@@ -358,7 +359,12 @@ export default function ShareholderFillForm() {
         </div>
 
         {/* Closed or failing data: say why instead of showing an empty form */}
-        {blocked && <StatusNotice tone={blocked.tone} message={blocked.message} />}
+        {blocked &&
+          (blocked.code === 'DATA_VIEWING_CLOSED' && blocked.notice ? (
+            <ShareholderNoticeCard notice={blocked.notice} />
+          ) : (
+            <StatusNotice tone={blocked.tone} message={blocked.message} />
+          ))}
 
         {/* Empty / loading / missing states */}
         {!blocked && loadingYears && (

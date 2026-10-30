@@ -6,11 +6,14 @@ import {
   DATA_VIEWING_KEY,
   DATA_VIEWING_NOTE_KEY,
 } from '../../../../libs/serverAuth';
+import { serializeNotice } from '../../../../libs/shareholderNotice';
 
 export const runtime = 'nodejs';
 
 const SHAREHOLDER_ROLES = ['user', 'user2'];
-const MAX_NOTE_LENGTH = 300;
+// The stored notice is a JSON document; cap it generously so a long agenda fits
+// but a runaway payload cannot.
+const MAX_NOTICE_JSON_LENGTH = 20000;
 const ROW_LIMIT = 25;
 
 // The list never needs to know a shareholder's real contact details — one masked
@@ -83,7 +86,7 @@ export async function GET(request) {
 
   try {
     const pool = getPool();
-    const { enabled, note } = await getDataViewingState();
+    const { enabled, note, notice } = await getDataViewingState();
 
     const meta = await pool.query(
       `SELECT s.updated_at, s.value, COALESCE(NULLIF(u.name, ''), u.username) AS updated_by_name
@@ -105,6 +108,7 @@ export async function GET(request) {
     return NextResponse.json({
       enabled,
       note,
+      notice,
       lastChangedAt: meta.rows[0]?.updated_at ?? null,
       lastChangedBy: meta.rows[0]?.updated_by_name ?? null,
       stats: stats.rows[0],
@@ -132,17 +136,19 @@ export async function GET(request) {
   }
 }
 
-/** Put the global switch: { enabled: boolean, note?: string }. */
+/** Put the master switch and/or the notice: { enabled: boolean, notice?: object }. */
 export async function PUT(request) {
   const auth = requireAdmin(request);
   if (auth.error) return auth.error;
 
   let enabled;
-  let note;
+  let noticeInput;
+  let noteInput;
   try {
     const body = await request.json();
     enabled = body.enabled;
-    note = body.note;
+    noticeInput = body.notice;
+    noteInput = body.note;
   } catch {
     return NextResponse.json({ message: 'Invalid request body' }, { status: 400 });
   }
@@ -150,14 +156,26 @@ export async function PUT(request) {
   if (typeof enabled !== 'boolean') {
     return NextResponse.json({ message: 'enabled must be true or false' }, { status: 400 });
   }
-  if (note !== undefined && (typeof note !== 'string' || note.length > MAX_NOTE_LENGTH)) {
-    return NextResponse.json({ message: `note must be a string of at most ${MAX_NOTE_LENGTH} characters` }, { status: 400 });
+
+  // Decide what (if anything) to write into the notice holder. A structured notice
+  // wins; a plain `note` string is still accepted for the legacy simple message.
+  let messageValue;
+  if (noticeInput && typeof noticeInput === 'object') {
+    messageValue = serializeNotice(noticeInput);
+    if (messageValue.length > MAX_NOTICE_JSON_LENGTH) {
+      return NextResponse.json({ message: 'The notice is too long to save. Please shorten some fields.' }, { status: 400 });
+    }
+  } else if (typeof noteInput === 'string') {
+    messageValue = noteInput.trim();
+    if (messageValue.length > MAX_NOTICE_JSON_LENGTH) {
+      return NextResponse.json({ message: 'The message is too long to save.' }, { status: 400 });
+    }
   }
 
   try {
     const pool = getPool();
     // Both keys land on ONE connection inside one transaction, so the flag and its
-    // note can never be seen half-updated by the next shareholder request.
+    // notice can never be seen half-updated by the next shareholder request.
     const client = await pool.connect();
     const upsert = async (key, value) => {
       await client.query(
@@ -172,7 +190,7 @@ export async function PUT(request) {
     try {
       await client.query('BEGIN');
       await upsert(DATA_VIEWING_KEY, enabled ? 'on' : 'off');
-      if (note !== undefined) await upsert(DATA_VIEWING_NOTE_KEY, note.trim());
+      if (messageValue !== undefined) await upsert(DATA_VIEWING_NOTE_KEY, messageValue);
       await client.query('COMMIT');
     } catch (error) {
       await client.query('ROLLBACK');

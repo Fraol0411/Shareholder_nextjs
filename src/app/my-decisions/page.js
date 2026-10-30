@@ -16,6 +16,7 @@ import {
 } from 'react-icons/fa';
 import AppShell from '../../components/AppShell';
 import { StatusNotice } from '../../components/ui/status-notice';
+import ShareholderNoticeCard from '../../components/ShareholderNoticeCard';
 import { getToken, getStoredUser, readApiError } from '../../libs/auth';
 import { useTranslation } from '../../components/LanguageProvider';
 
@@ -42,6 +43,8 @@ export default function MyDecisionsPage() {
   const [error, setError] = useState('');
   // A 403 with a reason code is the bank closing dividend data on purpose, not a fault.
   const [errorIsNotice, setErrorIsNotice] = useState(false);
+  // The structured notice behind a deliberate closure, when the server sends one.
+  const [closedNotice, setClosedNotice] = useState(null);
   const [expandedId, setExpandedId] = useState(null);
 
   useEffect(() => {
@@ -58,6 +61,7 @@ export default function MyDecisionsPage() {
     setIsLoading(true);
     setError('');
     setErrorIsNotice(false);
+    setClosedNotice(null);
     try {
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/decisions/my-decisions`, {
         headers: { Authorization: `Bearer ${token}` },
@@ -69,6 +73,7 @@ export default function MyDecisionsPage() {
         const failure = await readApiError(res, 'Failed to load decisions');
         setError(failure.message);
         setErrorIsNotice(failure.tone === 'notice');
+        setClosedNotice(failure.code === 'DATA_VIEWING_CLOSED' ? failure.notice : null);
         return;
       }
       const data = await res.json();
@@ -98,13 +103,18 @@ export default function MyDecisionsPage() {
         </div>
 
         {/* ── Error / closed data ── */}
-        {error && (
-          <StatusNotice
-            tone={errorIsNotice ? 'notice' : 'error'}
-            message={error}
-            className="mb-6"
-          />
-        )}
+        {error &&
+          (errorIsNotice && closedNotice ? (
+            <div className="mb-6">
+              <ShareholderNoticeCard notice={closedNotice} />
+            </div>
+          ) : (
+            <StatusNotice
+              tone={errorIsNotice ? 'notice' : 'error'}
+              message={error}
+              className="mb-6"
+            />
+          ))}
 
         {/* ── Loading ── */}
         {isLoading && (
