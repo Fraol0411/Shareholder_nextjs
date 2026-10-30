@@ -21,7 +21,7 @@ export default function AcceptInvitationPage() {
   const { t } = useTranslation();
   const currentYear = new Date().getFullYear();
 
-  // 'loading' | 'no-token' | 'closed' | 'verify' | 'password' | 'done' | 'activated' | 'used'
+  // 'loading' | 'no-token' | 'closed' | 'verify' | 'password' | 'done' | 'activated'
   const [step, setStep] = useState('loading');
   const [token, setToken] = useState('');
   const [campaign, setCampaign] = useState(null);
@@ -64,9 +64,11 @@ export default function AcceptInvitationPage() {
           setStep('activated');
           return;
         }
-        // Verified but never completed — the link is single-use, so it is spent.
-        if (data.link?.state === 'verified') {
-          setStep('used');
+        // Past the activation validity date (or campaign not live): the link can no
+        // longer be used. A link that was verified but never completed stays
+        // resumable, so we do NOT treat it as spent — it falls through to the form.
+        if (data.link?.state === 'unusable') {
+          setStep('closed');
           return;
         }
 
@@ -83,9 +85,12 @@ export default function AcceptInvitationPage() {
     if (!setupExpiresAt) return;
     const timer = setInterval(() => {
       if (Date.now() >= setupExpiresAt) {
-        setError('Your setup session expired. Please restart activation with a new code.');
-        setStep('closed');
+        // Timing out the setup session is not a dead end: the link itself is still
+        // valid, so send them back to re-verify with the same code rather than close.
+        setError('For security the password step timed out. Please verify your identity again to continue.');
         setSetupToken('');
+        setSetupExpiresAt(null);
+        setStep('verify');
       }
     }, 1000);
     return () => clearInterval(timer);
@@ -219,21 +224,6 @@ export default function AcceptInvitationPage() {
             <div className="h-full rounded-full bg-emerald-500 transition-all duration-1000 ease-linear" style={{ width: `${(redirectIn / redirectTotal) * 100}%` }} />
           </div>
           <button type="button" onClick={() => router.replace('/login')} className={`${submitBtnCls} mt-6`}>Go to Sign In Now</button>
-        </div>
-      );
-    }
-
-    if (step === 'used') {
-      return (
-        <div className="py-4 text-center">
-          <HiOutlineExclamationTriangle className="mx-auto mb-3 h-10 w-10 text-amber-500" strokeWidth={1.5} />
-          <h2 className="text-lg font-semibold text-slate-800 dark:text-white">This link was never completed</h2>
-          <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">
-            The identity check on this link was done, but no password was ever set. For your security a link
-            works only once, so this one is spent — please contact your Awash Insurance branch or the shareholder
-            desk and ask them to send you a new activation link.
-          </p>
-          <button type="button" onClick={() => router.push('/')} className={`${submitBtnCls} mt-6`}>Go to Sign In</button>
         </div>
       );
     }

@@ -15,8 +15,9 @@ const GENERIC_FAILURE = 'The activation link or verification details are not val
  * Body: { token, nationalId, code }
  *
  * Validates the unique activation token + shareholder national ID + code,
- * enforces the campaign window, expiry, lockout and single-use consumption,
- * then issues a short-lived purpose-restricted password-setup token.
+ * enforces the campaign window, expiry and lockout, then issues a short-lived
+ * purpose-restricted password-setup token. Verifying no longer burns the link:
+ * it can be repeated until the password is actually set.
  */
 export async function POST(request) {
   let token, nationalId, code;
@@ -79,13 +80,14 @@ export async function POST(request) {
       );
     }
 
-    // Window / campaign state / expiry / single-use checks.
-    // A disabled campaign stops every one of its links at once, and an enabled
-    // one resumes them — no invitation is deleted either way.
+    // Window / campaign state / expiry checks. A verified-but-not-completed link
+    // stays reusable — having already verified (consumed_at) is NOT a rejection
+    // reason here. A disabled campaign stops every one of its links at once, and
+    // an enabled one resumes them — no invitation is deleted either way.
     const campaignLive = activation.campaign_status === 'live';
     const windowOpen = now >= new Date(activation.starts_at).getTime() && now <= new Date(activation.ends_at).getTime();
     const notExpired = new Date(activation.expires_at).getTime() > now;
-    if (!campaignLive || !windowOpen || !notExpired || activation.consumed_at || activation.user_status === 'locked' || activation.user_status === 'disabled') {
+    if (!campaignLive || !windowOpen || !notExpired || activation.user_status === 'locked' || activation.user_status === 'disabled') {
       return NextResponse.json({ message: GENERIC_FAILURE }, { status: 400 });
     }
 
@@ -120,18 +122,17 @@ export async function POST(request) {
       );
     }
 
-    // Atomic single-use consumption (safe under concurrent requests)
-    const consumed = await pool.query(
+    // Record the identity check, but do NOT burn the link. A shareholder who
+    // verifies and then walks away (setup session times out, closes the tab,
+    // stops before setting a password) can come back and verify again with the
+    // same code. Only setting the password (password_set_at) finalizes the link,
+    // and the activation's validity date (expires_at) still bounds it above.
+    await pool.query(
       `UPDATE public.activations
-       SET consumed_at = NOW()
-       WHERE id = $1 AND consumed_at IS NULL
-       RETURNING user_id`,
+       SET consumed_at = COALESCE(consumed_at, NOW())
+       WHERE id = $1`,
       [activation.id]
     );
-
-    if (consumed.rows.length === 0) {
-      return NextResponse.json({ message: GENERIC_FAILURE }, { status: 400 });
-    }
 
     // Short-lived, purpose-restricted password-setup capability
     const setupToken = jwt.sign(

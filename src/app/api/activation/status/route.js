@@ -43,9 +43,13 @@ export async function GET(request) {
       if (row) {
         const usable =
           row.campaign_status === 'live' && new Date(row.expires_at).getTime() > Date.now();
+        // A verified-but-not-completed link is still resumable while usable, so
+        // 'verified' is only reported when the link can still be worked with;
+        // once past the validity date (or campaign not live) it is 'unusable'.
         link = {
-          state: row.activated ? 'activated' : row.verified ? 'verified' : usable ? 'usable' : 'unusable',
+          state: row.activated ? 'activated' : !usable ? 'unusable' : row.verified ? 'verified' : 'usable',
           expiresAt: row.expires_at,
+          usable,
         };
       }
     }
