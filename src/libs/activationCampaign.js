@@ -102,7 +102,7 @@ export async function generateInvitations(client, { campaignId, endsAt, baseUrl 
     const message =
       `Awash Insurance: Activate your shareholder account via this link: ${link} ` +
       `Verification code: ${code}. Valid until ${expiresAt.toLocaleDateString('en-GB')}. ` +
-      `${reference ? `Reference ${reference}. ` : ''}Do not share this code.`;
+      `Do not share this code.`;
     csvRows.push({ phone: toInternationalPhone(user.phone), message });
   }
 

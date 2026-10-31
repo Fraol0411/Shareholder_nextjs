@@ -18,8 +18,10 @@ import {
 } from "react-icons/fa";
 
 import AppShell from "../../components/AppShell";
+import ShareholderNoticeCard from "../../components/ShareholderNoticeCard";
 import { Spinner } from "../../components/ui/loading";
 import { useTranslation } from "../../components/LanguageProvider";
+import { useDividendAccessState } from "../../hooks/useDividendAccessState";
 import {
   getStoredUser,
   getToken,
@@ -234,6 +236,15 @@ export default function HomePortalPage() {
     setUser(storedUser);
   }, [router]);
 
+  // Operators are never blocked by the data-viewing switch, so only a shareholder
+  // asks for its state — that answer is what swaps the services for the notice.
+  const {
+    loading: accessLoading,
+    enabled: dataViewingEnabled,
+    notice: accessNotice,
+    note: accessNote,
+  } = useDividendAccessState({ skip: !user || isStaffRole(user.role) });
+
   /* =======================================================
      LOADING
   ======================================================= */
@@ -255,6 +266,10 @@ export default function HomePortalPage() {
 
   const staff = isStaffRole(user.role);
   const admin = isAdminRole(user.role);
+
+  // While the switch is closed a shareholder is shown the notice instead of the
+  // services, and is not offered links that can only refuse them.
+  const accessClosed = !staff && !accessLoading && !dataViewingEnabled;
 
   return (
     <AppShell>
@@ -296,40 +311,54 @@ export default function HomePortalPage() {
 
         {!staff && (
           <section className="mb-12 sm:mb-16">
-            <SectionHeader
-              eyebrow="home.shareholderServices"
-              title="home.shareholderTitle"
-              description="home.shareholderDescription"
-            />
-
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              <PortalCard
-                href="/devidenddetail"
-                icon={FaChartLine}
-                title="home.dividendInsights"
-                description="home.dividendInsightsDescription"
-                accent="green"
-                badge="home.finance"
+           
+            {accessClosed ? (
+              <ShareholderNoticeCard
+                notice={accessNotice}
+                legacyText={accessNote}
+              />
+            ) : accessLoading ? (
+              <div className="flex min-h-[210px] items-center justify-center">
+                <Spinner />
+              </div>
+            ) : (
+              <>
+               <SectionHeader
+                eyebrow="home.shareholderServices"
+                title="home.shareholderTitle"
+                description="home.shareholderDescription"
               />
 
-              <PortalCard
-                href="/fillform"
-                icon={FaFileInvoiceDollar}
-                title="home.investmentDecision"
-                description="home.investmentDecisionDescription"
-                accent="blue"
-                badge="home.action"
-              />
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                <PortalCard
+                  href="/devidenddetail"
+                  icon={FaChartLine}
+                  title="home.dividendInsights"
+                  description="home.dividendInsightsDescription"
+                  accent="green"
+                  badge="home.finance"
+                />
 
-              <PortalCard
-                href="/my-decisions"
-                icon={FaClipboardList}
-                title="home.submissionHistory"
-                description="home.submissionHistoryDescription"
-                accent="violet"
-                badge="home.records"
-              />
-            </div>
+                <PortalCard
+                  href="/fillform"
+                  icon={FaFileInvoiceDollar}
+                  title="home.investmentDecision"
+                  description="home.investmentDecisionDescription"
+                  accent="blue"
+                  badge="home.action"
+                />
+
+                <PortalCard
+                  href="/my-decisions"
+                  icon={FaClipboardList}
+                  title="home.submissionHistory"
+                  description="home.submissionHistoryDescription"
+                  accent="violet"
+                  badge="home.records"
+                />
+              </div>
+              </>
+            )}
           </section>
         )}
 
@@ -434,6 +463,7 @@ export default function HomePortalPage() {
             NOTICE / CTA
         ================================================= */}
 
+        {!accessClosed && (
         <section
           className="
     relative overflow-hidden rounded-2xl
@@ -501,6 +531,7 @@ export default function HomePortalPage() {
             </Link>
           </div>
         </section>
+        )}
       </div>
     </AppShell>
   );

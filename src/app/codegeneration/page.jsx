@@ -400,7 +400,7 @@ export default function ActivationCampaignConsolePage() {
                 <ul className="my-5 space-y-2 text-sm text-slate-600 dark:text-slate-300">
                   <li className="flex gap-2.5"><span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-brand-secondary" />Covers shareholders whose phone number <b>and</b> National ID/TIN are on file — <b>{inviteable}</b> invitable right now.</li>
                   <li className="flex gap-2.5"><span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-brand-secondary" />Only <b>hashes</b> of the link token and code are stored — never the values themselves.</li>
-                  <li className="flex gap-2.5"><span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-brand-secondary" />Links are single-use and expire after 72 hours or at campaign close, whichever is first.</li>
+                  <li className="flex gap-2.5"><span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-brand-secondary" />A link keeps working until that shareholder sets a password, and expires after 72 hours or at campaign close, whichever is first.</li>
                   <li className="flex gap-2.5"><span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-brand-secondary" />SMS message text is stored with each invitation so you can download the CSV again without re-issuing.</li>
                 </ul>
 

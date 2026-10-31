@@ -91,8 +91,8 @@ export function ShareholderNoticeCard({ notice, legacyText, className }) {
 
         {hasMeeting && (
           <div className="space-y-3 rounded-xl border border-slate-100 bg-slate-50/70 p-4 dark:border-slate-700 dark:bg-slate-900/30">
-            <DetailRow icon={FaCalendarAlt} label="Meeting Date" value={n.meetingDate} />
-            <DetailRow icon={FaClock} label="Meeting Time" value={n.meetingTime} />
+            <DetailRow icon={FaCalendarAlt} label="Date" value={n.meetingDate} />
+            <DetailRow icon={FaClock} label="Time" value={n.meetingTime} />
             <DetailRow icon={FaMapMarkerAlt} label="Venue" value={n.venue} />
           </div>
         )}

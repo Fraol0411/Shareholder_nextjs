@@ -20,10 +20,22 @@ export function timingSafeHexEqual(a, b) {
   return crypto.timingSafeEqual(bufA, bufB);
 }
 
-/** Random 64-char (256-bit) activation link token. */
+/**
+ * Activation link tokens: 16 characters drawn from letters and digits only.
+ * Restricting the alphabet keeps the link safe to paste into SMS, into a CSV for
+ * the gateway and into any browser, while staying unguessable (~6 bits per
+ * character, so ~95 bits of entropy per token).
+ */
+const TOKEN_ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+const TOKEN_LENGTH = 16;
+
 export function generateActivationToken() {
-  //return crypto.randomBytes(32).toString('hex');
-    return crypto.randomBytes(12).toString('base64url');
+  let token = '';
+  for (let i = 0; i < TOKEN_LENGTH; i += 1) {
+    // crypto.randomInt draws uniformly from the range, so no character is favoured
+    token += TOKEN_ALPHABET[crypto.randomInt(0, TOKEN_ALPHABET.length)];
+  }
+  return token;
 }
 
 

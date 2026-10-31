@@ -8,6 +8,7 @@ import LanguageSelector from './LanguageSelector';
 import Container from './Container';
 import ChangePasswordModal from './ChangePasswordModal';
 import { useTranslation } from './LanguageProvider';
+import { useDividendAccessState } from '../hooks/useDividendAccessState';
 
 import { 
   HiOutlineHome, 
@@ -65,11 +66,17 @@ export default function NavBar() {
   const staff = isStaffRole(role);
   const admin = isAdminRole(role);
 
+  // The data-viewing switch is about shareholder self-service, so only a signed-in
+  // shareholder needs to know it — operators never have their tools taken away.
+  const { enabled: dataViewingEnabled } = useDividendAccessState({ skip: !user || staff });
+
+  // `gated` links lead to dividend data: while the switch is closed they are hidden
+  // rather than offered, because the pages behind them can only refuse.
   const navItems = [
     { href: '/home', label: 'nav.home', icon: HiOutlineHome, show: true },
-    { href: '/devidenddetail', label: 'nav.dividend', icon: HiOutlineChartBar, show: !staff },
-    { href: '/fillform', label: 'nav.fillform', icon: HiOutlineDocumentText, show: !staff },
-    { href: '/my-decisions', label: 'nav.decisions', icon: HiOutlineClipboardDocumentList, show: !staff },
+    { href: '/devidenddetail', label: 'nav.dividend', icon: HiOutlineChartBar, show: !staff, gated: true },
+    { href: '/fillform', label: 'nav.fillform', icon: HiOutlineDocumentText, show: !staff, gated: true },
+    { href: '/my-decisions', label: 'nav.decisions', icon: HiOutlineClipboardDocumentList, show: !staff, gated: true },
     { href: '/staff-fillform', label: 'nav.fillform', icon: HiOutlineDocumentText, show: staff },
     { href: '/formbasket', label: 'nav.decisions', icon: HiOutlineClipboardDocumentList, show: staff },
     { href: '/register', label: 'nav.register', icon: HiOutlineUserPlus, show: admin },
@@ -77,7 +84,7 @@ export default function NavBar() {
     { href: '/activation-dashboard', label: 'nav.activationDashboard', icon: HiOutlineShieldCheck, show: admin },
     { href: '/data-access', label: 'nav.dataAccess', icon: HiOutlineEye, show: admin },
     // The Campaign Console (/codegeneration) is opened from the Activation Dashboard
-  ].filter((item) => item.show);
+  ].filter((item) => item.show && (!item.gated || dataViewingEnabled));
 
   const handleLogout = () => {
     setMobileOpen(false);

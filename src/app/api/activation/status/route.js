@@ -20,7 +20,11 @@ import { sha256Hex } from '../../../../libs/activation';
  */
 export async function GET(request) {
   const rawToken = new URL(request.url).searchParams.get('token') || '';
-  const linkToken = /^[0-9a-fA-F]{64}$/.test(rawToken) ? sha256Hex(rawToken.trim()) : null;
+  // Only a shape guard against junk and oversized input: the token is hashed and
+  // looked up, never decoded. Current links are 16 letters/digits; older issued
+  // links were base64url or hex, so the wider class and length are still accepted.
+  const looksLikeToken = /^[A-Za-z0-9_-]{16,64}$/.test(rawToken.trim());
+  const linkToken = looksLikeToken ? sha256Hex(rawToken.trim()) : null;
 
   try {
     const pool = getPool();
